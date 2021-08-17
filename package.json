@@ -11,7 +11,7 @@
   "keywords": [
     "web",
     "asteroids",
-    "socketio",
+    "socket-io",
     "javascript",
     "liquid-galaxy"
   ],
@@ -19,8 +19,6 @@
     "@commitlint/cli": "^13.1.0",
     "@commitlint/config-angular": "^13.1.0",
     "@types/node": "^16.6.1",
-    "@typescript-eslint/eslint-plugin": "^4.29.1",
-    "@typescript-eslint/parser": "^4.29.1",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.24.0",
