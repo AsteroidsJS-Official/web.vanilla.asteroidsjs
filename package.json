@@ -6,7 +6,10 @@
   "license": "MIT",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --collect-coverage",
+    "test:debug": "jest --watch --debug"
   },
   "keywords": [
     "web",
@@ -25,6 +28,7 @@
     "eslint-plugin-import-helpers": "^1.1.0",
     "eslint-plugin-prettier": "^3.4.0",
     "husky": "^7.0.1",
+    "jest": "^27.0.6",
     "prettier": "^2.3.2"
   }
 }
