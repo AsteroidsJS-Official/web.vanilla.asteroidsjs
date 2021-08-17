@@ -15,20 +15,7 @@ module.exports = {
       'warn',
       {
         newlinesBetween: 'always',
-        groups: [
-          '/fastify|inversify/',
-          '/.types/',
-          '/.decorator/',
-          '/.guard/',
-          '/.pipe/',
-          '/.exception/',
-          '/.entity/',
-          '/.dto|.enum|.model|.input|.args/',
-          '/.service/',
-          '/.controller/',
-          '/utils/',
-          ['index'],
-        ],
+        groups: ['/express/', '/socket/', '/utils/', ['index']],
         alphabetize: {
           order: 'asc',
           ignoreCase: true,
