@@ -1,7 +1,21 @@
+const fs = require('fs')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const path = require('path')
 const webpack = require('webpack')
 const WebpackShellPluginNext = require('webpack-shell-plugin-next')
+
+const htmlFiles = fs
+  .readdirSync(path.resolve(__dirname, './src/assets/html/'))
+  .filter((filename) => /\.html$/.test(filename))
+
+const htmlModules = htmlFiles.map(
+  (file) =>
+    new HtmlWebpackPlugin({
+      title: file.split('.')[0],
+      filename: 'assets/html/' + file,
+      template: path.resolve(__dirname, './src/assets/html/' + file),
+    }),
+)
 
 module.exports = {
   mode: process.env.NODE_ENV !== 'production' ? 'development' : 'production',
@@ -18,6 +32,10 @@ module.exports = {
         },
         use: 'ts-loader',
       },
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
+      },
     ],
   },
   resolve: {
@@ -30,18 +48,22 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      title: 'AsteroidsJS',
-      filename: 'assets/index.html',
-      template: path.resolve(__dirname, './src/assets/html/index.html'),
+      title: 'index',
+      filename: 'index.html',
+      template: path.resolve(__dirname, './src/index.html'),
     }),
+    ...htmlModules,
     new webpack.ProgressPlugin(),
     new WebpackShellPluginNext({
       onBuildEnd: {
-        scripts: ['nodemon dist/index.js --watch "./dist/index.js"'],
+        scripts:
+          process.env.NODE_ENV !== 'production'
+            ? ['nodemon dist/index.js --watch "./dist"']
+            : [],
         blocking: false,
         parallel: true,
       },
     }),
   ],
-  watch: true,
+  watch: process.env.NODE_ENV !== 'production',
 }
