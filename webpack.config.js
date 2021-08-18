@@ -5,24 +5,23 @@ const WebpackShellPluginNext = require('webpack-shell-plugin-next')
 
 module.exports = {
   mode: process.env.NODE_ENV !== 'production' ? 'development' : 'production',
-  entry: './src/index.js',
+  entry: './src/index.ts',
   target: 'node',
+  devtool: 'inline-source-map',
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.ts$/,
         exclude: /(node_modules|bower_components)/,
         resolve: {
           modules: [path.resolve(__dirname, 'src'), 'node_modules'],
         },
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-env'],
-          },
-        },
+        use: 'ts-loader',
       },
     ],
+  },
+  resolve: {
+    extensions: ['.ts', '.js'],
   },
   output: {
     filename: 'index.js',
