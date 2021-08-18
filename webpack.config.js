@@ -1,5 +1,6 @@
 const fs = require('fs')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const path = require('path')
 const webpack = require('webpack')
 const WebpackShellPluginNext = require('webpack-shell-plugin-next')
@@ -33,8 +34,8 @@ module.exports = {
         use: 'ts-loader',
       },
       {
-        test: /\.css$/i,
-        use: ['style-loader', 'css-loader'],
+        test: /\.(sass|scss|css)$/i,
+        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
       },
     ],
   },
@@ -47,6 +48,9 @@ module.exports = {
     clean: true,
   },
   plugins: [
+    new MiniCssExtractPlugin({
+      filename: 'css/global.css',
+    }),
     new HtmlWebpackPlugin({
       title: 'index',
       filename: 'index.html',
