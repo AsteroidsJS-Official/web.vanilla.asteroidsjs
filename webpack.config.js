@@ -2,6 +2,7 @@ const fs = require('fs')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const path = require('path')
+const TerserWebpackPlugin = require('terser-webpack-plugin')
 const webpack = require('webpack')
 const WebpackShellPluginNext = require('webpack-shell-plugin-next')
 
@@ -46,6 +47,14 @@ module.exports = {
     filename: 'index.js',
     path: path.resolve(__dirname, 'dist'),
     clean: true,
+  },
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserWebpackPlugin({
+        extractComments: true,
+      }),
+    ],
   },
   plugins: [
     new MiniCssExtractPlugin({
