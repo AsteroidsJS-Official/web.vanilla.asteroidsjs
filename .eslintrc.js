@@ -1,16 +1,24 @@
 module.exports = {
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: 8,
+    project: ['tsconfig.json', 'libs/**/tsconfig.lib.json'],
     sourceType: 'module',
   },
-  plugins: ['import-helpers'],
-  extends: ['prettier'],
+  plugins: ['@typescript-eslint/eslint-plugin', 'import-helpers'],
+  extends: [
+    'plugin:@typescript-eslint/eslint-recommended',
+    'plugin:@typescript-eslint/recommended',
+    'prettier',
+  ],
   root: true,
   env: {
     node: true,
     jest: true,
   },
   rules: {
+    '@typescript-eslint/interface-name-prefix': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
     'import-helpers/order-imports': [
       'warn',
       {
