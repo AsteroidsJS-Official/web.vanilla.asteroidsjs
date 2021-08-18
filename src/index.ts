@@ -5,6 +5,8 @@ import { config } from 'dotenv'
 import routes from './assets/ts/routes'
 import './assets/ts/socket'
 
+import './global.scss'
+
 config()
 
 const port = process.env.PORT || 8080
