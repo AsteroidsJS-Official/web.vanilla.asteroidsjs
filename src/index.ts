@@ -4,7 +4,7 @@ import { config } from 'dotenv'
 
 config()
 
-const socketApiUrl = process.env.SERVER_API_URL
+const socketApiUrl: string = process.env.SERVER_API_URL
 
 const socket = io(socketApiUrl || 'http://localhost:3001')
 
