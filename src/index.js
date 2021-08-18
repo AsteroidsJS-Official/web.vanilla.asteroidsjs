@@ -6,7 +6,7 @@ config()
 
 const socketApiUrl = process.env.SERVER_API_URL
 
-const socket = io(socketApiUrl)
+const socket = io(socketApiUrl || 'http://localhost:3001')
 
 socket.on('connect', () => {
   console.log('Connected to server: ' + socket.id)
