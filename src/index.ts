@@ -1,19 +1,17 @@
 import express from 'express'
-import path from 'path'
-import { config } from 'dotenv'
 
 import routes from './assets/ts/routes'
-import './assets/ts/socket'
+import { config } from 'dotenv'
+import path from 'path'
 
+import './assets/ts/socket'
 import './global.scss'
 
 config()
-
-const port = process.env.PORT || 8080
 
 const app = express()
 
 app.use(express.static(path.resolve(__dirname, '../dist/assets')))
 app.use('/', routes)
 
-app.listen(port)
+app.listen(process.env.PORT || 8080)
