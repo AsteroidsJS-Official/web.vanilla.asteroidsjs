@@ -7,3 +7,7 @@ GameFactory.setup()
 
 const ball = new Ball(GameFactory.context, 100, new Vector2(100, 100))
 ball.resultant = new Vector2(1, 1)
+
+setTimeout(() => {
+  ball.resultant = new Vector2(-1, -1)
+}, 5000)
