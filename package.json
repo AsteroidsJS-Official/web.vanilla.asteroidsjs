@@ -6,9 +6,8 @@
   "license": "MIT",
   "main": "index.js",
   "scripts": {
-    "start": "npm run build",
-    "build": "cross-env NODE_ENV=development webpack --progress",
-    "build:prod": "cross-env NODE_ENV=production webpack --progress",
+    "start": "cross-env NODE_ENV=development webpack --progress --watch",
+    "start:prod:": "cross-env NODE_ENV=production webpack --progress",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --collect-coverage",
