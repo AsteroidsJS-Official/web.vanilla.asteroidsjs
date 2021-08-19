@@ -51,7 +51,6 @@ export abstract class Entity implements ILoop {
 
     if (this.isOverflowingX && this.isOverflowingY) {
       const isTop = overflowTopAmount < this.dimensions.y / 2
-      const auxX = this.position.x
       const auxY = this.position.y
 
       this.position.y += isTop
@@ -73,15 +72,19 @@ export abstract class Entity implements ILoop {
       this.draw()
     } else if (this.isOverflowingY) {
       const isTop = overflowTopAmount < this.dimensions.y / 2
+
       this.position.y += isTop
         ? this.context.canvas.height
         : -this.context.canvas.height
+
       this.draw()
     } else if (this.isOverflowingX) {
       const isLeft = overflowLeftAmount < this.dimensions.x / 2
+
       this.position.x += isLeft
         ? this.context.canvas.width
         : -this.context.canvas.width
+
       this.draw()
     }
   }

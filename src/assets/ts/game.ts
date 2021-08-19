@@ -19,7 +19,7 @@ export class GameFactory {
       for (const entity of this.entities) {
         entity.loop()
       }
-    }, 20)
+    }, 5)
   }
 
   public static registerEntity(entity: Entity): void {

@@ -5,12 +5,38 @@ import { Vector2 } from './assets/ts/physics/vector2'
 
 GameFactory.setup()
 
-const ball = new Ball(GameFactory.context, 100, new Vector2(100, 100))
-ball.velocity = new Vector2(3, 3)
-ball.resultant = new Vector2(1, -1)
+const ball = new Ball(GameFactory.context, 50, new Vector2(100, 100))
 
-// y + height / 2
+let gameKeys: any = {}
 
-// setTimeout(() => {
-//   ball.resultant = new Vector2(-1, -1)
-// }, 5000)
+window.addEventListener('keydown', (e) => {
+  gameKeys = gameKeys || []
+  gameKeys[e.key] = true
+})
+window.addEventListener('keyup', (e) => {
+  gameKeys[e.key] = false
+})
+
+setInterval(() => {
+  let count = 0
+  for (const key in gameKeys) {
+    if (!gameKeys[key]) {
+      count++
+    }
+    if (count === 4) {
+      ball.resultant = new Vector2(0, 0)
+    }
+  }
+  if (gameKeys && gameKeys['ArrowLeft']) {
+    ball.resultant = new Vector2(-1, ball.resultant.y)
+  }
+  if (gameKeys && gameKeys['ArrowRight']) {
+    ball.resultant = new Vector2(1, ball.resultant.y)
+  }
+  if (gameKeys && gameKeys['ArrowUp']) {
+    ball.resultant = new Vector2(ball.resultant.x, 1)
+  }
+  if (gameKeys && gameKeys['ArrowDown']) {
+    ball.resultant = new Vector2(ball.resultant.x, -1)
+  }
+}, 5)
