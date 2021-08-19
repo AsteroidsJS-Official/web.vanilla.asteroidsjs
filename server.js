@@ -5,27 +5,47 @@ const { io } = require('socket.io-client')
 
 dotenv.config()
 
-const socketApiUrl = process.env.SERVER_API_URL || 'http://localhost:3003'
+/**
+ * Function that starts the application, serving the main "index.html" and
+ * making public the "dist" folder
+ */
+function setupServer() {
+  const app = express()
+  const router = express.Router()
 
-const socket = io(socketApiUrl)
+  app.use(express.static(path.resolve(__dirname, './dist')))
 
-socket.on('connect', () => {
-  console.log('Connected to server: ' + socket.id)
-})
+  router.get('/', (_, res) => {
+    res.sendFile(path.resolve(__dirname, './dist/index.html'))
+  })
 
-socket.on('disconnect', () => {
-  console.log('Disconnected from server: ' + socket.id)
-})
+  app.use('/', router)
 
-const app = express()
-const router = express.Router()
+  app.listen(process.env.PORT || 8080)
+}
+setupServer()
 
-app.use(express.static(path.resolve(__dirname, './dist')))
+/**
+ * Method that setups the socket client for connecting the game with rooms
+ * and allowing the multiplayer
+ */
+function setupSocketClient() {
+  const socket = io(process.env.SERVER_API_URL || 'http://localhost:3003')
 
-router.get('/', (_, res) => {
-  res.sendFile(path.resolve(__dirname, './dist/index.html'))
-})
+  /**
+   * Function that informs the user if the connection was successed
+   */
+  function connect() {
+    console.log('Connected to server: ' + socket.id)
+  }
+  socket.on('connect', connect)
 
-app.use('/', router)
-
-app.listen(process.env.PORT || 8080)
+  /**
+   * Function that informs the user if the connection was failed
+   */
+  function disconnect() {
+    console.log('Connected to server: ' + socket.id)
+  }
+  socket.on('disconnect', disconnect)
+}
+setupSocketClient()
