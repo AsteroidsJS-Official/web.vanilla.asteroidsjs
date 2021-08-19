@@ -30,7 +30,7 @@ setupServer()
  * and allowing the multiplayer
  */
 function setupSocketClient() {
-  const socket = io(process.env.SERVER_API_URL || 'http://localhost:3003')
+  const socket = io(process.env.SOCKET_URL || 'http://localhost:3001')
 
   /**
    * Function that informs the user if the connection was successed
