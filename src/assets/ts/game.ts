@@ -18,7 +18,6 @@ export class GameFactory {
       this.context.clearRect(0, 0, canvas.width, canvas.height)
       for (const entity of this.entities) {
         entity.loop()
-        entity.draw()
       }
     }, 20)
   }
