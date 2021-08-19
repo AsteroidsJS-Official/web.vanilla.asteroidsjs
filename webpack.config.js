@@ -20,7 +20,7 @@ const htmlModules = htmlFiles.map(
 )
 
 module.exports = {
-  mode: process.env.NODE_ENV !== 'production' ? 'development' : 'production',
+  mode: process.env.NODE_ENV,
   entry: './src/index.ts',
   target: 'node',
   devtool: 'inline-source-map',
@@ -48,17 +48,20 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     clean: true,
   },
-  optimization: {
-    minimize: true,
-    minimizer: [
-      new TerserWebpackPlugin({
-        extractComments: true,
-      }),
-    ],
-  },
+  optimization:
+    process.env.NODE_ENV === 'production'
+      ? {
+          minimize: true,
+          minimizer: [
+            new TerserWebpackPlugin({
+              extractComments: true,
+            }),
+          ],
+        }
+      : undefined,
   plugins: [
     new MiniCssExtractPlugin({
-      filename: 'css/global.css',
+      filename: 'global.css',
     }),
     new HtmlWebpackPlugin({
       title: 'index',
@@ -69,14 +72,10 @@ module.exports = {
     new webpack.ProgressPlugin(),
     new WebpackShellPluginNext({
       onBuildEnd: {
-        scripts:
-          process.env.NODE_ENV !== 'production'
-            ? ['nodemon dist/index.js --watch "./dist"']
-            : [],
+        scripts: ['node server.js'],
         blocking: false,
         parallel: true,
       },
     }),
   ],
-  watch: process.env.NODE_ENV !== 'production',
 }
