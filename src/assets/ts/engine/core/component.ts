@@ -1,12 +1,30 @@
 import { Type } from '../interfaces/type.interface'
 import { Entity } from './entity'
+import { Game } from './game'
 
 /**
  * Class that can be passed as dependency for objects of type `Entity`. It
  * can be used to add new behaviours to these entities
  */
 export abstract class Component {
-  public constructor(public readonly entity: Entity) {}
+  public constructor(
+    public readonly game: Game,
+    public readonly entity: Entity,
+  ) {}
+
+  /**
+   * Method that can create new entities
+   *
+   * @param entity defines the new entity type
+   * @param components defines the new entity component dependencies
+   * @returns the created entity
+   */
+  public instantiate<E extends Entity, C extends Component>(
+    entity: Type<E>,
+    components?: C[] | Type<C>[],
+  ): E {
+    return this.entity.instantiate(entity, components)
+  }
 
   /**
    * Method that returns some sibling component, attached to the same parent
