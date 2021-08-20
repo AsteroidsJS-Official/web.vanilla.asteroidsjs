@@ -15,13 +15,12 @@ export class AvoidOverflow extends Component implements IStart, ILoop {
   private context: CanvasRenderingContext2D
 
   start(): void {
+    this.requires([Image, Rigidbody, Transform])
+
     this.context = GameFactory.context
     this.image = this.getComponent(Image)
     this.rigidbody = this.getComponent(Rigidbody)
     this.transform = this.getComponent(Transform)
-
-    this.transform.position = new Vector2()
-    this.rigidbody.velocity = new Vector2(0, -1)
   }
 
   public loop(): void {

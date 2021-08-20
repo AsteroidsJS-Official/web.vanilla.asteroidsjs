@@ -1,3 +1,4 @@
+import { GameFactory } from '../game.factory'
 import { Type } from '../interfaces/type.interface'
 import { Component } from './component'
 
@@ -6,6 +7,13 @@ import { Component } from './component'
  */
 export abstract class Entity {
   public constructor(public components: Component[]) {}
+
+  public instantiate<T extends Component, C extends Entity>(
+    entity: Type<C>,
+    components?: T[] | Type<T>[],
+  ): C {
+    return GameFactory.register(entity, components)
+  }
 
   /**
    * Method that returns some child component, attached to this entity
@@ -28,7 +36,7 @@ export abstract class Entity {
    * @param components defines an array of component types
    * @returns an object that represents the created entity
    */
-  public static create<T extends Component, C extends Entity>(
+  public static instantiate<T extends Component, C extends Entity>(
     entity: Type<C>,
     components?: T[] | Type<T>[],
   ): Entity {

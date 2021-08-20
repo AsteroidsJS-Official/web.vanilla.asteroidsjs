@@ -26,10 +26,12 @@ export abstract class Component {
    *
    * @param components defines an array with all the required components
    */
-  protected requires<T extends Component>(components: Type<T>[]): void {
+  protected requires(components: Type<Component>[]): void {
     for (const component of components) {
       if (!this.entity.getComponent(component)) {
-        throw new Error(`${this.constructor.name} requires ${component.name}`)
+        throw new Error(
+          `${this.constructor.name} requires ${component.constructor.name}`,
+        )
       }
     }
   }

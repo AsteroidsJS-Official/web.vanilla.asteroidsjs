@@ -19,7 +19,7 @@ export class GameFactory {
   /**
    * Property that defines an array of entities, that represents all the instantiated entities in the game
    */
-  public static instaces: Entity[] = []
+  private static instances: Entity[] = []
 
   /**
    * Property that defines an array of entities or the entity types
@@ -31,7 +31,7 @@ export class GameFactory {
    *
    * @param options defines an object that contains the game options
    */
-  public static setup(options?: GameFactoryOptions): void {
+  public static create(options?: GameFactoryOptions): void {
     const canvas = document.getElementById(
       'asteroidsjs-canvas',
     ) as HTMLCanvasElement
@@ -43,7 +43,7 @@ export class GameFactory {
 
     this.entities.push(...options.entities)
 
-    this.instaces = this.entities.map((entity) => {
+    this.instances = this.entities.map((entity) => {
       if (!(entity instanceof Entity)) {
         entity = new entity()
       }
@@ -51,11 +51,36 @@ export class GameFactory {
     })
   }
 
+  public static register<T extends Component, C extends Entity>(
+    entity: Type<C>,
+    components?: T[] | Type<T>[],
+  ): C {
+    const instance = new entity()
+    instance.components = components.map((component) => {
+      if (!(component instanceof Component)) {
+        component = new component(instance)
+      }
+      return component
+    })
+
+    if (this.hasStart(instance)) {
+      instance.start()
+    }
+    instance.components.forEach((component: Component) => {
+      if (this.hasStart(component)) {
+        component.start()
+      }
+    })
+
+    this.instances.push(instance)
+    return instance
+  }
+
   /**
    * Method that start all the entity lifecyle methods
    */
   public static start(): void {
-    for (const entity of this.instaces) {
+    for (const entity of this.instances) {
       if (this.hasStart(entity)) {
         entity.start()
       }
@@ -74,7 +99,7 @@ export class GameFactory {
         this.context.canvas.width,
         this.context.canvas.height,
       )
-      for (const entity of this.instaces) {
+      for (const entity of this.instances) {
         if (this.hasLoop(entity)) {
           entity.loop()
         }
