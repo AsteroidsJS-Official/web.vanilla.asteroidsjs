@@ -3,22 +3,19 @@ import { Vector2 } from '../core/vector2'
 import { IDraw } from '../interfaces/draw.interface'
 import { ILoop } from '../interfaces/loop.interface'
 import { IStart } from '../interfaces/start.interface'
-import { Rigidbody } from './rigidbody.component'
 import { Transform } from './transform.component'
 
 export class AvoidOverflow extends Component implements IStart, ILoop {
   public drawer: IDraw
   public transform: Transform
-  public rigidbody: Rigidbody
 
   public start(): void {
-    this.requires([Rigidbody, Transform])
+    this.requires([Transform])
 
     if (this.game.hasDraw(this.entity)) {
       this.drawer = this.entity
     }
 
-    this.rigidbody = this.getComponent(Rigidbody)
     this.transform = this.getComponent(Transform)
   }
 

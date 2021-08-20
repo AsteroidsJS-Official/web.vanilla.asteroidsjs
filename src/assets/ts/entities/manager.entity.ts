@@ -7,6 +7,9 @@ import { Ball } from './ball.entity'
 
 export class Manager extends Entity implements IStart {
   public start(): void {
-    this.instantiate(Ball, [Transform, Rigidbody, AvoidOverflow])
+    this.instantiate({
+      entity: Ball,
+      components: [Transform, Rigidbody, AvoidOverflow],
+    })
   }
 }

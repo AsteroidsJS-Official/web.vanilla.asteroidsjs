@@ -1,3 +1,4 @@
+import { IInstantiateOptions } from '../interfaces/instantiate-options.interface'
 import { Type } from '../interfaces/type.interface'
 import { Component } from './component'
 import { Game } from './game'
@@ -5,7 +6,7 @@ import { Game } from './game'
 /**
  * Class that represents some object in the game
  */
-export abstract class Entity {
+export class Entity {
   public constructor(
     public readonly game: Game,
     public components: Component[] = [],
@@ -18,11 +19,10 @@ export abstract class Entity {
    * @param components defines the new entity component dependencies
    * @returns the created entity
    */
-  public instantiate<E extends Entity, C extends Component>(
-    entity: Type<E>,
-    components?: C[] | Type<C>[],
-  ): E {
-    return this.game.instantiate(entity, components)
+  public instantiate<E extends Entity>(
+    options?: IInstantiateOptions<E>,
+  ): E extends Entity ? E : Entity {
+    return this.game.instantiate(options)
   }
 
   /**

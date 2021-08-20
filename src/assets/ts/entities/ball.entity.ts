@@ -34,11 +34,10 @@ export class Ball extends Entity implements IStart, IDraw {
   }
 
   private createSpaceship(): void {
-    const spaceship = this.instantiate(Spaceship, [
-      Transform,
-      Rigidbody,
-      AvoidOverflow,
-    ])
+    const spaceship = this.instantiate({
+      entity: Spaceship,
+      components: [Transform, Rigidbody, AvoidOverflow],
+    })
 
     spaceship.getComponent(Transform).position =
       this.getComponent(Transform).position

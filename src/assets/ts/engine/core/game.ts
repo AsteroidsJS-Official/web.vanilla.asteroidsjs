@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
 import { IDraw } from '../interfaces/draw.interface'
+import { IInstantiateOptions } from '../interfaces/instantiate-options.interface'
 import { ILoop } from '../interfaces/loop.interface'
 import { IStart } from '../interfaces/start.interface'
-import { Type } from '../interfaces/type.interface'
-import { Component } from './component'
 import { Entity } from './entity'
 
 /**
@@ -73,17 +72,15 @@ export class Game {
    * @param components defines the new entity component dependencies
    * @returns the created entity
    */
-  public instantiate<E extends Entity, C extends Component>(
-    entity: Type<E>,
-    components?: C[] | Type<C>[],
-  ): E {
-    const instance = new entity(this)
-    instance.components = components.map((component) => {
-      if (!(component instanceof Component)) {
-        component = new component(this, instance)
-      }
-      return component
-    })
+  public instantiate<E extends Entity>(
+    options?: IInstantiateOptions<E>,
+  ): E extends Entity ? E : Entity {
+    const instance =
+      options && options.entity ? new options.entity(this) : new Entity(this)
+
+    instance.components = options.components.map(
+      (component) => new component(this, instance),
+    )
 
     if (this.hasStart(instance)) {
       instance.start()
@@ -96,7 +93,8 @@ export class Game {
     }
 
     this.entities.push(instance)
-    return instance
+
+    return instance as E extends Entity ? E : Entity
   }
 
   /**

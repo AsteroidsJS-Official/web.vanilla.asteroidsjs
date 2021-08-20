@@ -1,3 +1,4 @@
+import { IInstantiateOptions } from '../interfaces/instantiate-options.interface'
 import { Type } from '../interfaces/type.interface'
 import { Entity } from './entity'
 import { Game } from './game'
@@ -19,11 +20,10 @@ export abstract class Component {
    * @param components defines the new entity component dependencies
    * @returns the created entity
    */
-  public instantiate<E extends Entity, C extends Component>(
-    entity: Type<E>,
-    components?: C[] | Type<C>[],
-  ): E {
-    return this.entity.instantiate(entity, components)
+  public instantiate<E extends Entity, t>(
+    options?: IInstantiateOptions<E>,
+  ): E extends Entity ? E : Entity {
+    return this.entity.instantiate(options)
   }
 
   /**
