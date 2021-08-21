@@ -22,23 +22,47 @@ export class AvoidOverflow extends Component implements IStart, ILoop {
   public loop(): void {
     this.drawer?.draw()
 
-    if (this.isOverflowingY()) {
+    if (this.isOverflowingX() && this.isOverflowingY()) {
+      const overflowAmountTop =
+        this.transform.canvasPosition.y - this.transform.dimensions.y / 2
+      const overflowAmountLeft =
+        this.transform.canvasPosition.x - this.transform.dimensions.x / 2
+
+      const isTop = overflowAmountTop < this.transform.dimensions.y / 2
+      const isLeft = overflowAmountLeft < this.transform.dimensions.x / 2
+
+      const auxY = this.transform.position.y
+      const newY = isTop
+        ? this.transform.position.y - this.game.context.canvas.height
+        : this.transform.position.y + this.game.context.canvas.height
+
+      const newX = isLeft
+        ? this.transform.position.x + this.game.context.canvas.width
+        : this.transform.position.x - this.game.context.canvas.width
+
+      this.transform.position = new Vector2(this.transform.position.x, newY)
+
+      this.drawer?.draw()
+
+      this.transform.position = new Vector2(newX, auxY)
+
+      this.drawer?.draw()
+
+      this.transform.position = new Vector2(this.transform.position.x, newY)
+
+      this.drawer?.draw()
+    } else if (this.isOverflowingY()) {
       const overflowAmount =
         this.transform.canvasPosition.y - this.transform.dimensions.y / 2
 
       const isTop = overflowAmount < this.transform.dimensions.y / 2
 
-      if (isTop) {
-        this.transform.position = new Vector2(
-          this.transform.position.x,
-          this.transform.position.y - this.game.context.canvas.height,
-        )
-      } else {
-        this.transform.position = new Vector2(
-          this.transform.position.x,
-          this.transform.position.y + this.game.context.canvas.height,
-        )
-      }
+      this.transform.position = new Vector2(
+        this.transform.position.x,
+        isTop
+          ? this.transform.position.y - this.game.context.canvas.height
+          : this.transform.position.y + this.game.context.canvas.height,
+      )
 
       this.drawer?.draw()
     } else if (this.isOverflowingX()) {
@@ -47,17 +71,12 @@ export class AvoidOverflow extends Component implements IStart, ILoop {
 
       const isLeft = overflowAmount < this.transform.dimensions.x / 2
 
-      if (isLeft) {
-        this.transform.position = new Vector2(
-          this.transform.position.x + this.game.context.canvas.width,
-          this.transform.position.y,
-        )
-      } else {
-        this.transform.position = new Vector2(
-          this.transform.position.x - this.game.context.canvas.width,
-          this.transform.position.y,
-        )
-      }
+      this.transform.position = new Vector2(
+        isLeft
+          ? this.transform.position.x + this.game.context.canvas.width
+          : this.transform.position.x - this.game.context.canvas.width,
+        this.transform.position.y,
+      )
 
       this.drawer?.draw()
     }
