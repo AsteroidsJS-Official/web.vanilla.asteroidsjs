@@ -1,8 +1,8 @@
 import { Component } from '../core/component'
-import { Vector2 } from '../core/vector2'
 import { IDraw } from '../interfaces/draw.interface'
 import { ILoop } from '../interfaces/loop.interface'
 import { IStart } from '../interfaces/start.interface'
+import { Vector2 } from '../math/vector2'
 import { Transform } from './transform.component'
 
 export class AvoidOverflow extends Component implements IStart, ILoop {
