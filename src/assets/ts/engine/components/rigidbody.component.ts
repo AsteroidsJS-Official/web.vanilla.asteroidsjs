@@ -6,10 +6,25 @@ import { Transform } from './transform.component'
 
 export class Rigidbody extends Component implements IStart, ILoop {
   public mass = 1
-  public velocity = new Vector2()
   public resultant = new Vector2()
+  public maxVelocity = Infinity;
 
+  private _velocity = new Vector2()
   private transform: Transform
+
+  public get velocity(): Vector2 {
+    return this._velocity;
+  }
+
+  public set velocity(velocity: Vector2){
+    if(velocity.magnitude > this.maxVelocity){
+      const result = this.maxVelocity / velocity.magnitude;
+
+      velocity = new Vector2(velocity.x * result, velocity.y * result);
+    }
+
+    this._velocity = velocity;
+  }
 
   public start(): void {
     this.requires([Transform])
@@ -22,9 +37,8 @@ export class Rigidbody extends Component implements IStart, ILoop {
       new Vector2(this.resultant.x, this.resultant.y),
       this.mass,
     )
-    const velocity = new Vector2(this.velocity.x, this.velocity.y)
 
-    this.transform.position = Vector2.sum(this.transform.position, velocity)
+    this.transform.position = Vector2.sum(this.transform.position, this.velocity)
     this.velocity = Vector2.sum(this.velocity, aceleration)
   }
 }
