@@ -11,8 +11,8 @@ export class Spaceship extends Entity implements ISpaceship, IStart, IDraw {
   private transform: Transform
   private rigidbody: Rigidbody
 
-  public readonly force = 0.1
-  public readonly angularForce = 0.001
+  public readonly force = 0.2
+  public readonly angularForce = 0.01
 
   public get direction(): Vector2 {
     return new Vector2(
@@ -27,8 +27,8 @@ export class Spaceship extends Entity implements ISpaceship, IStart, IDraw {
 
     this.transform.dimensions = new Rect(-50, -50, 100, 100)
     this.rigidbody.mass = 10
-    this.rigidbody.maxVelocity = 2
-    this.rigidbody.maxAngularVelocity = 0.025
+    this.rigidbody.maxVelocity = 4
+    this.rigidbody.maxAngularVelocity = 0.05
   }
 
   public draw(): void {
