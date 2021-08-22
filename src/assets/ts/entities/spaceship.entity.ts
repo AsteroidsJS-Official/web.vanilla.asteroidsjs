@@ -3,6 +3,7 @@ import { Transform } from '../engine/components/transform.component'
 import { Entity } from '../engine/core/entity'
 import { IDraw } from '../engine/interfaces/draw.interface'
 import { IStart } from '../engine/interfaces/start.interface'
+import { Rect } from '../engine/math/rect'
 import { Vector2 } from '../engine/math/vector2'
 import { ISpaceship } from '../interfaces/spaceship.interface'
 
@@ -24,7 +25,7 @@ export class Spaceship extends Entity implements ISpaceship, IStart, IDraw {
     this.transform = this.getComponent(Transform)
     this.rigidbody = this.getComponent(Rigidbody)
 
-    this.transform.dimensions = new Vector2(50, 50)
+    this.transform.dimensions = new Rect(-50, -50, 100, 100)
     this.rigidbody.mass = 10
     this.rigidbody.maxVelocity = 2
     this.rigidbody.maxAngularVelocity = 0.025
@@ -43,14 +44,14 @@ export class Spaceship extends Entity implements ISpaceship, IStart, IDraw {
 
     this.game.context.beginPath()
     this.game.context.fillStyle = '#ff0055'
-    this.game.context.moveTo(0, -this.transform.dimensions.y / 2)
+    this.game.context.moveTo(0, -this.transform.dimensions.height / 2)
     this.game.context.lineTo(
-      -this.transform.dimensions.x / 2,
-      this.transform.dimensions.y / 2,
+      -this.transform.dimensions.width / 2,
+      this.transform.dimensions.height / 2,
     )
     this.game.context.lineTo(
-      this.transform.dimensions.x / 2,
-      this.transform.dimensions.y / 2,
+      this.transform.dimensions.width / 2,
+      this.transform.dimensions.height / 2,
     )
     this.game.context.closePath()
     this.game.context.fill()
