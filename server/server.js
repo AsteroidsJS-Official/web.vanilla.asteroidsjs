@@ -17,20 +17,6 @@ dotenv.config()
  */
 
 /**
- * The current screen id.
- *
- * @type {string|null}
- */
-let screenId = null
-
-/**
- * The current screen number.
- *
- * @type {number}
- */
-let screenNumber = 1
-
-/**
  * Represents the connected screens.
  *
  * @type {Object.<number, Screen>}
@@ -60,38 +46,48 @@ function setupServer() {
 
   const router = express.Router()
 
-  app.use(express.static(path.resolve(__dirname, '../dist')))
+  router.use(
+    '/screen/:screenNumber',
+    express.static(path.resolve(__dirname, '../dist')),
+  )
 
-  router.get('/', async (_, res) => {
-    console.log('here')
-    if (screens.length === screenAmount) {
+  router.get('/', (_, res) => {
+    const sKeys = Object.keys(screens).map((s) => parseInt(s))
+    console.log(sKeys)
+
+    if (sKeys.length === screenAmount) {
       res.send('Screen limit reached!')
     } else {
-      const sKeys = parseInt(Object.keys(screens))
-      res.redirect('/screen/' + screens['1'] ? sKeys[sKeys.length - 1] + 1 : 1)
+      res.redirect(
+        '/screen/' + (screens['1'] ? sKeys[sKeys.length - 1] + 1 : 1),
+      )
       res.end()
     }
   })
 
-  router.get('/screen/:screen', async (req, res) => {
-    const screenNumber = req.params.screen
+  router.get('/screen/:screenNumber', (req, res) => {
     res.sendFile(path.resolve(__dirname, '../dist/index.html'))
   })
 
   app.use('/', router)
 
   httpServer.listen(process.env.PORT || 8080)
+
+  console.log('Listening on port ' + process.env.PORT || 8080)
 }
 setupServer()
 
 function setupSocketScreen() {
   ioScreen.on('connection', (socket) => {
     console.log('Connected: ' + socket.id)
-    screenId = socket.id
 
-    socket.on('test', (arg) => {
-      console.log(arg)
+    socket.on('connectScreen', (location, callback) => {
+      const screenN = location.split('/screen')[1].split('/')[0]
+      const screen = setScreen(socket.id, screenN, 600, 400)
+      callback(screen)
     })
+
+    socket.emit('test-index', 'Hello from server')
   })
 }
 setupSocketScreen()
@@ -120,6 +116,34 @@ function setupSocketClient() {
   socket.on('disconnect', disconnect)
 }
 setupSocketClient()
+
+/**
+ * Sets the new screen to the screens object.
+ *
+ * @param {string} id - The screen socket id.
+ * @param {number} screenN - The screen number.
+ * @param {number} width - The screen width.
+ * @param {number} height - The screen height.
+ * @returns The connected screen data.
+ */
+function setScreen(id, screenN, width, height) {
+  if (screens[screenN]) {
+    screens[screenN].id = id
+    return screens[screenN]
+  }
+
+  /**
+   * @type {Screen}
+   */
+  const screen = { id, width, height }
+
+  const numbers = Object.keys(screens).map((n) => parseInt(n))
+  const newScreenN = numbers.length === 0 ? 1 : numbers[numbers.length - 1] + 1
+  screen['number'] = newScreenN
+
+  screens[newScreenN.toString()] = screen
+  return screen
+}
 
 // async function connectScreen(screen) {
 //   screenSocket = io(process.env.MASTER_SCREEN_URL || 'http://localhost:8000')
