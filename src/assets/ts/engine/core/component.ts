@@ -20,7 +20,7 @@ export abstract class Component {
    * @param components defines the new entity component dependencies
    * @returns the created entity
    */
-  public instantiate<E extends Entity, t>(
+  public instantiate<E extends Entity>(
     options?: IInstantiateOptions<E>,
   ): E extends Entity ? E : Entity {
     return this.entity.instantiate(options)

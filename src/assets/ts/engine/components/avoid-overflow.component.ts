@@ -1,3 +1,5 @@
+import { hasDraw } from '../utils/validations'
+
 import { Component } from '../core/component'
 import { IDraw } from '../interfaces/draw.interface'
 import { ILoop } from '../interfaces/loop.interface'
@@ -12,10 +14,13 @@ export class AvoidOverflow extends Component implements IStart, ILoop {
   public start(): void {
     this.requires([Transform])
 
-    if (this.game.hasDraw(this.entity)) {
-      this.drawer = this.entity
+    if (!hasDraw(this.entity)) {
+      throw new Error(
+        `${this.entity.constructor.name} has a ${this.constructor.name} but not implements the IDraw interface`,
+      )
     }
 
+    this.drawer = this.entity
     this.transform = this.getComponent(Transform)
   }
 
@@ -24,12 +29,12 @@ export class AvoidOverflow extends Component implements IStart, ILoop {
 
     if (this.isOverflowingX() && this.isOverflowingY()) {
       const overflowAmountTop =
-        this.transform.canvasPosition.y - this.transform.dimensions.y / 2
+        this.transform.canvasPosition.y - this.transform.dimensions.height / 2
       const overflowAmountLeft =
-        this.transform.canvasPosition.x - this.transform.dimensions.x / 2
+        this.transform.canvasPosition.x - this.transform.dimensions.width / 2
 
-      const isTop = overflowAmountTop < this.transform.dimensions.y / 2
-      const isLeft = overflowAmountLeft < this.transform.dimensions.x / 2
+      const isTop = overflowAmountTop < this.transform.dimensions.height / 2
+      const isLeft = overflowAmountLeft < this.transform.dimensions.width / 2
 
       const auxY = this.transform.position.y
       const newY = isTop
@@ -53,9 +58,15 @@ export class AvoidOverflow extends Component implements IStart, ILoop {
       this.drawer?.draw()
     } else if (this.isOverflowingY()) {
       const overflowAmount =
+<<<<<<< HEAD
         this.transform.canvasPosition.y - this.transform.dimensions.y / 2
 
       const isTop = overflowAmount < this.transform.dimensions.y / 2
+=======
+        this.transform.canvasPosition.y - this.transform.dimensions.height / 2
+
+      const isTop = overflowAmount < this.transform.dimensions.height / 2
+>>>>>>> feature/collider
 
       this.transform.position = new Vector2(
         this.transform.position.x,
@@ -67,9 +78,15 @@ export class AvoidOverflow extends Component implements IStart, ILoop {
       this.drawer?.draw()
     } else if (this.isOverflowingX()) {
       const overflowAmount =
+<<<<<<< HEAD
         this.transform.canvasPosition.x - this.transform.dimensions.x / 2
 
       const isLeft = overflowAmount < this.transform.dimensions.x / 2
+=======
+        this.transform.canvasPosition.x - this.transform.dimensions.width / 2
+
+      const isLeft = overflowAmount < this.transform.dimensions.width / 2
+>>>>>>> feature/collider
 
       this.transform.position = new Vector2(
         isLeft
@@ -86,12 +103,12 @@ export class AvoidOverflow extends Component implements IStart, ILoop {
     const topEdge =
       this.game.context.canvas.height / 2 -
       this.transform.position.y -
-      this.transform.dimensions.y / 2
+      this.transform.dimensions.height / 2
 
     const bottomEdge =
       this.game.context.canvas.height / 2 -
       this.transform.position.y +
-      this.transform.dimensions.y / 2
+      this.transform.dimensions.height / 2
 
     return topEdge < 0 || bottomEdge > this.game.context.canvas.height
   }
@@ -100,12 +117,12 @@ export class AvoidOverflow extends Component implements IStart, ILoop {
     const leftEdge =
       this.game.context.canvas.width / 2 -
       this.transform.position.x -
-      this.transform.dimensions.x / 2
+      this.transform.dimensions.width / 2
 
     const rightEdge =
       this.game.context.canvas.width / 2 -
       this.transform.position.x +
-      this.transform.dimensions.x / 2
+      this.transform.dimensions.width / 2
 
     return leftEdge < 0 || rightEdge > this.game.context.canvas.width
   }

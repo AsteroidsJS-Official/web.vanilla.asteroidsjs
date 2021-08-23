@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
-import { IDraw } from '../interfaces/draw.interface'
+import { hasLoop, hasStart } from '../utils/validations'
+
 import { IInstantiateOptions } from '../interfaces/instantiate-options.interface'
-import { ILoop } from '../interfaces/loop.interface'
-import { IStart } from '../interfaces/start.interface'
 import { Entity } from './entity'
 
 /**
@@ -33,12 +32,12 @@ export class Game {
    */
   public start(): void {
     for (const instance of this.bootstrap) {
-      if (this.hasStart(instance)) {
+      if (hasStart(instance)) {
         instance.start()
       }
 
       for (const component of instance.components) {
-        if (this.hasStart(component)) {
+        if (hasStart(component)) {
           component.start()
         }
       }
@@ -52,17 +51,17 @@ export class Game {
         this.context.canvas.height,
       )
       for (const entity of this.entities) {
-        if (this.hasLoop(entity)) {
+        if (hasLoop(entity)) {
           entity.loop()
         }
 
         for (const component of entity.components) {
-          if (this.hasLoop(component)) {
+          if (hasLoop(component)) {
             component.loop()
           }
         }
       }
-    }, 5)
+    }, 100 / 6)
   }
 
   /**
@@ -82,12 +81,12 @@ export class Game {
       (component) => new component(this, instance),
     )
 
-    if (this.hasStart(instance)) {
+    if (hasStart(instance)) {
       instance.start()
     }
 
     for (const component of instance.components) {
-      if (this.hasStart(component)) {
+      if (hasStart(component)) {
         component.start()
       }
     }
@@ -95,35 +94,5 @@ export class Game {
     this.entities.push(instance)
 
     return instance as E extends Entity ? E : Entity
-  }
-
-  /**
-   * Method that validates if some object is of type "ILoop"
-   * @param loopObject defines an object that will be validated
-   * @returns true if the object implements the "ILoop" interface, otherwise
-   * false
-   */
-  public hasLoop(loopObject: any): loopObject is ILoop {
-    return 'loop' in loopObject
-  }
-
-  /**
-   * Method that validates if some object is of type "IStart"
-   * @param startObject defines an object that will be validated
-   * @returns true if the object implements the "IStart" interface, otherwise
-   * false
-   */
-  public hasStart(startObject: any): startObject is IStart {
-    return 'start' in startObject
-  }
-
-  /**
-   * Method that validates if some object is of type "IDraw"
-   * @param drawObject defines an object that will be validated
-   * @returns true if the object implements the "IDraw" interface, otherwise
-   * false
-   */
-  public hasDraw(drawObject: any): drawObject is IDraw {
-    return 'draw' in drawObject
   }
 }
