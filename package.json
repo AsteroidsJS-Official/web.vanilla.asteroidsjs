@@ -6,8 +6,8 @@
   "license": "MIT",
   "main": "index.js",
   "scripts": {
-    "start": "cross-env NODE_ENV=development START=true webpack --progress --watch",
-    "start:prod": "cross-env NODE_ENV=production START=true webpack --progress --watch",
+    "start": "cross-env NODE_ENV=development START=true SCREEN_AMOUNT=$npm_config_nscreens webpack --progress --watch",
+    "start:prod": "cross-env NODE_ENV=production START=true SCREEN_AMOUNT=$npm_config_nscreens webpack --progress --watch",
     "build": "cross-env NODE_ENV=development webpack --progress",
     "build:prod": "cross-env NODE_ENV=production webpack --progress",
     "test": "jest",
