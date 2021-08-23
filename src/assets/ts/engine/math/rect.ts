@@ -9,10 +9,5 @@ export class Rect {
     return this.width * this.height
   }
 
-  public constructor(
-    public x: number,
-    public y: number,
-    public width: number,
-    public height: number,
-  ) {}
+  public constructor(public width: number, public height: number) {}
 }

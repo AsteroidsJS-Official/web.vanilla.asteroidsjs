@@ -1,13 +1,18 @@
 import { Rigidbody } from '../engine/components/rigidbody.component'
 import { Transform } from '../engine/components/transform.component'
 import { Entity } from '../engine/core/entity'
+import { ICollider2 } from '../engine/interfaces/collider2.interface'
+import { Collision2 } from '../engine/interfaces/collision2.interface'
 import { IDraw } from '../engine/interfaces/draw.interface'
 import { IStart } from '../engine/interfaces/start.interface'
 import { Rect } from '../engine/math/rect'
 import { Vector2 } from '../engine/math/vector2'
 import { ISpaceship } from '../interfaces/spaceship.interface'
 
-export class Spaceship extends Entity implements ISpaceship, IStart, IDraw {
+export class Spaceship
+  extends Entity
+  implements ISpaceship, IStart, IDraw, ICollider2
+{
   private transform: Transform
   private rigidbody: Rigidbody
 
@@ -25,10 +30,26 @@ export class Spaceship extends Entity implements ISpaceship, IStart, IDraw {
     this.transform = this.getComponent(Transform)
     this.rigidbody = this.getComponent(Rigidbody)
 
+<<<<<<< HEAD
     this.transform.dimensions = new Rect(-25, -25, 50, 50)
+=======
+    this.transform.dimensions = new Rect(50, 50)
+>>>>>>> feature/collider
     this.rigidbody.mass = 10
     this.rigidbody.maxVelocity = 2
     this.rigidbody.maxAngularVelocity = 0.025
+  }
+
+  public startCollide(collision: Collision2): void {
+    console.log('init')
+  }
+
+  public stayCollide(collision: Collision2): void {
+    console.log('stay')
+  }
+
+  public endCollide(collision: Collision2): void {
+    console.log('end')
   }
 
   public draw(): void {
