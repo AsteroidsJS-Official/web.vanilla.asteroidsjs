@@ -9,7 +9,7 @@ export class Transform extends Component {
   /**
    * Property that defines the entity dimensions such as width and height
    */
-  public dimensions = new Rect(-50, -50, 100, 100)
+  public dimensions = new Rect(100, 100)
 
   /**
    * Property that defines the entity rotation in radians
