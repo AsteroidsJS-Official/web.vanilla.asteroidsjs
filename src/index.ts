@@ -1,7 +1,14 @@
+import io from 'socket.io-client/dist/socket.io.js'
+
 import './global.scss'
+
 import { Ball } from './assets/ts/entities/ball'
 import { GameFactory } from './assets/ts/game'
 import { Vector2 } from './assets/ts/physics/vector2'
+
+const socket = io('http://localhost:8080')
+
+socket.emit('test', 'Hello')
 
 GameFactory.setup()
 
