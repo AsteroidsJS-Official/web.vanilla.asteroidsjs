@@ -30,11 +30,7 @@ export class Spaceship
     this.transform = this.getComponent(Transform)
     this.rigidbody = this.getComponent(Rigidbody)
 
-<<<<<<< HEAD
-    this.transform.dimensions = new Rect(-25, -25, 50, 50)
-=======
     this.transform.dimensions = new Rect(50, 50)
->>>>>>> feature/collider
     this.rigidbody.mass = 10
     this.rigidbody.maxVelocity = 2
     this.rigidbody.maxAngularVelocity = 0.025

@@ -58,15 +58,9 @@ export class AvoidOverflow extends Component implements IStart, ILoop {
       this.drawer?.draw()
     } else if (this.isOverflowingY()) {
       const overflowAmount =
-<<<<<<< HEAD
-        this.transform.canvasPosition.y - this.transform.dimensions.y / 2
-
-      const isTop = overflowAmount < this.transform.dimensions.y / 2
-=======
         this.transform.canvasPosition.y - this.transform.dimensions.height / 2
 
       const isTop = overflowAmount < this.transform.dimensions.height / 2
->>>>>>> feature/collider
 
       this.transform.position = new Vector2(
         this.transform.position.x,
@@ -78,15 +72,9 @@ export class AvoidOverflow extends Component implements IStart, ILoop {
       this.drawer?.draw()
     } else if (this.isOverflowingX()) {
       const overflowAmount =
-<<<<<<< HEAD
-        this.transform.canvasPosition.x - this.transform.dimensions.x / 2
-
-      const isLeft = overflowAmount < this.transform.dimensions.x / 2
-=======
         this.transform.canvasPosition.x - this.transform.dimensions.width / 2
 
       const isLeft = overflowAmount < this.transform.dimensions.width / 2
->>>>>>> feature/collider
 
       this.transform.position = new Vector2(
         isLeft
