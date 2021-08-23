@@ -24,6 +24,10 @@ module.exports = {
   entry: './src/index.ts',
   target: 'node',
   devtool: 'inline-source-map',
+  externals: {
+    bufferutil: 'bufferutil',
+    'utf-8-validate': 'utf-8-validate',
+  },
   module: {
     rules: [
       {
@@ -72,7 +76,7 @@ module.exports = {
     new webpack.ProgressPlugin(),
     new WebpackShellPluginNext({
       onBuildEnd: {
-        scripts: ['node server.js'],
+        scripts: process.env.START ? ['node server/index.js'] : [],
         blocking: false,
         parallel: true,
       },
