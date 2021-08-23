@@ -8,7 +8,13 @@ import { Vector2 } from './assets/ts/physics/vector2'
 
 const socket = io('http://localhost:8080')
 
-socket.emit('test', 'Hello')
+socket.emit('connectScreen', window.location.pathname, (response: any) => {
+  console.log(response)
+})
+
+socket.on('test-index', (arg: string) => {
+  console.log(arg)
+})
 
 GameFactory.setup()
 
