@@ -113,4 +113,8 @@ export class Rigidbody extends Component implements IStart, ILoop {
     )
     this.velocity = Vector2.sum(this.velocity, aceleration)
   }
+
+  private abs(value: number): number {
+    return value < 0 ? -value : value
+  }
 }
