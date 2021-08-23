@@ -40,9 +40,7 @@ export class Spaceship
     console.log('init')
   }
 
-  public stayCollide(collision: Collision2): void {
-    console.log('stay')
-  }
+  public stayCollide(collision: Collision2): void {}
 
   public endCollide(collision: Collision2): void {
     console.log('end')

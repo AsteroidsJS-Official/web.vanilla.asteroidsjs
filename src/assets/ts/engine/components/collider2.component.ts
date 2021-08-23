@@ -41,7 +41,7 @@ export class Collider2 extends Component implements IStart, ILoop {
         Vector2.distance(transform1.position, transform2.position) <
         (transform1.dimensions.width + transform2.dimensions.width) / 2
       ) {
-        return
+        continue
       }
 
       this.collisions = this.collisions.filter((_, i) => i !== index)
