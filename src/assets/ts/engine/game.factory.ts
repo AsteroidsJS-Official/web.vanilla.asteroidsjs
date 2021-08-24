@@ -19,8 +19,11 @@ export class GameFactory {
     canvas.width = options.width || window.innerWidth
     canvas.height = options.height || window.innerHeight
 
+    canvas.style.transform = `translateX(${-options.displacement || 0}px)`
+
     const game = new Game()
 
+    game.screenNumber = options.screenNumber
     game.context = canvas.getContext('2d')
     game.bootstrap.push(...options.bootstrap.map((entity) => new entity(game)))
 
