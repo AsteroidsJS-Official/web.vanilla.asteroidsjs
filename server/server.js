@@ -84,6 +84,12 @@ function setupServer() {
   router.get('/', (_, res) => {
     const sKeys = Object.keys(screens).map((s) => +s)
 
+    res.header('Access-Control-Allow-Origin', '*')
+    res.header(
+      'Access-Control-Allow-Headers',
+      'Origin, X-Requested-With, Content-Type, Accept',
+    )
+
     if (sKeys.length === +screenAmount) {
       res.send('Screen limit reached!')
     } else {
@@ -95,6 +101,12 @@ function setupServer() {
   })
 
   router.get('/screen/:screenNumber', (_, res) => {
+    res.header('Access-Control-Allow-Origin', '*')
+    res.header(
+      'Access-Control-Allow-Headers',
+      'Origin, X-Requested-With, Content-Type, Accept',
+    )
+
     if (Object.keys(screens).map((s) => +s).length === +screenAmount) {
       res.send('Screen limit reached!')
     } else {
