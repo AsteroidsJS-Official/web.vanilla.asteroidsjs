@@ -13,6 +13,7 @@ dotenv.config()
  * @property {number} number - The screen number.
  * @property {number} width - The screen width.
  * @property {number} height - The screen height.
+ * @property {number} position - The screen position in the screens object.
  */
 
 /**
@@ -25,7 +26,7 @@ const args = process.argv.slice(2)
 /**
  * Represents the connected screens.
  *
- * @type {Object.<number, Screen>}
+ * @type {Object.<string, Screen>}
  */
 let screens = {}
 
@@ -38,6 +39,13 @@ let screenAmount =
   args.find((arg) => arg.includes('nscreens'))?.split('=')[1] ||
   process.env.SCREEN_AMOUNT ||
   3
+
+/**
+ * The amount of screens in each side of the master screen.
+ *
+ * @type {number}
+ */
+let screensBySide = Math.floor(screenAmount / 2)
 
 /**
  * The screen socket for screen connections.
@@ -63,9 +71,9 @@ function setupServer() {
   )
 
   router.get('/', (_, res) => {
-    const sKeys = Object.keys(screens).map((s) => parseInt(s))
+    const sKeys = Object.keys(screens).map((s) => +s)
 
-    if (sKeys.length === screenAmount) {
+    if (sKeys.length === +screenAmount) {
       res.send('Screen limit reached!')
     } else {
       res.redirect(
@@ -76,7 +84,11 @@ function setupServer() {
   })
 
   router.get('/screen/:screenNumber', (_, res) => {
-    res.sendFile(path.resolve(__dirname, '../dist/index.html'))
+    if (Object.keys(screens).map((s) => +s).length === +screenAmount) {
+      res.send('Screen limit reached!')
+    } else {
+      res.sendFile(path.resolve(__dirname, '../dist/index.html'))
+    }
   })
 
   app.use('/', router)
@@ -108,6 +120,45 @@ function setupSocketScreen() {
       callback(screen)
     }
     socket.on('connect-screen', connectScreen)
+
+    /**
+     * Sets the total screen amount.
+     *
+     * @param {number} amount - The amount of screens to be used in the game area.
+     */
+    function setScreenAmount(amount) {
+      screenAmount = amount
+      screensBySide = Math.floor(amount / 2)
+    }
+    socket.on('set-screen-amount', setScreenAmount)
+
+    /**
+     * Gets an object with the screens and the canvas total width and height.
+     *
+     * @param {(screens: Screen, canvasWidth: number, canvasHeight: number) => void} callback - The function that is going to be called at the end.
+     */
+    function getScreens(callback) {
+      const screenKeys = Object.keys(screens).sort((s1, s2) => +s1 - +s2)
+
+      const leftSide = [...screenKeys].slice(screensBySide + 1)
+      const rightSide = [...screenKeys].slice(0, screensBySide + 1)
+
+      ;[...leftSide, ...rightSide].forEach((screenNumber, index) => {
+        screens[screenNumber].position = index
+      })
+
+      const canvasWidth = Object.values(screens)
+        .map((s) => s.width)
+        .reduce((previous, current) => previous + current)
+      const canvasHeight = screens['1'].height
+
+      callback({
+        screens,
+        canvasWidth,
+        canvasHeight,
+      })
+    }
+    socket.on('get-screens', getScreens)
   })
 }
 setupSocketScreen()
@@ -157,7 +208,7 @@ function setScreen(id, screenN, width, height) {
   /**
    * @type {Screen}
    */
-  const screen = { id, width, height }
+  const screen = { id, width, height, position: 0 }
 
   const numbers = Object.keys(screens).map((n) => parseInt(n))
   const newScreenN = numbers.length === 0 ? 1 : numbers[numbers.length - 1] + 1
