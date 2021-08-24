@@ -16,6 +16,11 @@ export class Game {
   public context: CanvasRenderingContext2D
 
   /**
+   * Property that defines the current screen number
+   */
+  public screenNumber: number
+
+  /**
    * Property that defines an array of entities, that represents all the
    * initial instantiated entities in the game
    */

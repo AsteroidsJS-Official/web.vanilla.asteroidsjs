@@ -21,6 +21,7 @@ export class GameFactory {
 
     const game = new Game()
 
+    game.screenNumber = options.screenNumber
     game.context = canvas.getContext('2d')
     game.bootstrap.push(...options.bootstrap.map((entity) => new entity(game)))
 
