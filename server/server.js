@@ -107,9 +107,7 @@ function setupSocketScreen() {
       const screen = setScreen(socket.id, number, width, height)
       callback(screen)
     }
-    socket.on('connectScreen', connectScreen)
-
-    socket.emit('test-index', 'Hello from server')
+    socket.on('connect-screen', connectScreen)
   })
 }
 setupSocketScreen()
