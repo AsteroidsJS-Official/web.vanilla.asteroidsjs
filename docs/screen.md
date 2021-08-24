@@ -5,8 +5,7 @@ const screens = {
     number: 1,
     width: 500,
     height: 300,
-    position: 2,
-    center: 0
+    position: 2
   },
   '2': {},
   '3': {},
