@@ -17,6 +17,17 @@ dotenv.config()
  */
 
 /**
+ * @typedef {Object} Vector2
+ * @property {object} position - The entity position;
+ * @property {number} position.x - The entity x position;
+ * @property {number} position.y - The entity y position;
+ * @property {number} rotation - The entity rotation;
+ * @property {object} dimensions - The entity dimensions;
+ * @property {number} dimensions.width - The entity width;
+ * @property {number} dimensions.height - The entity height;
+ */
+
+/**
  * The arguments passed by the command line.
  *
  * @type {string[]}
@@ -115,8 +126,9 @@ function setupSocketScreen() {
      * @param {number} height - The screen height.
      * @param {(screen: Screen) => void} callback - A function to be called once the screen has been set.
      */
-    function connectScreen(number, width, height, callback) {
+    function connectScreen({ number, width, height }, callback) {
       const screen = setScreen(socket.id, number, width, height)
+      socket.join(screen.number === 1 ? 'master' : 'slave')
       callback(screen)
     }
     socket.on('connect-screen', connectScreen)
@@ -159,6 +171,18 @@ function setupSocketScreen() {
       })
     }
     socket.on('get-screens', getScreens)
+
+    /**
+     * Updates the positions of the entity in the slaves screens.
+     *
+     * @param {Vector2} vector - The master entity vector.
+     */
+    function updateSlaves(screenNumber, vector) {
+      if (screenNumber === 1) {
+        ioScreen.to('slave').emit('update-slave', vector)
+      }
+    }
+    socket.on('update-slaves', updateSlaves)
   })
 }
 setupSocketScreen()
