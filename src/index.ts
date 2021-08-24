@@ -31,6 +31,8 @@ function connectScreen(response: IScreen): void {
   })
 
   socket.on('start-game', () => {
+    button.style.display = 'none'
+
     socket.emit(
       'get-screens',
       (data: {
