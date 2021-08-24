@@ -8,18 +8,21 @@ import { IScreen } from './assets/ts/interfaces/screen.interface'
 const socket = io('http://localhost:8080')
 
 socket.emit(
-  'connectScreen',
+  'connect-screen',
   window.location.pathname.split('/screen/')[1].split('/')[0],
   window.innerWidth,
   window.innerHeight,
   (response: IScreen) => {
     console.log(response)
-    bootstrap()
+    bootstrap(response)
   },
 )
 
-// TODO: pass window sizes as params to setup()
-function bootstrap(): void {
-  const game = GameFactory.create({ bootstrap: [Manager] })
+function bootstrap(response: IScreen): void {
+  const game = GameFactory.create({
+    bootstrap: [Manager],
+    width: response.width,
+    height: response.height,
+  })
   game.start()
 }
