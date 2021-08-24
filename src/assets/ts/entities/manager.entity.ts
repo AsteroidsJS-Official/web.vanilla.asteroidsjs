@@ -1,3 +1,5 @@
+import { SocketUpdateTransform } from '../engine/components/socket-update-transform.component'
+
 import { AvoidOverflow } from '../engine/components/avoid-overflow.component'
 import { Collider2 } from '../engine/components/collider2.component'
 import { Input } from '../engine/components/input.component'
@@ -6,6 +8,7 @@ import { Transform } from '../engine/components/transform.component'
 import { Entity } from '../engine/core/entity'
 import { IStart } from '../engine/interfaces/start.interface'
 import { Meteor } from './meteor.entity'
+import { SpaceshipVirtual } from './spaceship-virtual.entity'
 import { Spaceship } from './spaceship.entity'
 
 export class Manager extends Entity implements IStart {
@@ -15,9 +18,23 @@ export class Manager extends Entity implements IStart {
       components: [Transform, Rigidbody, AvoidOverflow],
     })
 
-    this.instantiate({
-      entity: Spaceship,
-      components: [Transform, Rigidbody, AvoidOverflow, Input, Collider2],
-    })
+    if (this.game.screenNumber === 1) {
+      this.instantiate({
+        entity: Spaceship,
+        components: [
+          Transform,
+          Rigidbody,
+          AvoidOverflow,
+          Input,
+          Collider2,
+          SocketUpdateTransform,
+        ],
+      })
+    } else {
+      this.instantiate({
+        entity: SpaceshipVirtual,
+        components: [Transform, AvoidOverflow, SocketUpdateTransform],
+      })
+    }
   }
 }
