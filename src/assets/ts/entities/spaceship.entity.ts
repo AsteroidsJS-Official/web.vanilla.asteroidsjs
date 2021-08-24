@@ -16,8 +16,8 @@ export class Spaceship
   private transform: Transform
   private rigidbody: Rigidbody
 
-  public readonly force = 0.2
-  public readonly angularForce = 0.01
+  public readonly force = 0.5
+  public readonly angularForce = 0.1
 
   public get direction(): Vector2 {
     return new Vector2(
@@ -30,10 +30,10 @@ export class Spaceship
     this.transform = this.getComponent(Transform)
     this.rigidbody = this.getComponent(Rigidbody)
 
-    this.transform.dimensions = new Rect(50, 50)
+    this.transform.dimensions = new Rect(40, 50)
     this.rigidbody.mass = 10
-    this.rigidbody.maxVelocity = 2
-    this.rigidbody.maxAngularVelocity = 0.025
+    this.rigidbody.maxVelocity = 5
+    this.rigidbody.maxAngularVelocity = 0.1
   }
 
   public startCollide(collision: Collision2): void {
