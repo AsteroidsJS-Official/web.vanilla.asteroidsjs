@@ -39,26 +39,26 @@ export class Input extends Component implements IStart {
    * Function that realize the player moves
    * @param key string that represents the key pressed
    */
-  private setGameKeyPressed(key: string, isPreseed: boolean): void {
+  private setGameKeyPressed(key: string, isPressed: boolean): void {
     switch (key) {
       case 'W':
       case 'ArrowUp':
-        this.gameKeys['up'] = isPreseed
+        this.gameKeys['up'] = isPressed
         break
 
       case 'A':
       case 'ArrowLeft':
-        this.gameKeys['left'] = isPreseed
+        this.gameKeys['left'] = isPressed
         break
 
       case 'S':
       case 'ArrowDown':
-        this.gameKeys['down'] = isPreseed
+        this.gameKeys['down'] = isPressed
         break
 
       case 'D':
       case 'ArrowRight':
-        this.gameKeys['right'] = isPreseed
+        this.gameKeys['right'] = isPressed
         break
     }
   }
@@ -66,25 +66,29 @@ export class Input extends Component implements IStart {
   private move(): void {
     if (
       !Object.entries(this.gameKeys)
+        .filter((item) => item[0] === 'left' || item[0] === 'right')
         .map((item) => item[1])
         .reduce((prev, cur) => prev || cur)
     ) {
-      this.rigidbody.resultant = new Vector2()
-      this.rigidbody.angularResultant = 0
-      return
+      this.rigidbody.angularVelocity = 0
     }
+
+    if (!this.gameKeys['up']) {
+      this.rigidbody.resultant = new Vector2()
+    }
+
     for (const key in this.gameKeys) {
       if (this.gameKeys[key] && key === 'up') {
         this.rigidbody.resultant = Vector2.sum(
-          this.rigidbody.resultant,
+          new Vector2(),
           Vector2.multiply(this.spaceship.direction, this.spaceship.force),
         )
       }
       if (this.gameKeys[key] && key === 'right') {
-        this.rigidbody.angularResultant += this.spaceship.angularForce
+        this.rigidbody.angularVelocity = this.spaceship.angularForce
       }
       if (this.gameKeys[key] && key === 'left') {
-        this.rigidbody.angularResultant += -this.spaceship.angularForce
+        this.rigidbody.angularVelocity = -this.spaceship.angularForce
       }
     }
   }
