@@ -3,4 +3,5 @@ export interface IScreen {
   number: number
   width: number
   height: number
+  position: number
 }
