@@ -68,7 +68,7 @@ export class Input extends Component implements IStart {
       !Object.entries(this.gameKeys)
         .filter((item) => item[0] === 'left' || item[0] === 'right')
         .map((item) => item[1])
-        .reduce((prev, cur) => prev || cur)
+        .reduce((prev, cur) => prev || cur, false)
     ) {
       this.rigidbody.angularVelocity = 0
       this.rigidbody.angularResultant = 0
