@@ -183,6 +183,14 @@ function setupSocketScreen() {
       }
     }
     socket.on('update-slaves', updateSlaves)
+
+    /**
+     * Emits to all slaves screens that the game has started.
+     */
+    function startGame() {
+      ioScreen.emit('start-game')
+    }
+    socket.on('start-game', startGame)
   })
 }
 setupSocketScreen()
