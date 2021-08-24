@@ -6,4 +6,5 @@ export interface GameFactoryOptions {
   screenNumber: number
   width?: number
   height?: number
+  displacement?: number
 }
