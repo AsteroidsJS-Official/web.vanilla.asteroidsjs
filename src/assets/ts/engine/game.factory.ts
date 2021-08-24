@@ -16,8 +16,8 @@ export class GameFactory {
       'asteroidsjs-canvas',
     ) as HTMLCanvasElement
 
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
+    canvas.width = options.width || window.innerWidth
+    canvas.height = options.height || window.innerHeight
 
     const game = new Game()
 
