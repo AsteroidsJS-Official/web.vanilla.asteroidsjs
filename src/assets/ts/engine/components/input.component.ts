@@ -71,6 +71,7 @@ export class Input extends Component implements IStart {
         .reduce((prev, cur) => prev || cur)
     ) {
       this.rigidbody.angularVelocity = 0
+      this.rigidbody.angularResultant = 0
     }
 
     if (!this.gameKeys['up']) {
@@ -85,10 +86,18 @@ export class Input extends Component implements IStart {
         )
       }
       if (this.gameKeys[key] && key === 'right') {
-        this.rigidbody.angularVelocity = this.spaceship.angularForce
+        this.rigidbody.angularResultant += this.spaceship.angularForce
+
+        if (this.gameKeys['left']) {
+          this.rigidbody.angularResultant = 0
+        }
       }
       if (this.gameKeys[key] && key === 'left') {
-        this.rigidbody.angularVelocity = -this.spaceship.angularForce
+        this.rigidbody.angularResultant += -this.spaceship.angularForce
+
+        if (this.gameKeys['right']) {
+          this.rigidbody.angularResultant = 0
+        }
       }
     }
   }

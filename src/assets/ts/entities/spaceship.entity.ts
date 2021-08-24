@@ -17,7 +17,7 @@ export class Spaceship
   private rigidbody: Rigidbody
 
   public readonly force = 0.5
-  public readonly angularForce = 0.1
+  public readonly angularForce = 0.02
 
   public get direction(): Vector2 {
     return new Vector2(
