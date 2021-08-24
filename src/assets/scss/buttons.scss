@@ -1,0 +1,27 @@
+#play-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  height: 100px;
+  width: 200px;
+
+  color: #ff0055;
+  font-size: 4rem;
+  font-weight: 900;
+
+  opacity: 1;
+  cursor: pointer;
+  background-color: transparent;
+  outline: none;
+  box-shadow: none;
+  border: none;
+
+  transform: translate(-50%, -50%);
+
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
