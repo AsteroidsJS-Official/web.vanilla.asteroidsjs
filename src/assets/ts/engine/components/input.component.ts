@@ -1,12 +1,13 @@
 import { IGameKeys } from '../../interfaces/input.interface'
 import { ISpaceship } from '../../interfaces/spaceship.interface'
 import { Component } from '../core/component'
+import { ILoop } from '../interfaces/loop.interface'
 import { IStart } from '../interfaces/start.interface'
 import { Vector2 } from '../math/vector2'
 import { Rigidbody } from './rigidbody.component'
 import { fromEvent } from 'rxjs'
 
-export class Input extends Component implements IStart {
+export class Input extends Component implements IStart, ILoop {
   private gameKeys: IGameKeys = {}
   private spaceship: ISpaceship
   private rigidbody: Rigidbody
@@ -26,12 +27,10 @@ export class Input extends Component implements IStart {
   public keyPressed(): void {
     fromEvent(window, 'keydown').subscribe((e: KeyboardEvent) => {
       this.setGameKeyPressed(e.key, true)
-      this.move()
     })
 
     fromEvent(window, 'keyup').subscribe((e: KeyboardEvent) => {
       this.setGameKeyPressed(e.key, false)
-      this.move()
     })
   }
 
@@ -63,7 +62,7 @@ export class Input extends Component implements IStart {
     }
   }
 
-  private move(): void {
+  public loop(): void {
     if (
       !Object.entries(this.gameKeys)
         .filter((item) => item[0] === 'left' || item[0] === 'right')
@@ -75,13 +74,13 @@ export class Input extends Component implements IStart {
     }
 
     if (!this.gameKeys['up']) {
-      this.rigidbody.resultant = new Vector2()
+      // this.rigidbody.resultant = new Vector2()
     }
 
     for (const key in this.gameKeys) {
       if (this.gameKeys[key] && key === 'up') {
         this.rigidbody.resultant = Vector2.sum(
-          new Vector2(),
+          this.rigidbody.resultant,
           Vector2.multiply(this.spaceship.direction, this.spaceship.force),
         )
       }

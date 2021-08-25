@@ -17,6 +17,8 @@ export class Rigidbody extends Component implements IStart, ILoop {
    */
   public mass = 1
 
+  public friction = 0
+
   /**
    * Property that defines the sum of all the forces applied to the entity,
    * resulting in a movement or not
@@ -102,19 +104,21 @@ export class Rigidbody extends Component implements IStart, ILoop {
     this.angularVelocity += angularAceleration
     this.transform.rotation += this.angularVelocity
 
-    const aceleration = Vector2.multiply(
-      new Vector2(this.resultant.x, this.resultant.y),
-      1 / this.mass,
-    )
+    const aceleration = Vector2.multiply(this.resultant, 1 / this.mass)
 
     this.transform.position = Vector2.sum(
       this.transform.position,
       this.velocity,
     )
     this.velocity = Vector2.sum(this.velocity, aceleration)
+
+    this.applyFriction()
   }
 
-  private abs(value: number): number {
-    return value < 0 ? -value : value
+  private applyFriction(): void {
+    let force = Vector2.multiply(this.velocity.normalized, -1)
+    const normal = this.mass
+    force = Vector2.multiply(force, this.friction * normal)
+    this.resultant = force
   }
 }
