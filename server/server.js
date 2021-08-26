@@ -203,6 +203,10 @@ function setupSocketScreen() {
       ioScreen.emit('start-game')
     }
     socket.on('start-game', startGame)
+
+    socket.on('disconnect', (reason) => {
+      console.log(`(${socket.id}) Screen disconnected: ${reason}`)
+    })
   })
 }
 setupSocketScreen()
