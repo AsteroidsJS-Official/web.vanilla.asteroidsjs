@@ -7,27 +7,31 @@ import { Vector2 } from '../math/vector2'
 import { Transform } from './transform.component'
 
 /**
- * Component that adds physical behaviors such as velocity and acceleration to
- * an entity
+ * Component that adds physical behaviors such as velocity and
+ * acceleration to an entity
  */
 export class Rigidbody extends Component implements IStart, ILoop {
   /**
-   * Property that defines the entity mass, that directly interfers with the
-   * inertia of the entity
+   * Property that defines the entity mass, that directly interfers with
+   * the inertia of the entity
    */
   public mass = 1
 
+  /**
+   * Property that defines a value that represents the friction applied
+   * to some rigidbody that desacelerates it based on the velocity value
+   */
   public friction = 0
 
   /**
-   * Property that defines the sum of all the forces applied to the entity,
-   * resulting in a movement or not
+   * Property that defines the sum of all the forces applied to the
+   * entity, resulting in a movement or not
    */
   public resultant = new Vector2()
 
   /**
-   * Property that defines the sum of all the forces applied to the entity,
-   * resulting in a spin or not
+   * Property that defines the sum of all the forces applied to the
+   * entity, resulting in a spin or not
    */
   public angularResultant = 0
 
@@ -99,22 +103,38 @@ export class Rigidbody extends Component implements IStart, ILoop {
   }
 
   public loop(): void {
-    const angularAceleration = this.angularResultant / this.mass
+    this.updateRotation()
+    this.updatePosition()
+    this.applyFriction()
+  }
 
+  /**
+   * Method that changes the rigidbody rotation based on the properties
+   * related to it such as `angularResultant` and `angularVelocity`
+   */
+  private updateRotation(): void {
+    const angularAceleration = this.angularResultant / this.mass
     this.angularVelocity += angularAceleration
     this.transform.rotation += this.angularVelocity
+  }
 
+  /**
+   * Method that changes the rigidbody position based on the propertie
+   * related to it, such as `resultant` and `velocity`
+   */
+  private updatePosition(): void {
     const aceleration = Vector2.multiply(this.resultant, 1 / this.mass)
-
     this.transform.position = Vector2.sum(
       this.transform.position,
       this.velocity,
     )
     this.velocity = Vector2.sum(this.velocity, aceleration)
-
-    this.applyFriction()
   }
 
+  /**
+   * Method that applies the fricion based on the properties related to
+   * it, such as `resultant`, `velocity` and `mass`
+   */
   private applyFriction(): void {
     let force = Vector2.multiply(this.velocity.normalized, -1)
     const normal = this.mass

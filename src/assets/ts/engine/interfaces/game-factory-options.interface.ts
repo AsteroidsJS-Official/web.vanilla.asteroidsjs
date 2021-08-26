@@ -1,10 +1,37 @@
 import { Entity } from '../core/entity'
 import { Type } from './type.interface'
 
+/**
+ * Interface that represents all the options the user can set for running
+ * the game instance
+ */
 export interface GameFactoryOptions {
-  bootstrap: Type<Entity>[]
+  /**
+   * Property that defines which of the `Multiple Screens` this one is
+   */
   screenNumber: number
+
+  /**
+   * Property that defines the canvas width
+   */
   width?: number
+
+  /**
+   * Property that defines the canvas height
+   */
   height?: number
+
+  /**
+   * Property that defines the canvas displacement
+   *
+   * @note This property is only  applied when the `Multiple Screens` is
+   * applied
+   */
   displacement?: number
+
+  /**
+   * Property that represents an array of entities that will be the first
+   * ones to be instanciated in the application
+   */
+  bootstrap: Type<Entity>[]
 }
