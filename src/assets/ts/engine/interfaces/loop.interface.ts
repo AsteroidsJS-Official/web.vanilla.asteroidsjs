@@ -1,6 +1,6 @@
 /**
  * Interface that represents some class that has a `loop` method that is
- * called evenry game cycle
+ * called every game cycle
  */
 export interface ILoop {
   /**

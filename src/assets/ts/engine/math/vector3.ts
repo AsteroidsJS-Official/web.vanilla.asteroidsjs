@@ -1,11 +1,11 @@
 /**
  * Class that represents a vector with two dimensions
  *
- * This can be used to represents forces, velocity, position and dimensions
- * or some entity
+ * This can be used to represents forces, velocity, position and
+ * dimensions or some entity
  *
  * @example
- * ```typescript
+ * ```ts
  * const vector = new Vector3(1, 1, 1)
  * ```
  *
@@ -24,7 +24,7 @@ export class Vector3 {
    * magnitude 1
    *
    * @example
-   * ```typescript
+   * ```ts
    * const vector = new Vector2(2, 2, 2) // { x: 3, y: 4, z: 0 }
    * const normalizedVector = vector.nomalized // { x: 0.6, y: 0.8, z: 0 }
    * ```
@@ -37,8 +37,8 @@ export class Vector3 {
   public constructor(public x = 0, public y = 0, public z = 0) {}
 
   /**
-   * Method that calculates the distance between two vectors usin `Euclidean
-   * distance`
+   * Method that calculates the distance between two vectors usin
+   * `Euclidean distance`
    *
    * @param v1 defines the first vector
    * @param v2 defines the second vector
