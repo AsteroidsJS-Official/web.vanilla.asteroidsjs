@@ -24,7 +24,7 @@ export class Spaceship extends Entity implements ISpaceship, IStart, IDraw {
   /**
    * Property responsible for the spaceship acceleration force.
    */
-  public readonly force = 2
+  public readonly force = 3
 
   /**
    * Property responsible for the spaceship rotation force.
@@ -45,10 +45,10 @@ export class Spaceship extends Entity implements ISpaceship, IStart, IDraw {
     this.transform = this.getComponent(Transform)
     this.rigidbody = this.getComponent(Rigidbody)
 
-    this.transform.dimensions = new Rect(40, 50)
+    this.transform.dimensions = new Rect(30, 45)
     this.rigidbody.friction = 0.005
     this.rigidbody.mass = 10
-    this.rigidbody.maxAngularVelocity = 0.06
+    this.rigidbody.maxAngularVelocity = 0.09
   }
 
   public draw(): void {
