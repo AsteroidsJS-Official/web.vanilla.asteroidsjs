@@ -7,6 +7,10 @@ import { Rect } from '../math/rect'
 import { Vector2 } from '../math/vector2'
 import { Transform } from './transform.component'
 
+/**
+ * Class that represents the component that update the entities into the slave
+ * screens according to their position in the master
+ */
 export class SocketUpdateTransform extends Component implements IStart, ILoop {
   private transform: Transform
 
@@ -14,13 +18,8 @@ export class SocketUpdateTransform extends Component implements IStart, ILoop {
     this.transform = this.getComponent(Transform)
 
     if (this.game.screenNumber !== 1) {
-      socket.on('update-slave', ({ position, dimensions, rotation }) => {
-        this.transform.position = new Vector2(position.x, position.y)
-        this.transform.dimensions = new Rect(
-          dimensions.width,
-          dimensions.height,
-        )
-        this.transform.rotation = rotation
+      socket.on('update-slave', (response) => {
+        this.updateSlave(response)
       })
     }
   }
@@ -36,5 +35,30 @@ export class SocketUpdateTransform extends Component implements IStart, ILoop {
       dimensions,
       rotation,
     })
+  }
+
+  /**
+   * Updates the current slave screen based on the master screen entity.
+   *
+   * @param data An object containing the master entity's position, dimensions and rotation.
+   *
+   * @example
+   * {
+   *   position: { x: 67, y: -450 },
+   *   dimensions: { width: 40, height: 50 },
+   *   rotation: 40,
+   * }
+   */
+  updateSlave(data: {
+    position: { x: number; y: number }
+    dimensions: { width: number; height: number }
+    rotation: number
+  }): void {
+    this.transform.position = new Vector2(data.position.x, data.position.y)
+    this.transform.dimensions = new Rect(
+      data.dimensions.width,
+      data.dimensions.height,
+    )
+    this.transform.rotation = data.rotation
   }
 }
