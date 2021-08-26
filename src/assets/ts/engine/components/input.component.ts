@@ -7,9 +7,36 @@ import { Vector2 } from '../math/vector2'
 import { Rigidbody } from './rigidbody.component'
 import { fromEvent } from 'rxjs'
 
+/**
+ * Class that represents the component that allows  the user interaction
+ * with the game
+ */
 export class Input extends Component implements IStart, ILoop {
+  /**
+   * Property that contains the pressed keys and whether they are pressed
+   * or not.
+   *
+   * @example
+   * {
+   *   'up': true,
+   *   'left': true,
+   *   'right': false,
+   *   'down': false,
+   *   'shoot': false
+   * }
+   *
+   * @default {}
+   */
   private gameKeys: IGameKeys = {}
+
+  /**
+   * Property that represents the controlled spaceship.
+   */
   private spaceship: ISpaceship
+
+  /**
+   * Property that represents the controlled entity's rigidbody.
+   */
   private rigidbody: Rigidbody
 
   public start(): void {
@@ -26,38 +53,45 @@ export class Input extends Component implements IStart, ILoop {
    */
   public keyPressed(): void {
     fromEvent(window, 'keydown').subscribe((e: KeyboardEvent) => {
-      this.setGameKeyPressed(e.key, true)
+      this.setGameKeyPressed(e.code, true)
     })
 
     fromEvent(window, 'keyup').subscribe((e: KeyboardEvent) => {
-      this.setGameKeyPressed(e.key, false)
+      this.setGameKeyPressed(e.code, false)
     })
   }
 
   /**
-   * Function that realize the player moves
-   * @param key string that represents the key pressed
+   * Function that realize the player moves.
+   *
+   * @param key - String that represents the pressed key.
+   * @param isPressed - Whether the key is pressed or not.
    */
   private setGameKeyPressed(key: string, isPressed: boolean): void {
     switch (key) {
-      case 'W':
+      case 'KeyW':
       case 'ArrowUp':
         this.gameKeys['up'] = isPressed
         break
 
-      case 'A':
+      case 'KeyA':
       case 'ArrowLeft':
         this.gameKeys['left'] = isPressed
         break
 
-      case 'S':
+      case 'KeyS':
       case 'ArrowDown':
         this.gameKeys['down'] = isPressed
         break
 
-      case 'D':
+      case 'KeyD':
       case 'ArrowRight':
         this.gameKeys['right'] = isPressed
+        break
+
+      case 'Space':
+      case 'ShiftRight':
+        this.gameKeys['shoot'] = isPressed
         break
     }
   }
@@ -71,10 +105,6 @@ export class Input extends Component implements IStart, ILoop {
     ) {
       this.rigidbody.angularVelocity = 0
       this.rigidbody.angularResultant = 0
-    }
-
-    if (!this.gameKeys['up']) {
-      // this.rigidbody.resultant = new Vector2()
     }
 
     for (const key in this.gameKeys) {
