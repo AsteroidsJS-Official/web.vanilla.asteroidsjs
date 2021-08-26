@@ -7,13 +7,33 @@ import { Rect } from '../engine/math/rect'
 import { Vector2 } from '../engine/math/vector2'
 import { ISpaceship } from '../interfaces/spaceship.interface'
 
+/**
+ * Class that represents the spaceship entity controlled by the user.
+ */
 export class Spaceship extends Entity implements ISpaceship, IStart, IDraw {
+  /**
+   * Property that contains the spaceship position, dimensions and rotation.
+   */
   private transform: Transform
+
+  /**
+   * Property that contains the spaceship physics.
+   */
   private rigidbody: Rigidbody
 
+  /**
+   * Property responsible for the spaceship acceleration force.
+   */
   public readonly force = 2
+
+  /**
+   * Property responsible for the spaceship rotation force.
+   */
   public readonly angularForce = 0.03
 
+  /**
+   * Property that indicates the direction that the spaceship is facing.
+   */
   public get direction(): Vector2 {
     return new Vector2(
       Math.sin(this.transform.rotation),

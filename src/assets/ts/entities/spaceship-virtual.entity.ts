@@ -4,9 +4,19 @@ import { IDraw } from '../engine/interfaces/draw.interface'
 import { IStart } from '../engine/interfaces/start.interface'
 import { Vector2 } from '../engine/math/vector2'
 
+/**
+ * Class that represents the virtual spaceship entity, used for rendering
+ * uncontrollable spaceships.
+ */
 export class SpaceshipVirtual extends Entity implements IStart, IDraw {
+  /**
+   * Property that contains the spaceship position, dimensions and rotation.
+   */
   private transform: Transform
 
+  /**
+   * Property that indicates the direction that the spaceship is facing.
+   */
   public get direction(): Vector2 {
     return new Vector2(
       Math.sin(this.transform.rotation),
