@@ -11,6 +11,11 @@ const connectScreenData = {
   height: window.innerHeight,
 }
 
+/**
+ * Connects the current screen to the socket screen.
+ *
+ * @param response - The screen information.
+ */
 function connectScreen(response: IScreen): void {
   console.log(response)
 
@@ -30,7 +35,10 @@ function connectScreen(response: IScreen): void {
     socket.emit('start-game')
   })
 
-  socket.on('start-game', () => {
+  /**
+   * Configures the canvas total size and it's displacement.
+   */
+  function startGame(): void {
     button.style.display = 'none'
 
     socket.emit(
@@ -54,10 +62,17 @@ function connectScreen(response: IScreen): void {
         )
       },
     )
-  })
+  }
+  socket.on('start-game', startGame)
 }
 socket.emit('connect-screen', connectScreenData, connectScreen)
 
+/**
+ * Creates and starts the game.
+ *
+ * @param response - The master screen data.
+ * @param displacement - The canvas displacement.
+ */
 function bootstrap(response: IScreen, displacement: number): void {
   const game = GameFactory.create({
     bootstrap: [Manager],
