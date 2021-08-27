@@ -39,6 +39,11 @@ export class Input extends Component implements IStart, ILoop {
    */
   private rigidbody: Rigidbody
 
+  /**
+   * Property that contains the bullet generation interval.
+   */
+  private bulletInterval: NodeJS.Timer
+
   public start(): void {
     this.requires([Rigidbody])
 
@@ -107,27 +112,48 @@ export class Input extends Component implements IStart, ILoop {
       this.rigidbody.angularResultant = 0
     }
 
-    for (const key in this.gameKeys) {
-      if (this.gameKeys[key] && key === 'up') {
-        this.rigidbody.resultant = Vector2.sum(
-          this.rigidbody.resultant,
-          Vector2.multiply(this.spaceship.direction, this.spaceship.force),
-        )
-      }
-      if (this.gameKeys[key] && key === 'right') {
-        this.rigidbody.angularResultant += this.spaceship.angularForce
+    if (this.gameKeys['shoot'] && !this.spaceship.isShooting) {
+      this.generateBullet()
+    } else if (!this.gameKeys['shoot'] && this.spaceship.isShooting) {
+      clearInterval(this.bulletInterval)
+    }
 
-        if (this.gameKeys['left']) {
-          this.rigidbody.angularResultant = 0
-        }
-      }
-      if (this.gameKeys[key] && key === 'left') {
-        this.rigidbody.angularResultant += -this.spaceship.angularForce
+    this.spaceship.isShooting = this.gameKeys['shoot']
 
-        if (this.gameKeys['right']) {
-          this.rigidbody.angularResultant = 0
-        }
+    if (this.gameKeys['up']) {
+      this.rigidbody.resultant = Vector2.sum(
+        this.rigidbody.resultant,
+        Vector2.multiply(this.spaceship.direction, this.spaceship.force),
+      )
+    }
+    if (this.gameKeys['right']) {
+      this.rigidbody.angularResultant += this.spaceship.angularForce
+
+      if (this.gameKeys['left']) {
+        this.rigidbody.angularResultant = 0
       }
     }
+    if (this.gameKeys['left']) {
+      this.rigidbody.angularResultant += -this.spaceship.angularForce
+
+      if (this.gameKeys['right']) {
+        this.rigidbody.angularResultant = 0
+      }
+    }
+  }
+
+  /**
+   * Generates a bullet each amount of time.
+   */
+  private generateBullet(): void {
+    // this.spaceship.shoot()
+
+    this.bulletInterval = setInterval(() => {
+      if (!this.spaceship.isShooting) {
+        return
+      }
+
+      this.spaceship.shoot()
+    }, 400)
   }
 }

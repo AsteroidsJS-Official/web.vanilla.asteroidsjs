@@ -1,18 +1,37 @@
+import { RenderOverflow } from '../engine/components/render-overflow.component'
+import { Rigidbody } from '../engine/components/rigidbody.component'
 import { Transform } from '../engine/components/transform.component'
 import { Entity } from '../engine/core/entity'
 import { IDraw } from '../engine/interfaces/draw.interface'
+import { ILoop } from '../engine/interfaces/loop.interface'
 import { IStart } from '../engine/interfaces/start.interface'
 import { Vector2 } from '../engine/math/vector2'
+import { Bullet } from './bullet.entity'
 
 /**
  * Class that represents the virtual spaceship entity, used for rendering
  * uncontrollable spaceships.
  */
-export class SpaceshipVirtual extends Entity implements IStart, IDraw {
+export class SpaceshipVirtual extends Entity implements IStart, IDraw, ILoop {
   /**
    * Property that contains the spaceship position, dimensions and rotation.
    */
   private transform: Transform
+
+  /**
+   * Property that contains the spaceship velocity.
+   */
+  private velocity: Vector2
+
+  /**
+   * Property responsible for the spaceship bullet velocity.
+   */
+  public readonly bulletVelocity = 10
+
+  /**
+   * Property that contains the bullet generation interval.
+   */
+  private bulletInterval: NodeJS.Timer
 
   /**
    * Property that indicates the direction that the spaceship is facing.
@@ -23,6 +42,8 @@ export class SpaceshipVirtual extends Entity implements IStart, IDraw {
       Math.cos(this.transform.rotation),
     )
   }
+
+  public isShooting = false
 
   public start(): void {
     this.transform = this.getComponent(Transform)
@@ -58,5 +79,56 @@ export class SpaceshipVirtual extends Entity implements IStart, IDraw {
       -this.transform.canvasPosition.x,
       -this.transform.canvasPosition.y,
     )
+  }
+
+  public loop(): void {
+    if (this.isShooting && !this.bulletInterval) {
+      this.bulletInterval = setInterval(() => {
+        const bulletLeft = this.instantiate({
+          entity: Bullet,
+          components: [Transform, Rigidbody, RenderOverflow],
+        })
+
+        bulletLeft.transform.position = Vector2.sum(
+          this.transform.position,
+          Vector2.multiply(
+            new Vector2(
+              Math.sin(this.transform.rotation - (2 * Math.PI) / 3),
+              Math.cos(this.transform.rotation - (2 * Math.PI) / 3),
+            ),
+            23,
+          ),
+        )
+        bulletLeft.transform.rotation = this.transform.rotation
+        bulletLeft.rigidbody.velocity = Vector2.sum(
+          this.velocity,
+          Vector2.multiply(this.direction, this.bulletVelocity),
+        )
+
+        const bulletRight = this.instantiate({
+          entity: Bullet,
+          components: [Transform, Rigidbody, RenderOverflow],
+        })
+
+        bulletRight.transform.position = Vector2.sum(
+          this.transform.position,
+          Vector2.multiply(
+            new Vector2(
+              Math.sin(this.transform.rotation + (2 * Math.PI) / 3),
+              Math.cos(this.transform.rotation + (2 * Math.PI) / 3),
+            ),
+            20,
+          ),
+        )
+        bulletRight.transform.rotation = this.transform.rotation
+        bulletRight.rigidbody.velocity = Vector2.sum(
+          this.velocity,
+          Vector2.multiply(this.direction, this.bulletVelocity),
+        )
+      }, 400)
+    } else if (!this.isShooting && this.bulletInterval) {
+      clearInterval(this.bulletInterval)
+      this.bulletInterval = null
+    }
   }
 }
