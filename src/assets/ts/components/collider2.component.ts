@@ -55,7 +55,7 @@ export class Collider2 extends Component implements IOnStart, IOnLoop {
   public onLoop(): void {
     this.normalizeCollisions()
 
-    const rigidbodies = this.findAll(Rigidbody).filter(
+    const rigidbodies = this.find(Rigidbody).filter(
       (c) => c.entity !== this.entity,
     )
     const transforms = rigidbodies.map((rigidbody) =>

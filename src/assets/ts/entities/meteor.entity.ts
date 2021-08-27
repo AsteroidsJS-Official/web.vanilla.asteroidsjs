@@ -1,16 +1,19 @@
 import { Transform } from '../components/transform.component'
 import { Entity } from '../engine/core/entity'
+import { IOnAwake } from '../engine/core/interfaces/on-awake.interface'
 import { IOnDraw } from '../engine/core/interfaces/on-draw.interface'
 import { IOnStart } from '../engine/core/interfaces/on-start.interface'
 import { Rect } from '../engine/core/math/rect'
 import { Vector2 } from '../engine/core/math/vector2'
 
-export class Meteor extends Entity implements IOnDraw, IOnStart {
+export class Meteor extends Entity implements IOnAwake, IOnStart, IOnDraw {
   private transform: Transform
 
-  public onStart(): void {
+  public onAwake(): void {
     this.transform = this.getComponent(Transform)
+  }
 
+  public onStart(): void {
     this.transform.position = new Vector2(0, 300)
     this.transform.dimensions = new Rect(75, 75)
   }

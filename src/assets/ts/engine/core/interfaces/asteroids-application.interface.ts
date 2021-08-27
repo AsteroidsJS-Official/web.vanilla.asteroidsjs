@@ -15,5 +15,7 @@ export interface IAsteroidsApplication {
     options?: IInstantiateOptions<E>,
   ): E extends Entity ? E : Entity
 
-  findAll<C extends Component>(component: Type<C>): C[]
+  find<C extends Component>(component: Type<C>): C[]
+
+  destroy<T extends Entity | Component>(instance: T): void
 }

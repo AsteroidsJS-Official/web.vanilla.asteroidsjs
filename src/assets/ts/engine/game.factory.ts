@@ -1,4 +1,4 @@
-import { hasStart, hasLoop, hasAwake } from './utils/validations'
+import { hasStart, hasLoop, hasAwake, isEntity } from './utils/validations'
 
 import { IScreen } from '../interfaces/screen.interface'
 import { Component } from './core/component'
@@ -109,10 +109,26 @@ class AsteroidsApplication implements IAsteroidsApplication {
    * @param component defines the component type
    * @returns an array with all the found components
    */
-  public findAll<C extends Component>(component: Type<C>): C[] {
+  public find<C extends Component>(component: Type<C>): C[] {
     return this.components.filter(
       (c) => c.constructor.name === component.name,
     ) as C[]
+  }
+
+  /**
+   * Method that detroyes some entity
+   *
+   * @param instance defines the instance that will be destroyed
+   */
+  public destroy<T extends Entity | Component>(instance: T): void {
+    if (isEntity(instance)) {
+      this.entities = this.entities.filter((entity) => entity !== instance)
+      instance.components.forEach((component) => this.destroy(component))
+    }
+
+    this.components = this.components.filter(
+      (component) => component !== instance,
+    )
   }
 }
 

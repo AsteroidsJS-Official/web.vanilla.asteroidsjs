@@ -39,12 +39,21 @@ export class Entity {
   }
 
   /**
+   * Method that detroyes some entity
+   *
+   * @param instance defines the instance that will be destroyed
+   */
+  public destroy<T extends Entity | Component>(instance: T): void {
+    this.game.destroy(instance)
+  }
+
+  /**
    * Method that returns some child component, attached to some entity
    *
    * @param component defines the component type
    * @returns an array of objects with the passed type
    */
-  public findAll<C extends Component>(component: Type<C>): C[] {
-    return this.game.findAll(component)
+  public find<C extends Component>(component: Type<C>): C[] {
+    return this.game.find(component)
   }
 }
