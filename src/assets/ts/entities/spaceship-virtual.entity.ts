@@ -1,8 +1,8 @@
 import { Transform } from '../components/transform.component'
-import { Entity } from '../engine/core/entity'
-import { IOnDraw } from '../engine/core/interfaces/on-draw.interface'
-import { IOnStart } from '../engine/core/interfaces/on-start.interface'
-import { Vector2 } from '../engine/core/math/vector2'
+import { Entity } from '../engine/entity'
+import { IOnDraw } from '../engine/interfaces/on-draw.interface'
+import { IOnStart } from '../engine/interfaces/on-start.interface'
+import { Vector2 } from '../engine/math/vector2'
 
 /**
  * Class that represents the virtual spaceship entity, used for rendering

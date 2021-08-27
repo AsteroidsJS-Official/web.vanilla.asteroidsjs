@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
 import { ICollider2 } from '../../interfaces/collider2.interface'
-import { Entity } from '../core/entity'
-import { IOnAwake } from '../core/interfaces/on-awake.interface'
-import { IOnDraw } from '../core/interfaces/on-draw.interface'
-import { IOnLoop } from '../core/interfaces/on-loop.interface'
-import { IOnStart } from '../core/interfaces/on-start.interface'
+import { Entity } from '../entity'
+import { IOnAwake } from '../interfaces/on-awake.interface'
+import { IOnDraw } from '../interfaces/on-draw.interface'
+import { IOnLoop } from '../interfaces/on-loop.interface'
+import { IOnStart } from '../interfaces/on-start.interface'
 
 /**
  * Method that validates if some object is of type {@link Entity}

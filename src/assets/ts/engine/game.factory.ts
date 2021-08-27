@@ -1,12 +1,12 @@
 import { hasStart, hasLoop, hasAwake, isEntity } from './utils/validations'
 
 import { IScreen } from '../interfaces/screen.interface'
-import { Component } from './core/component'
-import { Entity } from './core/entity'
-import { IAsteroidsApplication } from './core/interfaces/asteroids-application.interface'
-import { GameFactoryOptions } from './core/interfaces/game-factory-options.interface'
-import { IInstantiateOptions } from './core/interfaces/instantiate-options.interface'
-import { Type } from './core/interfaces/type.interface'
+import { Component } from './component'
+import { Entity } from './entity'
+import { IAsteroidsApplication } from './interfaces/asteroids-application.interface'
+import { GameFactoryOptions } from './interfaces/game-factory-options.interface'
+import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
+import { Type } from './interfaces/type.interface'
 
 /**
  * Class that represents the main application behaviour

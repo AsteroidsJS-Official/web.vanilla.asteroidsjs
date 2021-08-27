@@ -1,4 +1,4 @@
-import { IScreen } from '../../../interfaces/screen.interface'
+import { IScreen } from '../../interfaces/screen.interface'
 import { Component } from '../component'
 import { Entity } from '../entity'
 import { IInstantiateOptions } from './instantiate-options.interface'

@@ -1,4 +1,4 @@
-import { IScreen } from '../../../interfaces/screen.interface'
+import { IScreen } from '../../interfaces/screen.interface'
 import { Entity } from '../entity'
 import { Type } from './type.interface'
 

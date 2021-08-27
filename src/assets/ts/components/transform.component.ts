@@ -1,6 +1,6 @@
-import { Component } from '../engine/core/component'
-import { Rect } from '../engine/core/math/rect'
-import { Vector2 } from '../engine/core/math/vector2'
+import { Component } from '../engine/component'
+import { Rect } from '../engine/math/rect'
+import { Vector2 } from '../engine/math/vector2'
 
 /**
  * Component that adds soma spacial behaviours such as position and rotation

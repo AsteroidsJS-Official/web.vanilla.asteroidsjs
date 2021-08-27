@@ -1,10 +1,10 @@
 import { socket } from '../socket'
 
-import { Component } from '../engine/core/component'
-import { IOnLoop } from '../engine/core/interfaces/on-loop.interface'
-import { IOnStart } from '../engine/core/interfaces/on-start.interface'
-import { Rect } from '../engine/core/math/rect'
-import { Vector2 } from '../engine/core/math/vector2'
+import { Component } from '../engine/component'
+import { IOnLoop } from '../engine/interfaces/on-loop.interface'
+import { IOnStart } from '../engine/interfaces/on-start.interface'
+import { Rect } from '../engine/math/rect'
+import { Vector2 } from '../engine/math/vector2'
 import { Transform } from './transform.component'
 
 /**

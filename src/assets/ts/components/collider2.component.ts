@@ -1,9 +1,9 @@
 import { hasCollider } from '../engine/utils/validations'
 
-import { Component } from '../engine/core/component'
-import { IOnLoop } from '../engine/core/interfaces/on-loop.interface'
-import { IOnStart } from '../engine/core/interfaces/on-start.interface'
-import { Vector2 } from '../engine/core/math/vector2'
+import { Component } from '../engine/component'
+import { IOnLoop } from '../engine/interfaces/on-loop.interface'
+import { IOnStart } from '../engine/interfaces/on-start.interface'
+import { Vector2 } from '../engine/math/vector2'
 import { ICollider2 } from '../interfaces/collider2.interface'
 import { Collision2 } from '../interfaces/collision2.interface'
 import { Rigidbody } from './rigidbody.component'
