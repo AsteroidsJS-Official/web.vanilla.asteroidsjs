@@ -1,16 +1,16 @@
-import { abs } from '../math/utils'
+import { abs } from '../engine/core/math/utils'
 
-import { Component } from '../core/component'
-import { ILoop } from '../interfaces/loop.interface'
-import { IStart } from '../interfaces/start.interface'
-import { Vector2 } from '../math/vector2'
+import { Component } from '../engine/core/component'
+import { IOnLoop } from '../engine/core/interfaces/on-loop.interface'
+import { IOnStart } from '../engine/core/interfaces/on-start.interface'
+import { Vector2 } from '../engine/core/math/vector2'
 import { Transform } from './transform.component'
 
 /**
  * Component that adds physical behaviors such as velocity and
  * acceleration to an entity
  */
-export class Rigidbody extends Component implements IStart, ILoop {
+export class Rigidbody extends Component implements IOnStart, IOnLoop {
   /**
    * Property that defines the entity mass, that directly interfers with
    * the inertia of the entity
@@ -96,13 +96,13 @@ export class Rigidbody extends Component implements IStart, ILoop {
     this._angularVelocity = value < 0 ? -normalized : normalized
   }
 
-  public start(): void {
+  public onStart(): void {
     this.requires([Transform])
 
     this.transform = this.getComponent(Transform)
   }
 
-  public loop(): void {
+  public onLoop(): void {
     this.updateRotation()
     this.updatePosition()
     this.applyFriction()

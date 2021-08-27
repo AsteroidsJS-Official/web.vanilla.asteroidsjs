@@ -1,35 +1,27 @@
-import { SocketUpdateTransform } from '../engine/components/socket-update-transform.component'
-
-import { Input } from '../engine/components/input.component'
-import { RenderOverflow } from '../engine/components/render-overflow.component'
-import { Rigidbody } from '../engine/components/rigidbody.component'
-import { Transform } from '../engine/components/transform.component'
 import { Entity } from '../engine/core/entity'
-import { IStart } from '../engine/interfaces/start.interface'
-import { SpaceshipVirtual } from './spaceship-virtual.entity'
-import { Spaceship } from './spaceship.entity'
+import { IOnStart } from '../engine/core/interfaces/on-start.interface'
 
 /**
  * Class that represents the first entity to be loaded into the game
  */
-export class Manager extends Entity implements IStart {
-  public start(): void {
-    if (this.game.screenNumber === 1) {
-      this.instantiate({
-        entity: Spaceship,
-        components: [
-          Transform,
-          Rigidbody,
-          RenderOverflow,
-          Input,
-          SocketUpdateTransform,
-        ],
-      })
-    } else {
-      this.instantiate({
-        entity: SpaceshipVirtual,
-        components: [Transform, RenderOverflow, SocketUpdateTransform],
-      })
-    }
+export class Manager extends Entity implements IOnStart {
+  public onStart(): void {
+    // if (this.game.screenNumber === 1) {
+    //   this.instantiate({
+    //     entity: Spaceship,
+    //     components: [
+    //       Transform,
+    //       Rigidbody,
+    //       RenderOverflow,
+    //       Input,
+    //       SocketUpdateTransform,
+    //     ],
+    //   })
+    // } else {
+    //   this.instantiate({
+    //     entity: SpaceshipVirtual,
+    //     components: [Transform, RenderOverflow, SocketUpdateTransform],
+    //   })
+    // }
   }
 }

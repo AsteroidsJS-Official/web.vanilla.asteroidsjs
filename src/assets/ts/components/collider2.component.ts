@@ -1,11 +1,11 @@
-import { hasCollider } from '../utils/validations'
+import { hasCollider } from '../engine/utils/validations'
 
-import { Component } from '../core/component'
+import { Component } from '../engine/core/component'
+import { IOnLoop } from '../engine/core/interfaces/on-loop.interface'
+import { IOnStart } from '../engine/core/interfaces/on-start.interface'
+import { Vector2 } from '../engine/core/math/vector2'
 import { ICollider2 } from '../interfaces/collider2.interface'
 import { Collision2 } from '../interfaces/collision2.interface'
-import { ILoop } from '../interfaces/loop.interface'
-import { IStart } from '../interfaces/start.interface'
-import { Vector2 } from '../math/vector2'
 import { Rigidbody } from './rigidbody.component'
 import { Transform } from './transform.component'
 
@@ -16,7 +16,7 @@ import { Transform } from './transform.component'
  * A collider only interacts with entities that have the {@link Rigidbody}
  * component in order to make this behaviour more performatic
  */
-export class Collider2 extends Component implements IStart, ILoop {
+export class Collider2 extends Component implements IOnStart, IOnLoop {
   /**
    * Property that represents the parent entity as {@link ICollider2}
    */
@@ -38,7 +38,7 @@ export class Collider2 extends Component implements IStart, ILoop {
    */
   private collisions: Collision2[] = []
 
-  public start(): void {
+  public onStart(): void {
     this.requires([Transform, Rigidbody])
 
     if (!hasCollider(this.entity)) {
@@ -52,10 +52,12 @@ export class Collider2 extends Component implements IStart, ILoop {
     this.transform = this.getComponent(Transform)
   }
 
-  public loop(): void {
+  public onLoop(): void {
     this.normalizeCollisions()
 
-    const rigidbodies = this.findAllRigidbodies()
+    const rigidbodies = this.findAll(Rigidbody).filter(
+      (c) => c.entity !== this.entity,
+    )
     const transforms = rigidbodies.map((rigidbody) =>
       rigidbody.getComponent(Transform),
     )
@@ -110,16 +112,5 @@ export class Collider2 extends Component implements IStart, ILoop {
       this.collisions = this.collisions.filter((_, index) => index !== i)
       this.collider.endCollide(collision)
     }
-  }
-
-  /**
-   * Method that finds all the rigidbodies instanced in the game
-   *
-   * @returns an array with all the found rigidbodies
-   */
-  private findAllRigidbodies(): Rigidbody[] {
-    return this.game.entities
-      .filter((entity) => entity != this.entity)
-      .map((entity) => entity.getComponent(Rigidbody))
   }
 }

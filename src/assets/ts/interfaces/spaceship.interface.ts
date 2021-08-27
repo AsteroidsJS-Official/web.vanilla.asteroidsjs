@@ -1,4 +1,4 @@
-import { Vector2 } from '../engine/math/vector2'
+import { Vector2 } from '../engine/core/math/vector2'
 
 export interface ISpaceship {
   /**

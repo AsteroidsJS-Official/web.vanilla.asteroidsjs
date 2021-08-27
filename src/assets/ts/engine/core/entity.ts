@@ -1,14 +1,14 @@
-import { IInstantiateOptions } from '../interfaces/instantiate-options.interface'
-import { Type } from '../interfaces/type.interface'
 import { Component } from './component'
-import { Game } from './game'
+import { IAsteroidsApplication } from './interfaces/asteroids-application.interface'
+import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
+import { Type } from './interfaces/type.interface'
 
 /**
  * Class that represents some object in the game
  */
 export class Entity {
   public constructor(
-    public readonly game: Game,
+    public readonly game: IAsteroidsApplication,
     public components: Component[] = [],
   ) {}
 
@@ -36,5 +36,15 @@ export class Entity {
     return this.components.find(
       (c) => c.constructor.name === component.name,
     ) as T
+  }
+
+  /**
+   * Method that returns some child component, attached to some entity
+   *
+   * @param component defines the component type
+   * @returns an array of objects with the passed type
+   */
+  public findAll<C extends Component>(component: Type<C>): C[] {
+    return this.game.findAll(component)
   }
 }

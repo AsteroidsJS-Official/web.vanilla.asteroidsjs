@@ -1,16 +1,16 @@
-import { Rigidbody } from '../engine/components/rigidbody.component'
-import { Transform } from '../engine/components/transform.component'
+import { Rigidbody } from '../components/rigidbody.component'
+import { Transform } from '../components/transform.component'
 import { Entity } from '../engine/core/entity'
-import { IDraw } from '../engine/interfaces/draw.interface'
-import { IStart } from '../engine/interfaces/start.interface'
-import { Rect } from '../engine/math/rect'
-import { Vector2 } from '../engine/math/vector2'
+import { IOnDraw } from '../engine/core/interfaces/on-draw.interface'
+import { IOnStart } from '../engine/core/interfaces/on-start.interface'
+import { Rect } from '../engine/core/math/rect'
+import { Vector2 } from '../engine/core/math/vector2'
 import { ISpaceship } from '../interfaces/spaceship.interface'
 
 /**
  * Class that represents the spaceship entity controlled by the user.
  */
-export class Spaceship extends Entity implements ISpaceship, IStart, IDraw {
+export class Spaceship extends Entity implements ISpaceship, IOnStart, IOnDraw {
   /**
    * Property that contains the spaceship position, dimensions and rotation.
    */
@@ -41,7 +41,7 @@ export class Spaceship extends Entity implements ISpaceship, IStart, IDraw {
     )
   }
 
-  public start(): void {
+  public onStart(): void {
     this.transform = this.getComponent(Transform)
     this.rigidbody = this.getComponent(Rigidbody)
 
@@ -51,35 +51,47 @@ export class Spaceship extends Entity implements ISpaceship, IStart, IDraw {
     this.rigidbody.maxAngularVelocity = 0.09
   }
 
-  public draw(): void {
+  public onDraw(): void {
     this.drawTriangle()
   }
 
   private drawTriangle(): void {
-    this.game.context.translate(
-      this.transform.canvasPosition.x,
-      this.transform.canvasPosition.y,
-    )
-    this.game.context.rotate(this.transform.rotation)
+    const displacement = -this.transform.dimensions.height / 3
 
-    this.game.context.beginPath()
-    this.game.context.fillStyle = '#ff0055'
-    this.game.context.moveTo(0, -this.transform.dimensions.height / 2)
-    this.game.context.lineTo(
-      -this.transform.dimensions.width / 2,
-      this.transform.dimensions.height / 2,
-    )
-    this.game.context.lineTo(
-      this.transform.dimensions.width / 2,
-      this.transform.dimensions.height / 2,
-    )
-    this.game.context.closePath()
-    this.game.context.fill()
+    this.game
+      .getContext()
+      .translate(
+        this.transform.canvasPosition.x,
+        this.transform.canvasPosition.y,
+      )
+    this.game.getContext().rotate(this.transform.rotation)
 
-    this.game.context.rotate(-this.transform.rotation)
-    this.game.context.translate(
-      -this.transform.canvasPosition.x,
-      -this.transform.canvasPosition.y,
-    )
+    this.game.getContext().beginPath()
+    this.game.getContext().fillStyle = '#ff0055'
+    this.game
+      .getContext()
+      .moveTo(0, -this.transform.dimensions.height / 2 + displacement)
+    this.game
+      .getContext()
+      .lineTo(
+        -this.transform.dimensions.width / 2,
+        this.transform.dimensions.height / 2 + displacement,
+      )
+    this.game
+      .getContext()
+      .lineTo(
+        this.transform.dimensions.width / 2,
+        this.transform.dimensions.height / 2 + displacement,
+      )
+    this.game.getContext().closePath()
+    this.game.getContext().fill()
+
+    this.game.getContext().rotate(-this.transform.rotation)
+    this.game
+      .getContext()
+      .translate(
+        -this.transform.canvasPosition.x,
+        -this.transform.canvasPosition.y,
+      )
   }
 }

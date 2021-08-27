@@ -1,9 +1,9 @@
-import { IGameKeys } from '../../interfaces/input.interface'
-import { ISpaceship } from '../../interfaces/spaceship.interface'
-import { Component } from '../core/component'
-import { ILoop } from '../interfaces/loop.interface'
-import { IStart } from '../interfaces/start.interface'
-import { Vector2 } from '../math/vector2'
+import { Component } from '../engine/core/component'
+import { IOnLoop } from '../engine/core/interfaces/on-loop.interface'
+import { IOnStart } from '../engine/core/interfaces/on-start.interface'
+import { Vector2 } from '../engine/core/math/vector2'
+import { IGameKeys } from '../interfaces/input.interface'
+import { ISpaceship } from '../interfaces/spaceship.interface'
 import { Rigidbody } from './rigidbody.component'
 import { fromEvent } from 'rxjs'
 
@@ -11,7 +11,7 @@ import { fromEvent } from 'rxjs'
  * Class that represents the component that allows  the user interaction
  * with the game
  */
-export class Input extends Component implements IStart, ILoop {
+export class Input extends Component implements IOnStart, IOnLoop {
   /**
    * Property that contains the pressed keys and whether they are pressed
    * or not.
@@ -39,7 +39,7 @@ export class Input extends Component implements IStart, ILoop {
    */
   private rigidbody: Rigidbody
 
-  public start(): void {
+  public onStart(): void {
     this.requires([Rigidbody])
 
     this.spaceship = this.entity as unknown as ISpaceship
@@ -96,7 +96,7 @@ export class Input extends Component implements IStart, ILoop {
     }
   }
 
-  public loop(): void {
+  public onLoop(): void {
     if (
       !Object.entries(this.gameKeys)
         .filter((item) => item[0] === 'left' || item[0] === 'right')

@@ -1,14 +1,14 @@
-import { Transform } from '../engine/components/transform.component'
+import { Transform } from '../components/transform.component'
 import { Entity } from '../engine/core/entity'
-import { IDraw } from '../engine/interfaces/draw.interface'
-import { IStart } from '../engine/interfaces/start.interface'
-import { Vector2 } from '../engine/math/vector2'
+import { IOnDraw } from '../engine/core/interfaces/on-draw.interface'
+import { IOnStart } from '../engine/core/interfaces/on-start.interface'
+import { Vector2 } from '../engine/core/math/vector2'
 
 /**
  * Class that represents the virtual spaceship entity, used for rendering
  * uncontrollable spaceships.
  */
-export class SpaceshipVirtual extends Entity implements IStart, IDraw {
+export class SpaceshipVirtual extends Entity implements IOnStart, IOnDraw {
   /**
    * Property that contains the spaceship position, dimensions and rotation.
    */
@@ -24,39 +24,47 @@ export class SpaceshipVirtual extends Entity implements IStart, IDraw {
     )
   }
 
-  public start(): void {
+  public onStart(): void {
     this.transform = this.getComponent(Transform)
   }
 
-  public draw(): void {
+  public onDraw(): void {
     this.drawTriangle()
   }
 
   private drawTriangle(): void {
-    this.game.context.translate(
-      this.transform.canvasPosition.x,
-      this.transform.canvasPosition.y,
-    )
-    this.game.context.rotate(this.transform.rotation)
+    this.game
+      .getContext()
+      .translate(
+        this.transform.canvasPosition.x,
+        this.transform.canvasPosition.y,
+      )
+    this.game.getContext().rotate(this.transform.rotation)
 
-    this.game.context.beginPath()
-    this.game.context.fillStyle = '#ff0055'
-    this.game.context.moveTo(0, -this.transform.dimensions.height / 2)
-    this.game.context.lineTo(
-      -this.transform.dimensions.width / 2,
-      this.transform.dimensions.height / 2,
-    )
-    this.game.context.lineTo(
-      this.transform.dimensions.width / 2,
-      this.transform.dimensions.height / 2,
-    )
-    this.game.context.closePath()
-    this.game.context.fill()
+    this.game.getContext().beginPath()
+    this.game.getContext().fillStyle = '#ff0055'
+    this.game.getContext().moveTo(0, -this.transform.dimensions.height / 2)
+    this.game
+      .getContext()
+      .lineTo(
+        -this.transform.dimensions.width / 2,
+        this.transform.dimensions.height / 2,
+      )
+    this.game
+      .getContext()
+      .lineTo(
+        this.transform.dimensions.width / 2,
+        this.transform.dimensions.height / 2,
+      )
+    this.game.getContext().closePath()
+    this.game.getContext().fill()
 
-    this.game.context.rotate(-this.transform.rotation)
-    this.game.context.translate(
-      -this.transform.canvasPosition.x,
-      -this.transform.canvasPosition.y,
-    )
+    this.game.getContext().rotate(-this.transform.rotation)
+    this.game
+      .getContext()
+      .translate(
+        -this.transform.canvasPosition.x,
+        -this.transform.canvasPosition.y,
+      )
   }
 }

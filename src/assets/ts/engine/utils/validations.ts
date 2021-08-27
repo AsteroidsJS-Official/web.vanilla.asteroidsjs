@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
-import { ICollider2 } from '../interfaces/collider2.interface'
-import { IDraw } from '../interfaces/draw.interface'
-import { ILoop } from '../interfaces/loop.interface'
-import { IStart } from '../interfaces/start.interface'
+import { ICollider2 } from '../../interfaces/collider2.interface'
+import { IOnDraw } from '../core/interfaces/on-draw.interface'
+import { IOnLoop } from '../core/interfaces/on-loop.interface'
+import { IOnStart } from '../core/interfaces/on-start.interface'
 
 /**
  * Method that validates if some object is of type "ILoop"
@@ -11,7 +11,7 @@ import { IStart } from '../interfaces/start.interface'
  * @returns true if the object implements the "ILoop" interface, otherwise
  * false
  */
-export function hasLoop(entity: any): entity is ILoop {
+export function hasLoop(entity: any): entity is IOnLoop {
   return 'loop' in entity
 }
 
@@ -21,7 +21,7 @@ export function hasLoop(entity: any): entity is ILoop {
  * @returns true if the object implements the "IStart" interface, otherwise
  * false
  */
-export function hasStart(entity: any): entity is IStart {
+export function hasStart(entity: any): entity is IOnStart {
   return 'start' in entity
 }
 
@@ -31,7 +31,7 @@ export function hasStart(entity: any): entity is IStart {
  * @returns true if the object implements the "IDraw" interface, otherwise
  * false
  */
-export function hasDraw(entity: any): entity is IDraw {
+export function hasDraw(entity: any): entity is IOnDraw {
   return 'draw' in entity
 }
 

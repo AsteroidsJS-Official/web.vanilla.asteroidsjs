@@ -1,5 +1,5 @@
-import { Component } from '../core/component'
-import { Entity } from '../core/entity'
+import { Component } from '../component'
+import { Entity } from '../entity'
 import { Type } from './type.interface'
 
 /**

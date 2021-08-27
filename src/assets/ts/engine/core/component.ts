@@ -1,7 +1,7 @@
-import { IInstantiateOptions } from '../interfaces/instantiate-options.interface'
-import { Type } from '../interfaces/type.interface'
 import { Entity } from './entity'
-import { Game } from './game'
+import { IAsteroidsApplication } from './interfaces/asteroids-application.interface'
+import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
+import { Type } from './interfaces/type.interface'
 
 /**
  * Class that can be passed as dependency for objects of type `Entity`. It
@@ -9,7 +9,7 @@ import { Game } from './game'
  */
 export abstract class Component {
   public constructor(
-    public readonly game: Game,
+    public readonly game: IAsteroidsApplication,
     public readonly entity: Entity,
   ) {}
 
@@ -36,6 +36,16 @@ export abstract class Component {
    */
   public getComponent<T extends Component>(component: Type<T>): T {
     return this.entity.getComponent(component)
+  }
+
+  /**
+   * Method that returns some child component, attached to some entity
+   *
+   * @param component defines the component type
+   * @returns an array of objects with the passed type
+   */
+  public findAll<C extends Component>(component: Type<C>): C[] {
+    return this.game.findAll(component)
   }
 
   /**
