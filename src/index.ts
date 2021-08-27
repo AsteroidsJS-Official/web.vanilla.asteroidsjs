@@ -76,10 +76,14 @@ socket.emit('connect-screen', connectScreenData, connectScreen)
 function bootstrap(response: IScreen, displacement: number): void {
   const game = GameFactory.create({
     bootstrap: [Manager],
-    screenNumber: response.number,
-    width: response.width,
-    height: response.height,
+    screen: response,
     displacement,
   })
   game.start()
 }
+
+// bootstrap: [Manager],
+// screenNumber: response.number,
+// width: response.width,
+// height: response.height,
+// displacement,

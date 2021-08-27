@@ -1,3 +1,4 @@
+import { IScreen } from '../../../interfaces/screen.interface'
 import { Entity } from '../entity'
 import { Type } from './type.interface'
 
@@ -6,20 +7,7 @@ import { Type } from './type.interface'
  * the game instance
  */
 export interface GameFactoryOptions {
-  /**
-   * Property that defines which of the `Multiple Screens` this one is
-   */
-  screenNumber: number
-
-  /**
-   * Property that defines the canvas width
-   */
-  width?: number
-
-  /**
-   * Property that defines the canvas height
-   */
-  height?: number
+  screen: IScreen
 
   /**
    * Property that defines the canvas displacement

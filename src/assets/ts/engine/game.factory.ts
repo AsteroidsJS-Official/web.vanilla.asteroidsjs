@@ -1,4 +1,4 @@
-import { hasStart, hasLoop } from './utils/validations'
+import { hasStart, hasLoop, hasAwake } from './utils/validations'
 
 import { IScreen } from '../interfaces/screen.interface'
 import { Component } from './core/component'
@@ -13,43 +13,44 @@ import { Type } from './core/interfaces/type.interface'
  */
 class AsteroidsApplication implements IAsteroidsApplication {
   /**
-   * Property that defines a rendering context, used to render the game
-   * entities
-   */
-  public context: CanvasRenderingContext2D
-
-  /**
-   * Property that defines the current screen number
-   */
-  public screenNumber: number
-
-  /**
-   * Property that defines an array of entities, that represents all the
-   * initial instantiated entities in the game
-   */
-  public bootstrap: Entity[] = []
-
-  /**
    * Property that defines an array of entities, that represents all the
    * instantiated entities in the game
    */
-  public instances: Entity[] = []
+  private entities: Entity[] = []
+
+  /**
+   * Property that defines an array of components, that represents all the
+   * instantiated components in the game
+   */
+  private components: Component[] = []
+
+  /**
+   * Property that returns the canvas context
+   * @returns the canvas context
+   */
+  public getContext(): CanvasRenderingContext2D {
+    return this.context
+  }
+
+  /**
+   * Property that returns the screen data
+   * @returns the screen data
+   */
+  public getScreen(): IScreen {
+    return this.screen
+  }
+
+  public constructor(
+    private readonly screen: IScreen,
+    private readonly context: CanvasRenderingContext2D,
+    private readonly bootstrap: Type<Entity>[],
+  ) {}
 
   /**
    * Method that starts the game lifecycle
    */
   public start(): void {
-    for (const instance of this.bootstrap) {
-      if (hasStart(instance)) {
-        instance.onStart()
-      }
-
-      for (const component of instance.components) {
-        if (hasStart(component)) {
-          component.onStart()
-        }
-      }
-    }
+    this.bootstrap.forEach((entity) => this.instantiate({ entity }))
 
     setInterval(() => {
       this.context.clearRect(
@@ -58,17 +59,11 @@ class AsteroidsApplication implements IAsteroidsApplication {
         this.context.canvas.width,
         this.context.canvas.height,
       )
-      for (const entity of this.instances) {
-        if (hasLoop(entity)) {
-          entity.onLoop()
+      ;[this.entities, ...this.components].forEach((value) => {
+        if (hasLoop(value)) {
+          value.onLoop()
         }
-
-        for (const component of entity.components) {
-          if (hasLoop(component)) {
-            component.onLoop()
-          }
-        }
-      }
+      })
     }, 100 / 6)
   }
 
@@ -85,35 +80,39 @@ class AsteroidsApplication implements IAsteroidsApplication {
     const instance =
       options && options.entity ? new options.entity(this) : new Entity(this)
 
-    instance.components = options.components.map(
+    instance.components = (options.components ?? []).map(
       (component) => new component(this, instance),
     )
 
-    if (hasStart(instance)) {
-      instance.onStart()
-    }
+    const instances = [instance, ...instance.components]
 
-    for (const component of instance.components) {
-      if (hasStart(component)) {
-        component.onStart()
+    instances.forEach((value) => {
+      if (hasAwake(value)) {
+        value.onAwake()
       }
-    }
+    })
+    instances.forEach((value) => {
+      if (hasStart(value)) {
+        value.onStart()
+      }
+    })
 
-    this.instances.push(instance)
+    this.entities.push(instance)
+    this.components.push(...instance.components)
 
     return instance as E extends Entity ? E : Entity
   }
 
+  /**
+   * Method that finds all the components of some type
+   *
+   * @param component defines the component type
+   * @returns an array with all the found components
+   */
   public findAll<C extends Component>(component: Type<C>): C[] {
-    return
-  }
-
-  getContext(): CanvasRenderingContext2D {
-    return
-  }
-
-  getScreen(): IScreen {
-    return {} as IScreen
+    return this.components.filter(
+      (c) => c.constructor.name === component.name,
+    ) as C[]
   }
 }
 
@@ -132,17 +131,14 @@ export class GameFactory {
       'asteroidsjs-canvas',
     ) as HTMLCanvasElement
 
-    canvas.width = options.width || window.innerWidth
-    canvas.height = options.height || window.innerHeight
-
+    canvas.width = options.screen.width || window.innerWidth
+    canvas.height = options.screen.height || window.innerHeight
     canvas.style.transform = `translateX(${-options.displacement || 0}px)`
 
-    const game = new AsteroidsApplication()
-
-    game.screenNumber = options.screenNumber
-    game.context = canvas.getContext('2d')
-    game.bootstrap.push(...options.bootstrap.map((entity) => new entity(game)))
-
-    return game
+    return new AsteroidsApplication(
+      options.screen,
+      canvas.getContext('2d'),
+      options.bootstrap,
+    )
   }
 }
