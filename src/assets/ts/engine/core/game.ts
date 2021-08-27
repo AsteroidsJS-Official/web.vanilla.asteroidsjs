@@ -100,4 +100,8 @@ export class Game {
 
     return instance as E extends Entity ? E : Entity
   }
+
+  public destroy<E extends Entity>(entity?: E): void {
+    this.entities = this.entities.filter((instance) => instance !== entity)
+  }
 }

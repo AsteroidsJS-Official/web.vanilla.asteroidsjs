@@ -25,6 +25,10 @@ export class Entity {
     return this.game.instantiate(options)
   }
 
+  public destroy<E extends Entity>(entity?: E): void {
+    return this.game.destroy(entity)
+  }
+
   /**
    * Method that returns some child component, attached to this entity
    *
