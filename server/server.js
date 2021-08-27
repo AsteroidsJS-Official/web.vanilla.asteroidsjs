@@ -189,9 +189,11 @@ function setupSocketScreen() {
      *
      * @param {Vector2} vector - The master entity vector.
      */
-    function updateSlaves(screenNumber, vector) {
+    function updateSlaves(screenNumber, vector, isShooting, velocity) {
       if (screenNumber === 1) {
-        ioScreen.to('slave').emit('update-slave', vector)
+        ioScreen
+          .to('slave')
+          .emit('update-slave', { ...vector, isShooting, velocity })
       }
     }
     socket.on('update-slaves', updateSlaves)
