@@ -32,6 +32,8 @@ export class Spaceship extends Entity implements ISpaceship, IStart, IDraw {
 
   public isShooting = false
 
+  public lastShot: Date
+
   public get direction(): Vector2 {
     return new Vector2(
       Math.sin(this.transform.rotation),
@@ -94,6 +96,12 @@ export class Spaceship extends Entity implements ISpaceship, IStart, IDraw {
   }
 
   public shoot(): void {
+    if (this.lastShot && new Date().getTime() - this.lastShot.getTime() < 300) {
+      return
+    }
+
+    this.lastShot = new Date()
+
     const bulletLeft = this.instantiate({
       entity: Bullet,
       components: [Transform, Rigidbody, Render],

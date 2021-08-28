@@ -1,4 +1,5 @@
-import { RenderOverflow } from '../engine/components/render-overflow.component'
+import spaceshipImg from '../../svg/spaceship.svg'
+import { Render } from '../engine/components/render.component'
 import { Rigidbody } from '../engine/components/rigidbody.component'
 import { Transform } from '../engine/components/transform.component'
 import { Entity } from '../engine/core/entity'
@@ -29,9 +30,9 @@ export class SpaceshipVirtual extends Entity implements IStart, IDraw, ILoop {
   public readonly bulletVelocity = 10
 
   /**
-   * Property that contains the bullet generation interval.
+   * Property responsible for the spaceship last bullet time.
    */
-  private bulletInterval: NodeJS.Timer
+  public lastShot: Date
 
   /**
    * Property that indicates the direction that the spaceship is facing.
@@ -60,19 +61,31 @@ export class SpaceshipVirtual extends Entity implements IStart, IDraw, ILoop {
     )
     this.game.context.rotate(this.transform.rotation)
 
-    this.game.context.beginPath()
-    this.game.context.fillStyle = '#ff0055'
-    this.game.context.moveTo(0, -this.transform.dimensions.height / 2)
-    this.game.context.lineTo(
-      -this.transform.dimensions.width / 2,
-      this.transform.dimensions.height / 2,
+    const image = new Image()
+    image.src = spaceshipImg
+
+    // TODO: apply color to SVG
+    this.game.context.drawImage(
+      image,
+      0 - this.transform.dimensions.width / 2,
+      0 - this.transform.dimensions.height / 2,
+      this.transform.dimensions.width,
+      this.transform.dimensions.height,
     )
-    this.game.context.lineTo(
-      this.transform.dimensions.width / 2,
-      this.transform.dimensions.height / 2,
-    )
-    this.game.context.closePath()
-    this.game.context.fill()
+
+    // this.game.context.beginPath()
+    // this.game.context.fillStyle = '#ff0055'
+    // this.game.context.moveTo(0, -this.transform.dimensions.height / 2)
+    // this.game.context.lineTo(
+    //   -this.transform.dimensions.width / 2,
+    //   this.transform.dimensions.height / 2,
+    // )
+    // this.game.context.lineTo(
+    //   this.transform.dimensions.width / 2,
+    //   this.transform.dimensions.height / 2,
+    // )
+    // this.game.context.fill()
+    // this.game.context.closePath()
 
     this.game.context.rotate(-this.transform.rotation)
     this.game.context.translate(
@@ -82,53 +95,57 @@ export class SpaceshipVirtual extends Entity implements IStart, IDraw, ILoop {
   }
 
   public loop(): void {
-    if (this.isShooting && !this.bulletInterval) {
-      this.bulletInterval = setInterval(() => {
-        const bulletLeft = this.instantiate({
-          entity: Bullet,
-          components: [Transform, Rigidbody, RenderOverflow],
-        })
+    if (this.isShooting) {
+      if (
+        this.lastShot &&
+        new Date().getTime() - this.lastShot.getTime() < 300
+      ) {
+        return
+      }
 
-        bulletLeft.transform.position = Vector2.sum(
-          this.transform.position,
-          Vector2.multiply(
-            new Vector2(
-              Math.sin(this.transform.rotation - (2 * Math.PI) / 3),
-              Math.cos(this.transform.rotation - (2 * Math.PI) / 3),
-            ),
-            23,
+      this.lastShot = new Date()
+
+      const bulletLeft = this.instantiate({
+        entity: Bullet,
+        components: [Transform, Rigidbody, Render],
+      })
+
+      bulletLeft.transform.position = Vector2.sum(
+        this.transform.position,
+        Vector2.multiply(
+          new Vector2(
+            Math.sin(this.transform.rotation - (2 * Math.PI) / 4),
+            Math.cos(this.transform.rotation - (2 * Math.PI) / 4),
           ),
-        )
-        bulletLeft.transform.rotation = this.transform.rotation
-        bulletLeft.rigidbody.velocity = Vector2.sum(
-          this.velocity,
-          Vector2.multiply(this.direction, this.bulletVelocity),
-        )
+          23,
+        ),
+      )
+      bulletLeft.transform.rotation = this.transform.rotation
+      bulletLeft.rigidbody.velocity = Vector2.sum(
+        this.velocity,
+        Vector2.multiply(this.direction, this.bulletVelocity),
+      )
 
-        const bulletRight = this.instantiate({
-          entity: Bullet,
-          components: [Transform, Rigidbody, RenderOverflow],
-        })
+      const bulletRight = this.instantiate({
+        entity: Bullet,
+        components: [Transform, Rigidbody, Render],
+      })
 
-        bulletRight.transform.position = Vector2.sum(
-          this.transform.position,
-          Vector2.multiply(
-            new Vector2(
-              Math.sin(this.transform.rotation + (2 * Math.PI) / 3),
-              Math.cos(this.transform.rotation + (2 * Math.PI) / 3),
-            ),
-            20,
+      bulletRight.transform.position = Vector2.sum(
+        this.transform.position,
+        Vector2.multiply(
+          new Vector2(
+            Math.sin(this.transform.rotation + (2 * Math.PI) / 4),
+            Math.cos(this.transform.rotation + (2 * Math.PI) / 4),
           ),
-        )
-        bulletRight.transform.rotation = this.transform.rotation
-        bulletRight.rigidbody.velocity = Vector2.sum(
-          this.velocity,
-          Vector2.multiply(this.direction, this.bulletVelocity),
-        )
-      }, 400)
-    } else if (!this.isShooting && this.bulletInterval) {
-      clearInterval(this.bulletInterval)
-      this.bulletInterval = null
+          20,
+        ),
+      )
+      bulletRight.transform.rotation = this.transform.rotation
+      bulletRight.rigidbody.velocity = Vector2.sum(
+        this.velocity,
+        Vector2.multiply(this.direction, this.bulletVelocity),
+      )
     }
   }
 }

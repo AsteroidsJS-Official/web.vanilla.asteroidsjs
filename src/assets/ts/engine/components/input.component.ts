@@ -39,11 +39,6 @@ export class Input extends Component implements IStart, ILoop {
    */
   private rigidbody: Rigidbody
 
-  /**
-   * Property that contains the bullet generation interval.
-   */
-  private bulletInterval: NodeJS.Timer
-
   public start(): void {
     this.requires([Rigidbody])
 
@@ -113,12 +108,14 @@ export class Input extends Component implements IStart, ILoop {
     }
 
     if (this.gameKeys['shoot'] && !this.spaceship.isShooting) {
-      this.generateBullet()
+      this.spaceship.isShooting = true
     } else if (!this.gameKeys['shoot'] && this.spaceship.isShooting) {
-      clearInterval(this.bulletInterval)
+      this.spaceship.isShooting = false
     }
 
-    this.spaceship.isShooting = this.gameKeys['shoot']
+    if (this.spaceship.isShooting) {
+      this.spaceship.shoot()
+    }
 
     if (this.gameKeys['up']) {
       this.rigidbody.resultant = Vector2.sum(
@@ -140,20 +137,5 @@ export class Input extends Component implements IStart, ILoop {
         this.rigidbody.angularResultant = 0
       }
     }
-  }
-
-  /**
-   * Generates a bullet each amount of time.
-   */
-  private generateBullet(): void {
-    // this.spaceship.shoot()
-
-    this.bulletInterval = setInterval(() => {
-      if (!this.spaceship.isShooting) {
-        return
-      }
-
-      this.spaceship.shoot()
-    }, 400)
   }
 }

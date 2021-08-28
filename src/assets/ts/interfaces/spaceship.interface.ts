@@ -22,6 +22,11 @@ export interface ISpaceship {
   isShooting: boolean
 
   /**
+   * Property responsible for the spaceship last bullet time.
+   */
+  lastShot: Date
+
+  /**
    * Property that indicates the direction that the spaceship is facing.
    */
   get direction(): Vector2
