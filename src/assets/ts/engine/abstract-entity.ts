@@ -55,6 +55,26 @@ export class AbstractEntity {
   }
 
   /**
+   * Method that adds a new component to a specific entity instance
+   *
+   * @param component defines the component type
+   * @returns an object that represents the component instance
+   */
+  public addComponent<C extends AbstractComponent>(component: Type<C>): C {
+    return this.game.addComponent(this, component)
+  }
+
+  /**
+   * Method that adds a new provider to a specific entity instance
+   *
+   * @param provider defines the provider type
+   * @returns an object that represents the provider instance
+   */
+  public addProvider<P extends AbstractProvider>(provider: Type<P>): P {
+    return this.game.addProvider(this, provider)
+  }
+
+  /**
    * Method that detroyes some entity
    *
    * @param instance defines the instance that will be destroyed

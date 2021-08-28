@@ -52,6 +52,16 @@ export abstract class AbstractComponent {
   }
 
   /**
+   * Method that adds a new provider to a specific entity instance
+   *
+   * @param provider defines the provider type
+   * @returns an object that represents the provider instance
+   */
+  public addProvider<P extends AbstractProvider>(provider: Type<P>): P {
+    return this.game.addProvider(this.entity, provider)
+  }
+
+  /**
    * Method that returns some child component, attached to some entity
    *
    * @param component defines the component type
