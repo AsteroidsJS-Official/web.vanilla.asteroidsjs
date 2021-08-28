@@ -156,7 +156,7 @@ class AsteroidsApplication implements IAsteroidsApplication {
  * Class that represents the factory  responsible for instantiating all the
  * needed entities and their components and setting up the game
  */
-export class GameFactory {
+export class AsteroidsFactory {
   /**
    * Method used to define all the game options
    *

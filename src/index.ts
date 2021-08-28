@@ -3,7 +3,7 @@ import 'reflect-metadata'
 
 import { socket } from './assets/ts/socket'
 
-import { GameFactory } from './assets/ts/engine/game.factory'
+import { AsteroidsFactory } from './assets/ts/engine/asteroids.factory'
 import { Manager } from './assets/ts/entities/manager.entity'
 import { IScreen } from './assets/ts/interfaces/screen.interface'
 
@@ -76,7 +76,7 @@ socket.emit('connect-screen', connectScreenData, connectScreen)
  * @param displacement - The canvas displacement.
  */
 function bootstrap(response: IScreen, displacement: number): void {
-  const game = GameFactory.create({
+  const game = AsteroidsFactory.create({
     bootstrap: [Manager],
     screen: response,
     displacement,
