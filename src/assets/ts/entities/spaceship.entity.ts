@@ -18,10 +18,10 @@ import { ISpaceship } from '../interfaces/spaceship.interface'
  */
 @Entity({
   components: [
+    Input,
     Transform,
     Rigidbody,
     RenderOverflow,
-    Input,
     SocketUpdateTransform,
   ],
 })

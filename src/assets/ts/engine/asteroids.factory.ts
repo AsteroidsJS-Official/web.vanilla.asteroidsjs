@@ -8,10 +8,8 @@ import {
   COMPONENT_OPTIONS,
   ENTITY_OPTIONS,
   PROVIDER_OPTIONS,
-  REQUIRE_COMPONENTS,
 } from './constants'
 import { IAsteroidsApplication } from './interfaces/asteroids-application.interface'
-import { IEntityOptions } from './interfaces/entity-options.interface'
 import { GameFactoryOptions } from './interfaces/game-factory-options.interface'
 import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
 import { Type } from './interfaces/type.interface'
@@ -96,13 +94,18 @@ class AsteroidsApplication implements IAsteroidsApplication {
         ? new options.entity(this)
         : new AbstractEntity(this)
 
-    this.extendEntityMetadata(options.entity, {
-      components: options.components,
-      providers: options.providers,
-    })
-
-    const components = this.getComponents(options.entity)
-    const providers = this.getProviders(options.entity)
+    const components = [
+      ...new Set([
+        ...(options.components ?? []),
+        ...this.getComponents(options.entity),
+      ]),
+    ]
+    const providers = [
+      ...new Set([
+        ...(options.providers ?? []),
+        ...this.getProviders(options.entity),
+      ]),
+    ]
 
     if (components && components.length) {
       const requiredComponents: Type<AbstractComponent>[] = []
@@ -118,19 +121,24 @@ class AsteroidsApplication implements IAsteroidsApplication {
       })
     }
 
+    if (providers && providers.length) {
+      instance.providers = providers.map((provider) =>
+        this.findOrCreateProvider(provider),
+      )
+    }
     if (components && components.length) {
       instance.components = components.map(
         (component) => new component(this, instance),
       )
     }
-    if (providers && providers.length) {
-      instance.providers = providers.map((provider) =>
-        this.createAndRegisterProvider(provider),
-      )
-    }
+
+    instance.providers.forEach((provider) => {
+      if (hasAwake(provider)) {
+        provider.onAwake()
+      }
+    })
 
     const instances = [instance, ...instance.components]
-
     instances.forEach((value) => {
       if (hasAwake(value)) {
         value.onAwake()
@@ -146,6 +154,37 @@ class AsteroidsApplication implements IAsteroidsApplication {
     this.components.push(...instance.components)
 
     return instance as E extends AbstractEntity ? E : AbstractEntity
+  }
+
+  /**
+   * Method that adds a new component to a specific entity instance
+   *
+   * @param component defines the component type
+   * @returns an object that represents the component instance
+   */
+  public addComponent<E extends AbstractEntity, C extends AbstractComponent>(
+    entity: E,
+    component: Type<C>,
+  ): C {
+    const c = new component(this, entity)
+    entity.components.push(c)
+    this.components.push(c)
+    return c
+  }
+
+  /**
+   * Method that adds a new provider to a specific entity instance
+   *
+   * @param provider defines the provider type
+   * @returns an object that represents the provider instance
+   */
+  public addProvider<E extends AbstractEntity, P extends AbstractProvider>(
+    entity: E,
+    provider: Type<P>,
+  ): P {
+    const p = this.findOrCreateProvider(provider)
+    entity.providers.push(p)
+    return p
   }
 
   /**
@@ -178,27 +217,6 @@ class AsteroidsApplication implements IAsteroidsApplication {
     )
   }
 
-  private extendEntityMetadata<E extends AbstractEntity>(
-    entity?: Type<E>,
-    options?: IEntityOptions,
-  ): void {
-    const metadata: IInstantiateOptions<E> = Reflect.getMetadata(
-      ENTITY_OPTIONS,
-      entity,
-    )
-
-    metadata.components = [
-      ...(metadata.components ?? []),
-      ...(options.components ?? []),
-    ]
-    metadata.providers = [
-      ...(metadata.providers ?? []),
-      ...(options.providers ?? []),
-    ]
-
-    Reflect.defineMetadata(ENTITY_OPTIONS, metadata, entity)
-  }
-
   private getComponents<T extends AbstractEntity>(
     entity: Type<T>,
   ): Type<AbstractComponent>[] {
@@ -216,28 +234,26 @@ class AsteroidsApplication implements IAsteroidsApplication {
     )
   }
 
-  private createAndRegisterProvider(
-    provider: Type<AbstractProvider>,
-  ): AbstractProvider {
+  private findOrCreateProvider<P extends AbstractProvider>(
+    provider: Type<P>,
+  ): P {
     let instance = this.providers.find(
       (p) => p.constructor.name === provider.name,
     )
-
     if (!instance) {
       const providers = this.getProviders(provider).map((p) =>
-        this.createAndRegisterProvider(p),
+        this.findOrCreateProvider(p),
       )
-      instance = new provider()
-      instance.providers = providers
+      instance = new provider(this, providers)
+      this.providers.push(instance)
     }
-
-    return instance
+    return instance as P
   }
 
   private getRequiredComponents(
     component: Type<AbstractComponent>,
   ): Type<AbstractComponent>[] {
-    return Reflect.getMetadata(REQUIRE_COMPONENTS, component) ?? []
+    return Reflect.getMetadata(COMPONENT_OPTIONS, component)?.required ?? []
   }
 }
 
