@@ -1,12 +1,5 @@
-import { AbstractComponent } from '../abstract-component'
-import { AbstractProvider } from '../abstract-provider'
 import { ENTITY_OPTIONS } from '../constants'
-import { Type } from '../interfaces/type.interface'
-
-interface IEntityOptions {
-  components?: Type<AbstractComponent>[]
-  providers?: Type<AbstractProvider>[]
-}
+import { IEntityOptions } from '../interfaces/entity-options.interface'
 
 export function Entity(options?: IEntityOptions): ClassDecorator {
   options ??= {}

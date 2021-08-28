@@ -11,6 +11,7 @@ import {
   REQUIRE_COMPONENTS,
 } from './constants'
 import { IAsteroidsApplication } from './interfaces/asteroids-application.interface'
+import { IEntityOptions } from './interfaces/entity-options.interface'
 import { GameFactoryOptions } from './interfaces/game-factory-options.interface'
 import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
 import { Type } from './interfaces/type.interface'
@@ -95,28 +96,21 @@ class AsteroidsApplication implements IAsteroidsApplication {
         ? new options.entity(this)
         : new AbstractEntity(this)
 
-    options.components = [
-      ...new Set([
-        ...(options.components ?? []),
-        ...this.getComponents(options.entity),
-      ]),
-    ]
+    this.extendEntityMetadata(options.entity, {
+      components: options.components,
+      providers: options.providers,
+    })
 
-    options.providers = [
-      ...new Set([
-        ...(options.providers ?? []),
-        ...this.getProviders(options.entity),
-      ]),
-    ]
+    const components = this.getComponents(options.entity)
+    const providers = this.getProviders(options.entity)
 
-    const requiredComponents: Type<AbstractComponent>[] = []
-
-    if (options && options.components) {
-      options.components.forEach((component) => {
+    if (components && components.length) {
+      const requiredComponents: Type<AbstractComponent>[] = []
+      components.forEach((component) => {
         requiredComponents.push(...this.getRequiredComponents(component))
       })
       requiredComponents.forEach((component) => {
-        if (!options.components.includes(component)) {
+        if (!components.includes(component)) {
           throw new Error(
             `Component ${component.name} is required in ${options.entity.name} entity`,
           )
@@ -124,13 +118,16 @@ class AsteroidsApplication implements IAsteroidsApplication {
       })
     }
 
-    instance.components = (options.components ?? []).map(
-      (component) => new component(this, instance),
-    )
-
-    instance.providers = (options.providers ?? []).map((provider) =>
-      this.createAndRegisterProvider(provider),
-    )
+    if (components && components.length) {
+      instance.components = components.map(
+        (component) => new component(this, instance),
+      )
+    }
+    if (providers && providers.length) {
+      instance.providers = providers.map((provider) =>
+        this.createAndRegisterProvider(provider),
+      )
+    }
 
     const instances = [instance, ...instance.components]
 
@@ -174,11 +171,32 @@ class AsteroidsApplication implements IAsteroidsApplication {
     if (isEntity(instance)) {
       this.entities = this.entities.filter((entity) => entity !== instance)
       instance.components.forEach((component) => this.destroy(component))
+      return
     }
-
     this.components = this.components.filter(
       (component) => component !== instance,
     )
+  }
+
+  private extendEntityMetadata<E extends AbstractEntity>(
+    entity?: Type<E>,
+    options?: IEntityOptions,
+  ): void {
+    const metadata: IInstantiateOptions<E> = Reflect.getMetadata(
+      ENTITY_OPTIONS,
+      entity,
+    )
+
+    metadata.components = [
+      ...(metadata.components ?? []),
+      ...(options.components ?? []),
+    ]
+    metadata.providers = [
+      ...(metadata.providers ?? []),
+      ...(options.providers ?? []),
+    ]
+
+    Reflect.defineMetadata(ENTITY_OPTIONS, metadata, entity)
   }
 
   private getComponents<T extends AbstractEntity>(

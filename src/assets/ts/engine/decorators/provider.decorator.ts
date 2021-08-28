@@ -1,10 +1,5 @@
-import { AbstractProvider } from '../abstract-provider'
 import { PROVIDER_OPTIONS } from '../constants'
-import { Type } from '../interfaces/type.interface'
-
-interface IProviderOptions {
-  providers?: Type<AbstractProvider>[]
-}
+import { IProviderOptions } from '../interfaces/provider-options.interface'
 
 export function Provider(options?: IProviderOptions): ClassDecorator {
   options ??= {}

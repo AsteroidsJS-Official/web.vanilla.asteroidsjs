@@ -1,10 +1,5 @@
-import { AbstractProvider } from '../abstract-provider'
 import { COMPONENT_OPTIONS } from '../constants'
-import { Type } from '../interfaces/type.interface'
-
-interface IComponentOptions {
-  providers?: Type<AbstractProvider>[]
-}
+import { IComponentOptions } from '../interfaces/component-options.interface'
 
 export function Component(options?: IComponentOptions): ClassDecorator {
   options ??= {}
