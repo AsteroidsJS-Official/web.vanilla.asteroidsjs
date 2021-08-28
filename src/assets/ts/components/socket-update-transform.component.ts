@@ -2,7 +2,6 @@ import { socket } from '../socket'
 
 import { AbstractComponent } from '../engine/abstract-component'
 import { Component } from '../engine/decorators/component.decorator'
-import { RequireComponents } from '../engine/decorators/require-components.decorator'
 import { IOnAwake } from '../engine/interfaces/on-awake.interface'
 import { IOnLoop } from '../engine/interfaces/on-loop.interface'
 import { IOnStart } from '../engine/interfaces/on-start.interface'
@@ -14,8 +13,9 @@ import { Transform } from './transform.component'
  * Class that represents the component that update the entities into the slave
  * screens according to their position in the master
  */
-@Component()
-@RequireComponents([Transform])
+@Component({
+  required: [Transform],
+})
 export class SocketUpdateTransform
   extends AbstractComponent
   implements IOnAwake, IOnStart, IOnLoop

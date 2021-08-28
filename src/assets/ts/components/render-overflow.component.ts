@@ -2,7 +2,6 @@ import { hasDraw } from '../engine/utils/validations'
 
 import { AbstractComponent } from '../engine/abstract-component'
 import { Component } from '../engine/decorators/component.decorator'
-import { RequireComponents } from '../engine/decorators/require-components.decorator'
 import { IOnDraw } from '../engine/interfaces/on-draw.interface'
 import { IOnLoop } from '../engine/interfaces/on-loop.interface'
 import { IOnStart } from '../engine/interfaces/on-start.interface'
@@ -14,8 +13,9 @@ import { Transform } from './transform.component'
  * entity across the screen when it's positioned at any edge of the
  * canvas
  */
-@Component()
-@RequireComponents([Transform])
+@Component({
+  required: [Transform],
+})
 export class RenderOverflow
   extends AbstractComponent
   implements IOnStart, IOnLoop
