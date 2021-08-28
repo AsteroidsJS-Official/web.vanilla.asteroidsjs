@@ -1,5 +1,6 @@
 import { Component } from '../component'
 import { Entity } from '../entity'
+import { Provider } from '../provider'
 import { Type } from './type.interface'
 
 /**
@@ -17,4 +18,10 @@ export interface IInstantiateOptions<E extends Entity> {
    * will be instantiated and passed as dependency to the new entity
    */
   components?: Type<Component>[]
+
+  /**
+   * Property that defines an array with all the provider classes that
+   * will be instantiated and passed as dependency to the new entity
+   */
+  providers?: Type<Provider>[]
 }

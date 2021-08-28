@@ -8,6 +8,7 @@ import { IAsteroidsApplication } from './interfaces/asteroids-application.interf
 import { GameFactoryOptions } from './interfaces/game-factory-options.interface'
 import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
 import { Type } from './interfaces/type.interface'
+import { Provider } from './provider'
 
 /**
  * Class that represents the main application behaviour
@@ -24,6 +25,12 @@ class AsteroidsApplication implements IAsteroidsApplication {
    * instantiated components in the game
    */
   private components: Component[] = []
+
+  /**
+   * Property that defines an array of providers, that represents all the
+   * instantiated providers in the game
+   */
+  private providers: Provider[] = []
 
   /**
    * Property that returns the canvas context
@@ -100,6 +107,10 @@ class AsteroidsApplication implements IAsteroidsApplication {
       (component) => new component(this, instance),
     )
 
+    instance.providers = (options.providers ?? []).map((provider) =>
+      this.createAndRegisterProvider(provider),
+    )
+
     const instances = [instance, ...instance.components]
 
     instances.forEach((value) => {
@@ -145,6 +156,13 @@ class AsteroidsApplication implements IAsteroidsApplication {
     this.components = this.components.filter(
       (component) => component !== instance,
     )
+  }
+
+  private createAndRegisterProvider(provider: Type<Provider>): Provider {
+    const instance = this.providers.find(
+      (p) => p.constructor.name === provider.name,
+    )
+    return instance ?? new provider()
   }
 
   private getRequiredComponents(component: Type<Component>): Type<Component>[] {

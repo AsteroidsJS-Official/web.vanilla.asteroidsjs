@@ -2,6 +2,7 @@ import { Entity } from './entity'
 import { IAsteroidsApplication } from './interfaces/asteroids-application.interface'
 import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
 import { Type } from './interfaces/type.interface'
+import { Provider } from './provider'
 
 /**
  * Class that can be passed as dependency for objects of type `Entity`. It
@@ -24,6 +25,18 @@ export abstract class Component {
     options?: IInstantiateOptions<E>,
   ): E extends Entity ? E : Entity {
     return this.entity.instantiate(options)
+  }
+
+  /**
+   * Method that returns some sibling component, attached to the same parent
+   * entity
+   *
+   * @param component defines the component type
+   * @returns an object that represents the component instance, attached to
+   * the same parent entity
+   */
+  public getProvider<T extends Provider>(component: Type<T>): T {
+    return this.entity.getProvider(component)
   }
 
   /**
