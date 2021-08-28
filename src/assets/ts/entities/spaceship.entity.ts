@@ -1,5 +1,5 @@
 import spaceshipImg from '../../svg/spaceship.svg'
-import { RenderOverflow } from '../engine/components/render-overflow.component'
+import { Render } from '../engine/components/render.component'
 import { Rigidbody } from '../engine/components/rigidbody.component'
 import { Transform } from '../engine/components/transform.component'
 import { Entity } from '../engine/core/entity'
@@ -96,7 +96,7 @@ export class Spaceship extends Entity implements ISpaceship, IStart, IDraw {
   public shoot(): void {
     const bulletLeft = this.instantiate({
       entity: Bullet,
-      components: [Transform, Rigidbody, RenderOverflow],
+      components: [Transform, Rigidbody, Render],
     })
 
     bulletLeft.transform.position = Vector2.sum(
@@ -117,7 +117,7 @@ export class Spaceship extends Entity implements ISpaceship, IStart, IDraw {
 
     const bulletRight = this.instantiate({
       entity: Bullet,
-      components: [Transform, Rigidbody, RenderOverflow],
+      components: [Transform, Rigidbody, Render],
     })
 
     bulletRight.transform.position = Vector2.sum(
