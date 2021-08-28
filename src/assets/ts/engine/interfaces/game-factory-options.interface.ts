@@ -1,4 +1,5 @@
-import { Entity } from '../core/entity'
+import { IScreen } from '../../interfaces/screen.interface'
+import { AbstractEntity } from '../abstract-entity'
 import { Type } from './type.interface'
 
 /**
@@ -6,20 +7,7 @@ import { Type } from './type.interface'
  * the game instance
  */
 export interface GameFactoryOptions {
-  /**
-   * Property that defines which of the `Multiple Screens` this one is
-   */
-  screenNumber: number
-
-  /**
-   * Property that defines the canvas width
-   */
-  width?: number
-
-  /**
-   * Property that defines the canvas height
-   */
-  height?: number
+  screen: IScreen
 
   /**
    * Property that defines the canvas displacement
@@ -33,5 +21,5 @@ export interface GameFactoryOptions {
    * Property that represents an array of entities that will be the first
    * ones to be instanciated in the application
    */
-  bootstrap: Type<Entity>[]
+  bootstrap: Type<AbstractEntity>[]
 }

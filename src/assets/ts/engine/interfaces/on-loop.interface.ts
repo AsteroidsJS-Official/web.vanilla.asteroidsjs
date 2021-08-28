@@ -2,9 +2,9 @@
  * Interface that represents some class that has a `loop` method that is
  * called every game cycle
  */
-export interface ILoop {
+export interface IOnLoop {
   /**
    * Method that will be called every game cycle
    */
-  loop(): void
+  onLoop(): void
 }

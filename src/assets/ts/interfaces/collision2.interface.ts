@@ -1,5 +1,5 @@
 import { Rigidbody } from '../components/rigidbody.component'
-import { Vector2 } from '../math/vector2'
+import { Vector2 } from '../engine/math/vector2'
 
 /**
  * Interface that represents a collision between two {@link Rigidbody}

@@ -1,11 +1,13 @@
-import { Component } from '../core/component'
-import { Rect } from '../math/rect'
-import { Vector2 } from '../math/vector2'
+import { AbstractComponent } from '../engine/abstract-component'
+import { Component } from '../engine/decorators/component.decorator'
+import { Rect } from '../engine/math/rect'
+import { Vector2 } from '../engine/math/vector2'
 
 /**
  * Component that adds soma spacial behaviours such as position and rotation
  */
-export class Transform extends Component {
+@Component()
+export class Transform extends AbstractComponent {
   /**
    * Property that defines the entity dimensions such as width and height
    */
@@ -68,8 +70,8 @@ export class Transform extends Component {
    */
   public get canvasPosition(): Vector2 {
     return new Vector2(
-      this.game.context.canvas.width / 2 + this._position.x,
-      this.game.context.canvas.height / 2 - this._position.y,
+      this.game.getContext().canvas.width / 2 + this._position.x,
+      this.game.getContext().canvas.height / 2 - this._position.y,
     )
   }
 
@@ -78,8 +80,8 @@ export class Transform extends Component {
    */
   public set canvasPosition(value: Vector2) {
     this._position = new Vector2(
-      this.game.context.canvas.width / 2 - value.x,
-      this.game.context.canvas.height / 2 - value.y,
+      this.game.getContext().canvas.width / 2 - value.x,
+      this.game.getContext().canvas.height / 2 - value.y,
     )
   }
 }

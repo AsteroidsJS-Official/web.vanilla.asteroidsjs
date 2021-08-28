@@ -4,25 +4,17 @@
     "module": "commonjs",
     "esModuleInterop": true,
     "noImplicitAny": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
+      "@/*": ["src/*"]
     },
-    "lib": [
-      "es6",
-      "dom"
-    ]
+    "lib": ["es6", "dom"]
   },
-  "include": [
-    "src/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "**/*.spec.ts"
-  ]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
 }

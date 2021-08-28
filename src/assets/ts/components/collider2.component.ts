@@ -1,11 +1,10 @@
-import { hasCollider } from '../utils/validations'
-
-import { Component } from '../core/component'
+import { AbstractComponent } from '../engine/abstract-component'
+import { Component } from '../engine/decorators/component.decorator'
+import { IOnAwake } from '../engine/interfaces/on-awake.interface'
+import { IOnLoop } from '../engine/interfaces/on-loop.interface'
+import { Vector2 } from '../engine/math/vector2'
 import { ICollider2 } from '../interfaces/collider2.interface'
 import { Collision2 } from '../interfaces/collision2.interface'
-import { ILoop } from '../interfaces/loop.interface'
-import { IStart } from '../interfaces/start.interface'
-import { Vector2 } from '../math/vector2'
 import { Rigidbody } from './rigidbody.component'
 import { Transform } from './transform.component'
 
@@ -16,7 +15,10 @@ import { Transform } from './transform.component'
  * A collider only interacts with entities that have the {@link Rigidbody}
  * component in order to make this behaviour more performatic
  */
-export class Collider2 extends Component implements IStart, ILoop {
+@Component({
+  required: [Transform, Rigidbody],
+})
+export class Collider2 extends AbstractComponent implements IOnAwake, IOnLoop {
   /**
    * Property that represents the parent entity as {@link ICollider2}
    */
@@ -38,24 +40,18 @@ export class Collider2 extends Component implements IStart, ILoop {
    */
   private collisions: Collision2[] = []
 
-  public start(): void {
-    this.requires([Transform, Rigidbody])
-
-    if (!hasCollider(this.entity)) {
-      throw new Error(
-        `${this.entity.constructor.name} has a ${this.constructor.name} but not implements the ICollider2 interface`,
-      )
-    }
-
-    this.collider = this.entity
+  public onAwake(): void {
+    this.collider = this.entity as unknown as ICollider2
     this.rigidbody = this.getComponent(Rigidbody)
     this.transform = this.getComponent(Transform)
   }
 
-  public loop(): void {
+  public onLoop(): void {
     this.normalizeCollisions()
 
-    const rigidbodies = this.findAllRigidbodies()
+    const rigidbodies = this.find(Rigidbody).filter(
+      (c) => c.entity !== this.entity,
+    )
     const transforms = rigidbodies.map((rigidbody) =>
       rigidbody.getComponent(Transform),
     )
@@ -110,16 +106,5 @@ export class Collider2 extends Component implements IStart, ILoop {
       this.collisions = this.collisions.filter((_, index) => index !== i)
       this.collider.endCollide(collision)
     }
-  }
-
-  /**
-   * Method that finds all the rigidbodies instanced in the game
-   *
-   * @returns an array with all the found rigidbodies
-   */
-  private findAllRigidbodies(): Rigidbody[] {
-    return this.game.entities
-      .filter((entity) => entity != this.entity)
-      .map((entity) => entity.getComponent(Rigidbody))
   }
 }

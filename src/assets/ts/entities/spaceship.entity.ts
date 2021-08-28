@@ -1,8 +1,14 @@
-import { Rigidbody } from '../engine/components/rigidbody.component'
-import { Transform } from '../engine/components/transform.component'
-import { Entity } from '../engine/core/entity'
-import { IDraw } from '../engine/interfaces/draw.interface'
-import { IStart } from '../engine/interfaces/start.interface'
+import { SocketUpdateTransform } from '../components/socket-update-transform.component'
+
+import { Input } from '../components/input.component'
+import { RenderOverflow } from '../components/render-overflow.component'
+import { Rigidbody } from '../components/rigidbody.component'
+import { Transform } from '../components/transform.component'
+import { AbstractEntity } from '../engine/abstract-entity'
+import { Entity } from '../engine/decorators/entity.decorator'
+import { IOnAwake } from '../engine/interfaces/on-awake.interface'
+import { IOnDraw } from '../engine/interfaces/on-draw.interface'
+import { IOnStart } from '../engine/interfaces/on-start.interface'
 import { Rect } from '../engine/math/rect'
 import { Vector2 } from '../engine/math/vector2'
 import { ISpaceship } from '../interfaces/spaceship.interface'
@@ -10,7 +16,19 @@ import { ISpaceship } from '../interfaces/spaceship.interface'
 /**
  * Class that represents the spaceship entity controlled by the user.
  */
-export class Spaceship extends Entity implements ISpaceship, IStart, IDraw {
+@Entity({
+  components: [
+    Input,
+    Transform,
+    Rigidbody,
+    RenderOverflow,
+    SocketUpdateTransform,
+  ],
+})
+export class Spaceship
+  extends AbstractEntity
+  implements ISpaceship, IOnAwake, IOnStart, IOnDraw
+{
   /**
    * Property that contains the spaceship position, dimensions and rotation.
    */
@@ -41,45 +59,59 @@ export class Spaceship extends Entity implements ISpaceship, IStart, IDraw {
     )
   }
 
-  public start(): void {
+  public onAwake(): void {
     this.transform = this.getComponent(Transform)
     this.rigidbody = this.getComponent(Rigidbody)
+  }
 
+  public onStart(): void {
     this.transform.dimensions = new Rect(30, 45)
     this.rigidbody.friction = 0.005
     this.rigidbody.mass = 10
     this.rigidbody.maxAngularVelocity = 0.09
   }
 
-  public draw(): void {
+  public onDraw(): void {
     this.drawTriangle()
   }
 
   private drawTriangle(): void {
-    this.game.context.translate(
-      this.transform.canvasPosition.x,
-      this.transform.canvasPosition.y,
-    )
-    this.game.context.rotate(this.transform.rotation)
+    const displacement = -this.transform.dimensions.height / 3
 
-    this.game.context.beginPath()
-    this.game.context.fillStyle = '#ff0055'
-    this.game.context.moveTo(0, -this.transform.dimensions.height / 2)
-    this.game.context.lineTo(
-      -this.transform.dimensions.width / 2,
-      this.transform.dimensions.height / 2,
-    )
-    this.game.context.lineTo(
-      this.transform.dimensions.width / 2,
-      this.transform.dimensions.height / 2,
-    )
-    this.game.context.closePath()
-    this.game.context.fill()
+    this.game
+      .getContext()
+      .translate(
+        this.transform.canvasPosition.x,
+        this.transform.canvasPosition.y,
+      )
+    this.game.getContext().rotate(this.transform.rotation)
 
-    this.game.context.rotate(-this.transform.rotation)
-    this.game.context.translate(
-      -this.transform.canvasPosition.x,
-      -this.transform.canvasPosition.y,
-    )
+    this.game.getContext().beginPath()
+    this.game.getContext().fillStyle = '#ff0055'
+    this.game
+      .getContext()
+      .moveTo(0, -this.transform.dimensions.height / 2 + displacement)
+    this.game
+      .getContext()
+      .lineTo(
+        -this.transform.dimensions.width / 2,
+        this.transform.dimensions.height / 2 + displacement,
+      )
+    this.game
+      .getContext()
+      .lineTo(
+        this.transform.dimensions.width / 2,
+        this.transform.dimensions.height / 2 + displacement,
+      )
+    this.game.getContext().closePath()
+    this.game.getContext().fill()
+
+    this.game.getContext().rotate(-this.transform.rotation)
+    this.game
+      .getContext()
+      .translate(
+        -this.transform.canvasPosition.x,
+        -this.transform.canvasPosition.y,
+      )
   }
 }
