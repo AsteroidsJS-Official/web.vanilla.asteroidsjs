@@ -2,12 +2,13 @@ import { Rigidbody } from '../engine/components/rigidbody.component'
 import { Transform } from '../engine/components/transform.component'
 import { Entity } from '../engine/core/entity'
 import { IDraw } from '../engine/interfaces/draw.interface'
+import { ILoop } from '../engine/interfaces/loop.interface'
 import { IStart } from '../engine/interfaces/start.interface'
 import { Rect } from '../engine/math/rect'
 import { Vector2 } from '../engine/math/vector2'
 import { IBullet } from '../interfaces/bullet.interface'
 
-export class Bullet extends Entity implements IBullet, IDraw, IStart {
+export class Bullet extends Entity implements IBullet, IDraw, IStart, ILoop {
   public transform: Transform
 
   public rigidbody: Rigidbody
@@ -25,10 +26,6 @@ export class Bullet extends Entity implements IBullet, IDraw, IStart {
 
     this.transform.dimensions = new Rect(2, 14)
     this.rigidbody.mass = 3
-
-    setTimeout(() => {
-      this.destroy(this)
-    }, 1000)
   }
 
   draw(): void {
@@ -54,5 +51,22 @@ export class Bullet extends Entity implements IBullet, IDraw, IStart {
       -this.transform.canvasPosition.x,
       -this.transform.canvasPosition.y,
     )
+  }
+
+  loop(): void {
+    const hasOverflowX =
+      this.transform.canvasPosition.x + this.transform.dimensions.width + 50 <
+        0 ||
+      this.transform.canvasPosition.x - this.transform.dimensions.width - 50 >
+        this.game.context.canvas.width
+    const hasOverflowY =
+      this.transform.canvasPosition.y + this.transform.dimensions.height + 50 <
+        0 ||
+      this.transform.canvasPosition.y - this.transform.dimensions.height - 50 >
+        this.game.context.canvas.height
+
+    if (hasOverflowX || hasOverflowY) {
+      this.destroy(this)
+    }
   }
 }
