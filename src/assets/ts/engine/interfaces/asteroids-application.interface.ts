@@ -1,6 +1,6 @@
 import { IScreen } from '../../interfaces/screen.interface'
-import { Component } from '../component'
-import { Entity } from '../entity'
+import { AbstractComponent } from '../abstract-component'
+import { AbstractEntity } from '../abstract-entity'
 import { IInstantiateOptions } from './instantiate-options.interface'
 import { Type } from './type.interface'
 
@@ -11,11 +11,11 @@ export interface IAsteroidsApplication {
 
   getScreen(): IScreen
 
-  instantiate<E extends Entity>(
+  instantiate<E extends AbstractEntity>(
     options?: IInstantiateOptions<E>,
-  ): E extends Entity ? E : Entity
+  ): E extends AbstractEntity ? E : AbstractEntity
 
-  find<C extends Component>(component: Type<C>): C[]
+  find<C extends AbstractComponent>(component: Type<C>): C[]
 
-  destroy<T extends Entity | Component>(instance: T): void
+  destroy<T extends AbstractEntity | AbstractComponent>(instance: T): void
 }

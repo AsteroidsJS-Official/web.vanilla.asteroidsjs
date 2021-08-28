@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
 import { ICollider2 } from '../../interfaces/collider2.interface'
-import { Entity } from '../entity'
+import { AbstractEntity } from '../abstract-entity'
 import { IOnAwake } from '../interfaces/on-awake.interface'
 import { IOnDraw } from '../interfaces/on-draw.interface'
 import { IOnLoop } from '../interfaces/on-loop.interface'
@@ -13,7 +13,7 @@ import { IOnStart } from '../interfaces/on-start.interface'
  * @param entity defines an object that will be validated
  * @returns true if the object is of type, otherwise false
  */
-export function isEntity(entity: any): entity is Entity {
+export function isEntity(entity: any): entity is AbstractEntity {
   return 'components' in entity && 'game' in entity
 }
 

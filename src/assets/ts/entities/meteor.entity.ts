@@ -1,12 +1,15 @@
 import { Transform } from '../components/transform.component'
-import { Entity } from '../engine/entity'
+import { AbstractEntity } from '../engine/abstract-entity'
 import { IOnAwake } from '../engine/interfaces/on-awake.interface'
 import { IOnDraw } from '../engine/interfaces/on-draw.interface'
 import { IOnStart } from '../engine/interfaces/on-start.interface'
 import { Rect } from '../engine/math/rect'
 import { Vector2 } from '../engine/math/vector2'
 
-export class Meteor extends Entity implements IOnAwake, IOnStart, IOnDraw {
+export class Meteor
+  extends AbstractEntity
+  implements IOnAwake, IOnStart, IOnDraw
+{
   private transform: Transform
 
   public onAwake(): void {

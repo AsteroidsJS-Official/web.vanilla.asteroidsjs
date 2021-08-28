@@ -1,4 +1,5 @@
-import { Component } from '../engine/component'
+import { AbstractComponent } from '../engine/abstract-component'
+import { Component } from '../engine/decorators/component.decorator'
 import { RequireComponents } from '../engine/decorators/require-components.decorator'
 import { IOnAwake } from '../engine/interfaces/on-awake.interface'
 import { IOnLoop } from '../engine/interfaces/on-loop.interface'
@@ -13,8 +14,12 @@ import { fromEvent } from 'rxjs'
  * Class that represents the component that allows  the user interaction
  * with the game
  */
+@Component()
 @RequireComponents([Rigidbody])
-export class Input extends Component implements IOnAwake, IOnStart, IOnLoop {
+export class Input
+  extends AbstractComponent
+  implements IOnAwake, IOnStart, IOnLoop
+{
   /**
    * Property that contains the pressed keys and whether they are pressed
    * or not.

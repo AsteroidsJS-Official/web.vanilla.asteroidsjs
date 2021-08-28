@@ -1,4 +1,5 @@
-import { Component } from '../engine/component'
+import { AbstractComponent } from '../engine/abstract-component'
+import { Component } from '../engine/decorators/component.decorator'
 import { RequireComponents } from '../engine/decorators/require-components.decorator'
 import { IOnAwake } from '../engine/interfaces/on-awake.interface'
 import { IOnLoop } from '../engine/interfaces/on-loop.interface'
@@ -15,8 +16,9 @@ import { Transform } from './transform.component'
  * A collider only interacts with entities that have the {@link Rigidbody}
  * component in order to make this behaviour more performatic
  */
+@Component()
 @RequireComponents([Transform, Rigidbody])
-export class Collider2 extends Component implements IOnAwake, IOnLoop {
+export class Collider2 extends AbstractComponent implements IOnAwake, IOnLoop {
   /**
    * Property that represents the parent entity as {@link ICollider2}
    */

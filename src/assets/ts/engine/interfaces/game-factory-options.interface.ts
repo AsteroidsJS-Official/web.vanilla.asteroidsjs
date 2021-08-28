@@ -1,5 +1,5 @@
 import { IScreen } from '../../interfaces/screen.interface'
-import { Entity } from '../entity'
+import { AbstractEntity } from '../abstract-entity'
 import { Type } from './type.interface'
 
 /**
@@ -21,5 +21,5 @@ export interface GameFactoryOptions {
    * Property that represents an array of entities that will be the first
    * ones to be instanciated in the application
    */
-  bootstrap: Type<Entity>[]
+  bootstrap: Type<AbstractEntity>[]
 }

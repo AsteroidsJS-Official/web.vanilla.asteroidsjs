@@ -1,6 +1,11 @@
+import { SocketUpdateTransform } from '../components/socket-update-transform.component'
+
+import { Input } from '../components/input.component'
+import { RenderOverflow } from '../components/render-overflow.component'
 import { Rigidbody } from '../components/rigidbody.component'
 import { Transform } from '../components/transform.component'
-import { Entity } from '../engine/entity'
+import { AbstractEntity } from '../engine/abstract-entity'
+import { Entity } from '../engine/decorators/entity.decorator'
 import { IOnAwake } from '../engine/interfaces/on-awake.interface'
 import { IOnDraw } from '../engine/interfaces/on-draw.interface'
 import { IOnStart } from '../engine/interfaces/on-start.interface'
@@ -11,8 +16,17 @@ import { ISpaceship } from '../interfaces/spaceship.interface'
 /**
  * Class that represents the spaceship entity controlled by the user.
  */
+@Entity({
+  components: [
+    Transform,
+    Rigidbody,
+    RenderOverflow,
+    Input,
+    SocketUpdateTransform,
+  ],
+})
 export class Spaceship
-  extends Entity
+  extends AbstractEntity
   implements ISpaceship, IOnAwake, IOnStart, IOnDraw
 {
   /**

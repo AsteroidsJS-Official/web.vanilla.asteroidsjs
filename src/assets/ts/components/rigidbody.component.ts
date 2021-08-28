@@ -1,6 +1,7 @@
 import { abs } from '../engine/math/utils'
 
-import { Component } from '../engine/component'
+import { AbstractComponent } from '../engine/abstract-component'
+import { Component } from '../engine/decorators/component.decorator'
 import { RequireComponents } from '../engine/decorators/require-components.decorator'
 import { IOnAwake } from '../engine/interfaces/on-awake.interface'
 import { IOnLoop } from '../engine/interfaces/on-loop.interface'
@@ -11,8 +12,9 @@ import { Transform } from './transform.component'
  * Component that adds physical behaviors such as velocity and
  * acceleration to an entity
  */
+@Component()
 @RequireComponents([Transform])
-export class Rigidbody extends Component implements IOnAwake, IOnLoop {
+export class Rigidbody extends AbstractComponent implements IOnAwake, IOnLoop {
   /**
    * Property that defines the entity mass, that directly interfers with
    * the inertia of the entity

@@ -1,5 +1,9 @@
+import { SocketUpdateTransform } from '../components/socket-update-transform.component'
+
+import { RenderOverflow } from '../components/render-overflow.component'
 import { Transform } from '../components/transform.component'
-import { Entity } from '../engine/entity'
+import { AbstractEntity } from '../engine/abstract-entity'
+import { Entity } from '../engine/decorators/entity.decorator'
 import { IOnDraw } from '../engine/interfaces/on-draw.interface'
 import { IOnStart } from '../engine/interfaces/on-start.interface'
 import { Vector2 } from '../engine/math/vector2'
@@ -8,7 +12,13 @@ import { Vector2 } from '../engine/math/vector2'
  * Class that represents the virtual spaceship entity, used for rendering
  * uncontrollable spaceships.
  */
-export class SpaceshipVirtual extends Entity implements IOnStart, IOnDraw {
+@Entity({
+  components: [Transform, RenderOverflow, SocketUpdateTransform],
+})
+export class SpaceshipVirtual
+  extends AbstractEntity
+  implements IOnStart, IOnDraw
+{
   /**
    * Property that contains the spaceship position, dimensions and rotation.
    */

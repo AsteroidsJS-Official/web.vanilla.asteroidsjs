@@ -1,14 +1,19 @@
 import { hasStart, hasLoop, hasAwake, isEntity } from './utils/validations'
 
 import { IScreen } from '../interfaces/screen.interface'
-import { Component } from './component'
-import { REQUIRE_COMPONENTS } from './constants'
-import { Entity } from './entity'
+import { AbstractComponent } from './abstract-component'
+import { AbstractEntity } from './abstract-entity'
+import { AbstractProvider } from './abstract-provider'
+import {
+  COMPONENT_OPTIONS,
+  ENTITY_OPTIONS,
+  PROVIDER_OPTIONS,
+  REQUIRE_COMPONENTS,
+} from './constants'
 import { IAsteroidsApplication } from './interfaces/asteroids-application.interface'
 import { GameFactoryOptions } from './interfaces/game-factory-options.interface'
 import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
 import { Type } from './interfaces/type.interface'
-import { Provider } from './provider'
 
 /**
  * Class that represents the main application behaviour
@@ -18,19 +23,19 @@ class AsteroidsApplication implements IAsteroidsApplication {
    * Property that defines an array of entities, that represents all the
    * instantiated entities in the game
    */
-  private entities: Entity[] = []
+  private entities: AbstractEntity[] = []
 
   /**
    * Property that defines an array of components, that represents all the
    * instantiated components in the game
    */
-  private components: Component[] = []
+  private components: AbstractComponent[] = []
 
   /**
    * Property that defines an array of providers, that represents all the
    * instantiated providers in the game
    */
-  private providers: Provider[] = []
+  private providers: AbstractProvider[] = []
 
   /**
    * Property that returns the canvas context
@@ -51,7 +56,7 @@ class AsteroidsApplication implements IAsteroidsApplication {
   public constructor(
     private readonly screen: IScreen,
     private readonly context: CanvasRenderingContext2D,
-    private readonly bootstrap: Type<Entity>[],
+    private readonly bootstrap: Type<AbstractEntity>[],
   ) {}
 
   /**
@@ -82,13 +87,29 @@ class AsteroidsApplication implements IAsteroidsApplication {
    * @param components defines the new entity component dependencies
    * @returns the created entity
    */
-  public instantiate<E extends Entity>(
+  public instantiate<E extends AbstractEntity>(
     options?: IInstantiateOptions<E>,
-  ): E extends Entity ? E : Entity {
+  ): E extends AbstractEntity ? E : AbstractEntity {
     const instance =
-      options && options.entity ? new options.entity(this) : new Entity(this)
+      options && options.entity
+        ? new options.entity(this)
+        : new AbstractEntity(this)
 
-    const requiredComponents: Type<Component>[] = []
+    options.components = [
+      ...new Set([
+        ...(options.components ?? []),
+        ...this.getComponents(options.entity),
+      ]),
+    ]
+
+    options.providers = [
+      ...new Set([
+        ...(options.providers ?? []),
+        ...this.getProviders(options.entity),
+      ]),
+    ]
+
+    const requiredComponents: Type<AbstractComponent>[] = []
 
     if (options && options.components) {
       options.components.forEach((component) => {
@@ -127,7 +148,7 @@ class AsteroidsApplication implements IAsteroidsApplication {
     this.entities.push(instance)
     this.components.push(...instance.components)
 
-    return instance as E extends Entity ? E : Entity
+    return instance as E extends AbstractEntity ? E : AbstractEntity
   }
 
   /**
@@ -136,7 +157,7 @@ class AsteroidsApplication implements IAsteroidsApplication {
    * @param component defines the component type
    * @returns an array with all the found components
    */
-  public find<C extends Component>(component: Type<C>): C[] {
+  public find<C extends AbstractComponent>(component: Type<C>): C[] {
     return this.components.filter(
       (c) => c.constructor.name === component.name,
     ) as C[]
@@ -147,7 +168,9 @@ class AsteroidsApplication implements IAsteroidsApplication {
    *
    * @param instance defines the instance that will be destroyed
    */
-  public destroy<T extends Entity | Component>(instance: T): void {
+  public destroy<T extends AbstractEntity | AbstractComponent>(
+    instance: T,
+  ): void {
     if (isEntity(instance)) {
       this.entities = this.entities.filter((entity) => entity !== instance)
       instance.components.forEach((component) => this.destroy(component))
@@ -158,14 +181,44 @@ class AsteroidsApplication implements IAsteroidsApplication {
     )
   }
 
-  private createAndRegisterProvider(provider: Type<Provider>): Provider {
-    const instance = this.providers.find(
-      (p) => p.constructor.name === provider.name,
-    )
-    return instance ?? new provider()
+  private getComponents<T extends AbstractEntity>(
+    entity: Type<T>,
+  ): Type<AbstractComponent>[] {
+    return Reflect.getMetadata(ENTITY_OPTIONS, entity)?.components ?? []
   }
 
-  private getRequiredComponents(component: Type<Component>): Type<Component>[] {
+  private getProviders<
+    T extends AbstractEntity | AbstractProvider | AbstractComponent,
+  >(target: Type<T>): Type<AbstractProvider>[] {
+    return (
+      Reflect.getMetadata(ENTITY_OPTIONS, target)?.providers ??
+      Reflect.getMetadata(PROVIDER_OPTIONS, target)?.providers ??
+      Reflect.getMetadata(COMPONENT_OPTIONS, target)?.providers ??
+      []
+    )
+  }
+
+  private createAndRegisterProvider(
+    provider: Type<AbstractProvider>,
+  ): AbstractProvider {
+    let instance = this.providers.find(
+      (p) => p.constructor.name === provider.name,
+    )
+
+    if (!instance) {
+      const providers = this.getProviders(provider).map((p) =>
+        this.createAndRegisterProvider(p),
+      )
+      instance = new provider()
+      instance.providers = providers
+    }
+
+    return instance
+  }
+
+  private getRequiredComponents(
+    component: Type<AbstractComponent>,
+  ): Type<AbstractComponent>[] {
     return Reflect.getMetadata(REQUIRE_COMPONENTS, component) ?? []
   }
 }
