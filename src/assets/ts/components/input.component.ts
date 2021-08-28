@@ -1,4 +1,6 @@
 import { Component } from '../engine/component'
+import { RequireComponents } from '../engine/decorators/require-components.decorator'
+import { IOnAwake } from '../engine/interfaces/on-awake.interface'
 import { IOnLoop } from '../engine/interfaces/on-loop.interface'
 import { IOnStart } from '../engine/interfaces/on-start.interface'
 import { Vector2 } from '../engine/math/vector2'
@@ -11,7 +13,8 @@ import { fromEvent } from 'rxjs'
  * Class that represents the component that allows  the user interaction
  * with the game
  */
-export class Input extends Component implements IOnStart, IOnLoop {
+@RequireComponents([Rigidbody])
+export class Input extends Component implements IOnAwake, IOnStart, IOnLoop {
   /**
    * Property that contains the pressed keys and whether they are pressed
    * or not.
@@ -39,12 +42,12 @@ export class Input extends Component implements IOnStart, IOnLoop {
    */
   private rigidbody: Rigidbody
 
-  public onStart(): void {
-    this.requires([Rigidbody])
-
+  public onAwake(): void {
     this.spaceship = this.entity as unknown as ISpaceship
     this.rigidbody = this.getComponent(Rigidbody)
+  }
 
+  public onStart(): void {
     this.keyPressed()
   }
 

@@ -1,6 +1,7 @@
 import { hasDraw } from '../engine/utils/validations'
 
 import { Component } from '../engine/component'
+import { RequireComponents } from '../engine/decorators/require-components.decorator'
 import { IOnDraw } from '../engine/interfaces/on-draw.interface'
 import { IOnLoop } from '../engine/interfaces/on-loop.interface'
 import { IOnStart } from '../engine/interfaces/on-start.interface'
@@ -12,13 +13,12 @@ import { Transform } from './transform.component'
  * entity across the screen when it's positioned at any edge of the
  * canvas
  */
+@RequireComponents([Transform])
 export class RenderOverflow extends Component implements IOnStart, IOnLoop {
   public drawer: IOnDraw
   public transform: Transform
 
   public onStart(): void {
-    this.requires([Transform])
-
     if (!hasDraw(this.entity)) {
       throw new Error(
         `${this.entity.constructor.name} has a ${this.constructor.name} but not implements the IDraw interface`,

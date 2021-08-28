@@ -1,4 +1,6 @@
 import './global.scss'
+import 'reflect-metadata'
+
 import { socket } from './assets/ts/socket'
 
 import { GameFactory } from './assets/ts/engine/game.factory'

@@ -2,6 +2,7 @@ import { hasStart, hasLoop, hasAwake, isEntity } from './utils/validations'
 
 import { IScreen } from '../interfaces/screen.interface'
 import { Component } from './component'
+import { REQUIRE_COMPONENTS } from './constants'
 import { Entity } from './entity'
 import { IAsteroidsApplication } from './interfaces/asteroids-application.interface'
 import { GameFactoryOptions } from './interfaces/game-factory-options.interface'
@@ -80,6 +81,21 @@ class AsteroidsApplication implements IAsteroidsApplication {
     const instance =
       options && options.entity ? new options.entity(this) : new Entity(this)
 
+    const requiredComponents: Type<Component>[] = []
+
+    if (options && options.components) {
+      options.components.forEach((component) => {
+        requiredComponents.push(...this.getRequiredComponents(component))
+      })
+      requiredComponents.forEach((component) => {
+        if (!options.components.includes(component)) {
+          throw new Error(
+            `Component ${component.name} is required in ${options.entity.name} entity`,
+          )
+        }
+      })
+    }
+
     instance.components = (options.components ?? []).map(
       (component) => new component(this, instance),
     )
@@ -129,6 +145,10 @@ class AsteroidsApplication implements IAsteroidsApplication {
     this.components = this.components.filter(
       (component) => component !== instance,
     )
+  }
+
+  private getRequiredComponents(component: Type<Component>): Type<Component>[] {
+    return Reflect.getMetadata(REQUIRE_COMPONENTS, component) ?? []
   }
 }
 
