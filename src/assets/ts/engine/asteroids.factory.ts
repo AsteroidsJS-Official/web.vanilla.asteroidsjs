@@ -10,6 +10,7 @@ import {
   PROVIDER_OPTIONS,
 } from './constants'
 import { IAsteroidsApplication } from './interfaces/asteroids-application.interface'
+import { IComponentProperty } from './interfaces/component-property.interface'
 import { GameFactoryOptions } from './interfaces/game-factory-options.interface'
 import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
 import { Type } from './interfaces/type.interface'
@@ -94,17 +95,29 @@ class AsteroidsApplication implements IAsteroidsApplication {
         ? new options.entity(this)
         : new AbstractEntity(this)
 
+    if (options.use) {
+      for (const key in options.use) {
+        if (key in instance) {
+          ;(instance as any)[key] = options.use[key]
+        }
+      }
+    }
+
     const components = [
       ...new Set([
-        ...(options.components ?? []),
         ...this.getComponents(options.entity),
+        ...(options.components ?? []),
       ]),
     ]
     const providers = [
       ...new Set([
-        ...(options.providers ?? []),
         ...this.getProviders(options.entity),
+        ...(options.providers ?? []),
       ]),
+    ]
+    const properties = [
+      ...this.getProperties(options.entity),
+      ...(options.properties ?? []),
     ]
 
     if (components && components.length) {
@@ -127,9 +140,19 @@ class AsteroidsApplication implements IAsteroidsApplication {
       )
     }
     if (components && components.length) {
-      instance.components = components.map(
-        (component) => new component(this, instance),
-      )
+      instance.components = components.map((component) => {
+        const i = new component(this, instance)
+        const value = properties.find((p) => p.for === component)?.use
+
+        if (value) {
+          for (const key in value) {
+            if (key in i) {
+              ;(i as any)[key] = value[key]
+            }
+          }
+        }
+        return i
+      })
     }
 
     instance.providers.forEach((provider) => {
@@ -217,8 +240,8 @@ class AsteroidsApplication implements IAsteroidsApplication {
     )
   }
 
-  private getComponents<T extends AbstractEntity>(
-    entity: Type<T>,
+  private getComponents<E extends AbstractEntity>(
+    entity: Type<E>,
   ): Type<AbstractComponent>[] {
     return Reflect.getMetadata(ENTITY_OPTIONS, entity)?.components ?? []
   }
@@ -232,6 +255,12 @@ class AsteroidsApplication implements IAsteroidsApplication {
       Reflect.getMetadata(COMPONENT_OPTIONS, target)?.providers ??
       []
     )
+  }
+
+  private getProperties<E extends AbstractEntity>(
+    target: Type<E>,
+  ): IComponentProperty[] {
+    return Reflect.getMetadata(ENTITY_OPTIONS, target)?.properties ?? []
   }
 
   private findOrCreateProvider<P extends AbstractProvider>(
