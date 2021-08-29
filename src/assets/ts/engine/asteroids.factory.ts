@@ -71,7 +71,7 @@ class AsteroidsApplication implements IAsteroidsApplication {
         this.context.canvas.width,
         this.context.canvas.height,
       )
-      ;[this.entities, ...this.components].forEach((value) => {
+      ;[...this.entities, ...this.components].forEach((value) => {
         if (hasLoop(value)) {
           value.onLoop()
         }
