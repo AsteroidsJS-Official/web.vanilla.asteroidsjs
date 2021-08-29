@@ -8,6 +8,11 @@ import { Type } from './interfaces/type.interface'
  * Class that represents some object in the game
  */
 export class AbstractEntity {
+  /**
+   * Property that defines the entity unique id
+   */
+  public id: number | string
+
   public constructor(
     public readonly game: IAsteroidsApplication,
     public components: AbstractComponent[] = [],
