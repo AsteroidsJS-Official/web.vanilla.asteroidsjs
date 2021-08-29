@@ -8,7 +8,7 @@ import { IOnLoop } from '../interfaces/on-loop.interface'
 import { IOnStart } from '../interfaces/on-start.interface'
 
 /**
- * Method that validates if some object is of type {@link Entity}
+ * Function that validates if some object is of type {@link Entity}
  *
  * @param entity defines an object that will be validated
  * @returns true if the object is of type, otherwise false
@@ -18,7 +18,8 @@ export function isEntity(entity: any): entity is AbstractEntity {
 }
 
 /**
- * Method that validates if some object is of type {@link IOnLoop}
+ * Function that validates if some object is of type {@link IOnLoop}
+ *
  * @param entity defines an object that will be validated
  * @returns true if the object implements the {@link IOnLoop} interface, otherwise
  * false
@@ -28,7 +29,8 @@ export function hasLoop(entity: any): entity is IOnLoop {
 }
 
 /**
- * Method that validates if some object is of type {@link IOnAwake}
+ * Function that validates if some object is of type {@link IOnAwake}
+ *
  * @param entity defines an object that will be validated
  * @returns true if the object implements the {@link IOnAwake} interface, otherwise
  * false
@@ -38,7 +40,8 @@ export function hasAwake(entity: any): entity is IOnAwake {
 }
 
 /**
- * Method that validates if some object is of type {@link IOnStart}
+ * Function that validates if some object is of type {@link IOnStart}
+ *
  * @param entity defines an object that will be validated
  * @returns true if the object implements the {@link IOnStart} interface, otherwise
  * false
@@ -48,7 +51,8 @@ export function hasStart(entity: any): entity is IOnStart {
 }
 
 /**
- * Method that validates if some object is of type {@link IOnDraw}
+ * Function that validates if some object is of type {@link IOnDraw}
+ *
  * @param entity defines an object that will be validated
  * @returns true if the object implements the {@link IOnDraw} interface, otherwise
  * false
@@ -58,7 +62,8 @@ export function hasDraw(entity: any): entity is IOnDraw {
 }
 
 /**
- * Method that validates if some object is of type "ICollider"
+ * Function that validates if some object is of type "ICollider"
+ *
  * @param entity defines an object that will be validated
  * @returns true if the object implements the "ICollider" interface,
  * otherwise
@@ -70,4 +75,17 @@ export function hasCollider(entity: any): entity is ICollider2 {
     'onStayCollide' in entity &&
     'onEndCollide' in entity
   )
+}
+
+/**
+ * Function that generates a new "uuid" string
+ *
+ * @returns the "uuid" value
+ */
+export function uuid(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0,
+      v = c == 'x' ? r : (r & 0x3) | 0x8
+    return v.toString(16)
+  })
 }
