@@ -28,11 +28,20 @@ dotenv.config()
  */
 
 /**
+ * @typedef {Object} SocketData
+ * @property {string} id - The entity id;
+ * @property {string} type - The entity type;
+ * @property {number} data - The entity data;
+ */
+
+/**
  * The arguments passed by the command line.
  *
  * @type {string[]}
  */
 const args = process.argv.slice(2)
+
+let currentId = 0
 
 /**
  * Represents the connected screens.
@@ -185,16 +194,33 @@ function setupSocketScreen() {
     socket.on('get-screens', getScreens)
 
     /**
-     * Updates the positions of the entity in the slaves screens.
+     * Creates a new entity
      *
-     * @param {Vector2} vector - The master entity vector.
+     * @param {SocketData} data - The data used to create the new entity
      */
-    function updateSlaves(screenNumber, vector, isShooting, velocity) {
-      if (screenNumber === 1) {
-        ioScreen
-          .to('slave')
-          .emit('update-slave', { ...vector, isShooting, velocity })
-      }
+    function onInstantiate(data) {
+      data.id = ++currentId
+      ioScreen.to('slave').emit('instantiate', data)
+    }
+    socket.on('instantiate', onInstantiate)
+
+    /**
+     * Destroyes some entity
+     *
+     * @param {string} id - The entity id
+     */
+    function onDestroy(id) {
+      ioScreen.to('slave').emit('destroy', id)
+    }
+    socket.on('destroy', onDestroy)
+
+    /**
+     * Updates the entity data in the slaves screens.
+     *
+     * @param {SocketData} data - The master entity vector.
+     */
+    function updateSlaves(data) {
+      ioScreen.to('slave').emit('update-screen', data)
     }
     socket.on('update-slaves', updateSlaves)
 
