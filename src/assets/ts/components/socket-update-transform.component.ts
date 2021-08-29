@@ -1,33 +1,35 @@
 import { socket } from '../socket'
 
 import { AbstractComponent } from '../engine/abstract-component'
-import { Component } from '../engine/decorators/component.decorator'
 import { IOnAwake } from '../engine/interfaces/on-awake.interface'
 import { IOnLoop } from '../engine/interfaces/on-loop.interface'
 import { IOnStart } from '../engine/interfaces/on-start.interface'
 import { Rect } from '../engine/math/rect'
 import { Vector2 } from '../engine/math/vector2'
+import { ISpaceship } from '../interfaces/spaceship.interface'
+import { Rigidbody } from './rigidbody.component'
 import { Transform } from './transform.component'
 
 /**
  * Class that represents the component that update the entities into the slave
  * screens according to their position in the master
  */
-@Component({
-  required: [Transform],
-})
 export class SocketUpdateTransform
   extends AbstractComponent
   implements IOnAwake, IOnStart, IOnLoop
 {
+  private screenNumber: number
   private transform: Transform
+  private rigidbody: Rigidbody
 
   onAwake(): void {
+    this.screenNumber = this.game.getScreen().number
     this.transform = this.getComponent(Transform)
+    this.rigidbody = this.getComponent(Rigidbody)
   }
 
   onStart(): void {
-    if (this.game.getScreen().number !== 1) {
+    if (this.screenNumber !== 1) {
       socket.on('update-slave', (response) => {
         this.updateSlave(response)
       })
@@ -35,16 +37,23 @@ export class SocketUpdateTransform
   }
 
   onLoop(): void {
-    if (this.game.getScreen().number !== 1) {
+    if (this.screenNumber !== 1) {
       return
     }
 
     const { position, dimensions, rotation } = this.transform
-    socket.emit('update-slaves', this.game.getScreen().number, {
-      position,
-      dimensions,
-      rotation,
-    })
+    const { isShooting } = this.entity as unknown as ISpaceship
+    socket.emit(
+      'update-slaves',
+      this.screenNumber,
+      {
+        position,
+        dimensions,
+        rotation,
+      },
+      isShooting,
+      this.rigidbody.velocity,
+    )
   }
 
   /**
@@ -57,12 +66,15 @@ export class SocketUpdateTransform
    *   position: { x: 67, y: -450 },
    *   dimensions: { width: 40, height: 50 },
    *   rotation: 40,
+   *   isShooting: false
    * }
    */
   updateSlave(data: {
     position: { x: number; y: number }
     dimensions: { width: number; height: number }
     rotation: number
+    isShooting: boolean
+    velocity: Vector2
   }): void {
     this.transform.position = new Vector2(data.position.x, data.position.y)
     this.transform.dimensions = new Rect(
@@ -70,5 +82,9 @@ export class SocketUpdateTransform
       data.dimensions.height,
     )
     this.transform.rotation = data.rotation
+
+    const spaceship = this.entity as unknown as ISpaceship
+    ;(spaceship as any).velocity = data.velocity
+    spaceship.isShooting = data.isShooting
   }
 }

@@ -8,3 +8,7 @@ declare module 'socket.io-client/dist/socket.io.js' {
   ) => Socket<DefaultEventsMap, DefaultEventsMap>
   export default io
 }
+
+declare module '*.svg'
+declare module '*.png'
+declare module '*.jpeg'

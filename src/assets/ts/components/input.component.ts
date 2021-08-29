@@ -115,26 +115,34 @@ export class Input
       this.rigidbody.angularResultant = 0
     }
 
-    for (const key in this.gameKeys) {
-      if (this.gameKeys[key] && key === 'up') {
-        this.rigidbody.resultant = Vector2.sum(
-          this.rigidbody.resultant,
-          Vector2.multiply(this.spaceship.direction, this.spaceship.force),
-        )
-      }
-      if (this.gameKeys[key] && key === 'right') {
-        this.rigidbody.angularResultant += this.spaceship.angularForce
+    if (this.gameKeys['shoot'] && !this.spaceship.isShooting) {
+      this.spaceship.isShooting = true
+    } else if (!this.gameKeys['shoot'] && this.spaceship.isShooting) {
+      this.spaceship.isShooting = false
+    }
 
-        if (this.gameKeys['left']) {
-          this.rigidbody.angularResultant = 0
-        }
-      }
-      if (this.gameKeys[key] && key === 'left') {
-        this.rigidbody.angularResultant += -this.spaceship.angularForce
+    if (this.spaceship.isShooting) {
+      this.spaceship.shoot()
+    }
 
-        if (this.gameKeys['right']) {
-          this.rigidbody.angularResultant = 0
-        }
+    if (this.gameKeys['up']) {
+      this.rigidbody.resultant = Vector2.sum(
+        this.rigidbody.resultant,
+        Vector2.multiply(this.spaceship.direction, this.spaceship.force),
+      )
+    }
+    if (this.gameKeys['right']) {
+      this.rigidbody.angularResultant += this.spaceship.angularForce
+
+      if (this.gameKeys['left']) {
+        this.rigidbody.angularResultant = 0
+      }
+    }
+    if (this.gameKeys['left']) {
+      this.rigidbody.angularResultant += -this.spaceship.angularForce
+
+      if (this.gameKeys['right']) {
+        this.rigidbody.angularResultant = 0
       }
     }
   }

@@ -1,12 +1,17 @@
 import { SocketUpdateTransform } from '../components/socket-update-transform.component'
 
+import spaceshipImg from '../../svg/spaceship.svg'
 import { RenderOverflow } from '../components/render-overflow.component'
+import { Render } from '../components/render.component'
+import { Rigidbody } from '../components/rigidbody.component'
 import { Transform } from '../components/transform.component'
 import { AbstractEntity } from '../engine/abstract-entity'
 import { Entity } from '../engine/decorators/entity.decorator'
+import { IOnAwake } from '../engine/interfaces/on-awake.interface'
 import { IOnDraw } from '../engine/interfaces/on-draw.interface'
-import { IOnStart } from '../engine/interfaces/on-start.interface'
+import { IOnLoop } from '../engine/interfaces/on-loop.interface'
 import { Vector2 } from '../engine/math/vector2'
+import { Bullet } from './bullet.entity'
 
 /**
  * Class that represents the virtual spaceship entity, used for rendering
@@ -17,12 +22,29 @@ import { Vector2 } from '../engine/math/vector2'
 })
 export class SpaceshipVirtual
   extends AbstractEntity
-  implements IOnStart, IOnDraw
+  implements IOnAwake, IOnDraw, IOnLoop
 {
+  private context: CanvasRenderingContext2D
+
   /**
    * Property that contains the spaceship position, dimensions and rotation.
    */
   private transform: Transform
+
+  /**
+   * Property that contains the spaceship velocity.
+   */
+  private velocity: Vector2
+
+  /**
+   * Property responsible for the spaceship bullet velocity.
+   */
+  public readonly bulletVelocity = 10
+
+  /**
+   * Property responsible for the spaceship last bullet time.
+   */
+  public lastShot: Date
 
   /**
    * Property that indicates the direction that the spaceship is facing.
@@ -34,7 +56,10 @@ export class SpaceshipVirtual
     )
   }
 
-  public onStart(): void {
+  public isShooting = false
+
+  onAwake(): void {
+    this.context = this.game.getContext()
     this.transform = this.getComponent(Transform)
   }
 
@@ -43,38 +68,83 @@ export class SpaceshipVirtual
   }
 
   private drawTriangle(): void {
-    this.game
-      .getContext()
-      .translate(
-        this.transform.canvasPosition.x,
-        this.transform.canvasPosition.y,
-      )
-    this.game.getContext().rotate(this.transform.rotation)
+    this.context.translate(
+      this.transform.canvasPosition.x,
+      this.transform.canvasPosition.y,
+    )
+    this.context.rotate(this.transform.rotation)
 
-    this.game.getContext().beginPath()
-    this.game.getContext().fillStyle = '#ff0055'
-    this.game.getContext().moveTo(0, -this.transform.dimensions.height / 2)
-    this.game
-      .getContext()
-      .lineTo(
-        -this.transform.dimensions.width / 2,
-        this.transform.dimensions.height / 2,
-      )
-    this.game
-      .getContext()
-      .lineTo(
-        this.transform.dimensions.width / 2,
-        this.transform.dimensions.height / 2,
-      )
-    this.game.getContext().closePath()
-    this.game.getContext().fill()
+    const image = new Image()
+    image.src = spaceshipImg
 
-    this.game.getContext().rotate(-this.transform.rotation)
-    this.game
-      .getContext()
-      .translate(
-        -this.transform.canvasPosition.x,
-        -this.transform.canvasPosition.y,
+    // TODO: apply color to SVG
+    this.context.drawImage(
+      image,
+      0 - this.transform.dimensions.width / 2,
+      0 - this.transform.dimensions.height / 2,
+      this.transform.dimensions.width,
+      this.transform.dimensions.height,
+    )
+
+    this.context.rotate(-this.transform.rotation)
+    this.context.translate(
+      -this.transform.canvasPosition.x,
+      -this.transform.canvasPosition.y,
+    )
+  }
+
+  public onLoop(): void {
+    if (this.isShooting) {
+      if (
+        this.lastShot &&
+        new Date().getTime() - this.lastShot.getTime() < 300
+      ) {
+        return
+      }
+
+      this.lastShot = new Date()
+
+      const bulletLeft = this.instantiate({
+        entity: Bullet,
+        components: [Transform, Rigidbody, Render],
+      })
+
+      bulletLeft.transform.position = Vector2.sum(
+        this.transform.position,
+        Vector2.multiply(
+          new Vector2(
+            Math.sin(this.transform.rotation - (2 * Math.PI) / 4),
+            Math.cos(this.transform.rotation - (2 * Math.PI) / 4),
+          ),
+          23,
+        ),
       )
+      bulletLeft.transform.rotation = this.transform.rotation
+      bulletLeft.rigidbody.velocity = Vector2.sum(
+        this.velocity,
+        Vector2.multiply(this.direction, this.bulletVelocity),
+      )
+
+      const bulletRight = this.instantiate({
+        entity: Bullet,
+        components: [Transform, Rigidbody, Render],
+      })
+
+      bulletRight.transform.position = Vector2.sum(
+        this.transform.position,
+        Vector2.multiply(
+          new Vector2(
+            Math.sin(this.transform.rotation + (2 * Math.PI) / 4),
+            Math.cos(this.transform.rotation + (2 * Math.PI) / 4),
+          ),
+          20,
+        ),
+      )
+      bulletRight.transform.rotation = this.transform.rotation
+      bulletRight.rigidbody.velocity = Vector2.sum(
+        this.velocity,
+        Vector2.multiply(this.direction, this.bulletVelocity),
+      )
+    }
   }
 }

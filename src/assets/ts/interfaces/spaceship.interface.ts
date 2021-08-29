@@ -12,7 +12,27 @@ export interface ISpaceship {
   readonly angularForce: number
 
   /**
+   * Property responsible for the spaceship bullet velocity.
+   */
+  readonly bulletVelocity: number
+
+  /**
+   * Property responsible for the spaceship bullet emission.
+   */
+  isShooting: boolean
+
+  /**
+   * Property responsible for the spaceship last bullet time.
+   */
+  lastShot: Date
+
+  /**
    * Property that indicates the direction that the spaceship is facing.
    */
   get direction(): Vector2
+
+  /**
+   * Method responsible for shooting the spaceship bullets.
+   */
+  shoot(): void
 }
