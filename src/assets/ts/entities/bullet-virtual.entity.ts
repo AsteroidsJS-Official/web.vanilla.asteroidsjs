@@ -3,9 +3,9 @@ import { Rigidbody } from '../components/rigidbody.component'
 import { Transform } from '../components/transform.component'
 import { AbstractEntity } from '../engine/abstract-entity'
 import { Entity } from '../engine/decorators/entity.decorator'
+import { IOnAwake } from '../engine/interfaces/on-awake.interface'
 import { IOnDraw } from '../engine/interfaces/on-draw.interface'
 import { IOnLoop } from '../engine/interfaces/on-loop.interface'
-import { IOnStart } from '../engine/interfaces/on-start.interface'
 import { Rect } from '../engine/math/rect'
 import { Vector2 } from '../engine/math/vector2'
 import { IBullet } from '../interfaces/bullet.interface'
@@ -13,9 +13,9 @@ import { IBullet } from '../interfaces/bullet.interface'
 @Entity({
   components: [Transform, Rigidbody, Render],
 })
-export class Bullet
+export class BulletVirtual
   extends AbstractEntity
-  implements IBullet, IOnDraw, IOnStart, IOnLoop
+  implements IBullet, IOnDraw, IOnAwake, IOnLoop
 {
   public transform: Transform
   public rigidbody: Rigidbody
@@ -28,7 +28,7 @@ export class Bullet
     )
   }
 
-  onStart(): void {
+  onAwake(): void {
     this.context = this.game.getContext()
     this.transform = this.getComponent(Transform)
     this.rigidbody = this.getComponent(Rigidbody)
@@ -48,7 +48,6 @@ export class Bullet
     this.context.shadowBlur = 25
 
     this.context.beginPath()
-
     this.context.fillStyle = '#ffc887'
     this.context.rect(
       0,
