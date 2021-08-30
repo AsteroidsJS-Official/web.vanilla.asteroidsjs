@@ -1,28 +1,26 @@
-import { SocketUpdateTransform } from '../components/socket-update-transform.component'
+import { ISocketData } from '../interfaces/socket-data.interface'
+import { socket } from '../socket'
 
 import spaceshipImg from '../../svg/spaceship.svg'
 import { RenderOverflow } from '../components/render-overflow.component'
-import { Render } from '../components/render.component'
-import { Rigidbody } from '../components/rigidbody.component'
 import { Transform } from '../components/transform.component'
 import { AbstractEntity } from '../engine/abstract-entity'
 import { Entity } from '../engine/decorators/entity.decorator'
 import { IOnAwake } from '../engine/interfaces/on-awake.interface'
 import { IOnDraw } from '../engine/interfaces/on-draw.interface'
-import { IOnLoop } from '../engine/interfaces/on-loop.interface'
+import { IOnStart } from '../engine/interfaces/on-start.interface'
 import { Vector2 } from '../engine/math/vector2'
-import { Bullet } from './bullet.entity'
 
 /**
  * Class that represents the virtual spaceship entity, used for rendering
  * uncontrollable spaceships.
  */
 @Entity({
-  components: [Transform, RenderOverflow, SocketUpdateTransform],
+  components: [Transform, RenderOverflow],
 })
 export class SpaceshipVirtual
   extends AbstractEntity
-  implements IOnAwake, IOnDraw, IOnLoop
+  implements IOnAwake, IOnStart, IOnDraw
 {
   private context: CanvasRenderingContext2D
 
@@ -63,6 +61,17 @@ export class SpaceshipVirtual
     this.transform = this.getComponent(Transform)
   }
 
+  onStart(): void {
+    socket.on('update-screen', ({ id, data }: ISocketData) => {
+      if (this.id !== id) {
+        return
+      }
+      this.transform.position = data.position
+      this.transform.dimensions = data.dimensions
+      this.transform.rotation = data.rotation
+    })
+  }
+
   public onDraw(): void {
     this.drawTriangle()
   }
@@ -91,60 +100,5 @@ export class SpaceshipVirtual
       -this.transform.canvasPosition.x,
       -this.transform.canvasPosition.y,
     )
-  }
-
-  public onLoop(): void {
-    if (this.isShooting) {
-      if (
-        this.lastShot &&
-        new Date().getTime() - this.lastShot.getTime() < 300
-      ) {
-        return
-      }
-
-      this.lastShot = new Date()
-
-      const bulletLeft = this.instantiate({
-        entity: Bullet,
-        components: [Transform, Rigidbody, Render],
-      })
-
-      bulletLeft.transform.position = Vector2.sum(
-        this.transform.position,
-        Vector2.multiply(
-          new Vector2(
-            Math.sin(this.transform.rotation - (2 * Math.PI) / 4),
-            Math.cos(this.transform.rotation - (2 * Math.PI) / 4),
-          ),
-          23,
-        ),
-      )
-      bulletLeft.transform.rotation = this.transform.rotation
-      bulletLeft.rigidbody.velocity = Vector2.sum(
-        this.velocity,
-        Vector2.multiply(this.direction, this.bulletVelocity),
-      )
-
-      const bulletRight = this.instantiate({
-        entity: Bullet,
-        components: [Transform, Rigidbody, Render],
-      })
-
-      bulletRight.transform.position = Vector2.sum(
-        this.transform.position,
-        Vector2.multiply(
-          new Vector2(
-            Math.sin(this.transform.rotation + (2 * Math.PI) / 4),
-            Math.cos(this.transform.rotation + (2 * Math.PI) / 4),
-          ),
-          20,
-        ),
-      )
-      bulletRight.transform.rotation = this.transform.rotation
-      bulletRight.rigidbody.velocity = Vector2.sum(
-        this.velocity,
-        Vector2.multiply(this.direction, this.bulletVelocity),
-      )
-    }
   }
 }
