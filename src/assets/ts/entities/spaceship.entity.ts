@@ -16,6 +16,7 @@ import { IOnLoop } from '../engine/interfaces/on-loop.interface'
 import { Vector2 } from '../engine/math/vector2'
 import { ISpaceship } from '../interfaces/spaceship.interface'
 import { Bullet } from './bullet.entity'
+import { Child } from './child.entity'
 
 /**
  * Class that represents the spaceship entity controlled by the user.
@@ -47,6 +48,10 @@ export class Spaceship
    */
   private rigidbody: Rigidbody
 
+  private image: HTMLImageElement
+
+  private child: IOnDraw
+
   public get direction(): Vector2 {
     return new Vector2(
       Math.sin(this.transform.rotation),
@@ -54,9 +59,26 @@ export class Spaceship
     )
   }
 
-  public onAwake(): void {
+  onAwake(): void {
     this.transform = this.getComponent(Transform)
     this.rigidbody = this.getComponent(Rigidbody)
+  }
+
+  onStart(): void {
+    this.image = new Image()
+    this.image.src = spaceshipImg
+
+    this.child = this.instantiate({
+      entity: Child,
+      properties: [
+        {
+          for: Transform,
+          use: {
+            parent: this.transform,
+          },
+        },
+      ],
+    }) as unknown as IOnDraw
   }
 
   onLoop(): void {
@@ -71,6 +93,7 @@ export class Spaceship
   }
 
   public onDraw(): void {
+    this.child.onDraw()
     this.drawTriangle()
   }
 
@@ -93,14 +116,12 @@ export class Spaceship
         this.transform.canvasPosition.y,
       )
     this.game.getContext().rotate(this.transform.rotation)
-    const image = new Image()
-    image.src = spaceshipImg
 
     // TODO: apply color to SVG
     this.game
       .getContext()
       .drawImage(
-        image,
+        this.image,
         0 - this.transform.dimensions.width / 2,
         0 - this.transform.dimensions.height / 2,
         this.transform.dimensions.width,

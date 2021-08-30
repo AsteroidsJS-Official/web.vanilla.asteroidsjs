@@ -13,6 +13,10 @@ export class Transform extends AbstractComponent {
    */
   public dimensions = new Rect(100, 100)
 
+  public localPosition = new Vector2()
+
+  public parent: Transform
+
   /**
    * Property that defines the entity rotation in radians
    */
@@ -27,42 +31,45 @@ export class Transform extends AbstractComponent {
    * Property that defines the entity rotation in radians
    */
   public get rotation(): number {
-    return this._rotation
+    if (!this.parent) {
+      return this._rotation
+    }
+    return this.parent.rotation + this._rotation
   }
 
   /**
    * Property that defines the entity rotation in radians
    */
   public set rotation(value: number) {
-    this._rotation = value
-  }
-
-  /**
-   * Property that defines the entity rotation in degrees
-   */
-  public get euler(): number {
-    return (this._rotation * 180) / Math.PI
-  }
-
-  /**
-   * Property that defines the entity rotation in degrees
-   */
-  public set euler(value: number) {
-    this._rotation = (value * Math.PI) / 180
+    if (!this.parent) {
+      this._rotation = value
+      return
+    }
+    this._rotation = this.parent.rotation + value
   }
 
   /**
    * Property that defines the entity position
    */
   public get position(): Vector2 {
-    return this._position
+    if (!this.parent) {
+      return this._position
+    }
+    return Vector2.sum(this.parent.position, this.localPosition)
   }
 
   /**
    * Property that defines the entity position
    */
   public set position(value: Vector2) {
-    this._position = value
+    if (!this.parent) {
+      this._position = value
+      return
+    }
+    this.localPosition = Vector2.sum(
+      value,
+      Vector2.multiply(this.parent.position, -1),
+    )
   }
 
   /**
@@ -70,18 +77,8 @@ export class Transform extends AbstractComponent {
    */
   public get canvasPosition(): Vector2 {
     return new Vector2(
-      this.game.getContext().canvas.width / 2 + this._position.x,
-      this.game.getContext().canvas.height / 2 - this._position.y,
-    )
-  }
-
-  /**
-   * Property that defines the entity position in html canvas
-   */
-  public set canvasPosition(value: Vector2) {
-    this._position = new Vector2(
-      this.game.getContext().canvas.width / 2 - value.x,
-      this.game.getContext().canvas.height / 2 - value.y,
+      this.game.getContext().canvas.width / 2 + this.position.x,
+      this.game.getContext().canvas.height / 2 - this.position.y,
     )
   }
 }

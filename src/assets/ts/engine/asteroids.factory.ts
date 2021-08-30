@@ -146,9 +146,7 @@ class AsteroidsApplication implements IAsteroidsApplication {
 
         if (value) {
           for (const key in value) {
-            if (key in i) {
-              ;(i as any)[key] = value[key]
-            }
+            ;(i as any)[key] = value[key]
           }
         }
         return i
