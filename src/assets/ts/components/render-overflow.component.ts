@@ -39,12 +39,16 @@ export class RenderOverflow
 
     if (this.isOverflowingX() && this.isOverflowingY()) {
       const overflowAmountTop =
-        this.transform.canvasPosition.y - this.transform.dimensions.height / 2
+        this.transform.canvasPosition.y -
+        this.transform.totalDimensions.height / 2
       const overflowAmountLeft =
-        this.transform.canvasPosition.x - this.transform.dimensions.width / 2
+        this.transform.canvasPosition.x -
+        this.transform.totalDimensions.width / 2
 
-      const isTop = overflowAmountTop < this.transform.dimensions.height / 2
-      const isLeft = overflowAmountLeft < this.transform.dimensions.width / 2
+      const isTop =
+        overflowAmountTop < this.transform.totalDimensions.height / 2
+      const isLeft =
+        overflowAmountLeft < this.transform.totalDimensions.width / 2
 
       const auxY = this.transform.position.y
       const newY = isTop
@@ -68,9 +72,10 @@ export class RenderOverflow
       this.drawer?.draw()
     } else if (this.isOverflowingY()) {
       const overflowAmount =
-        this.transform.canvasPosition.y - this.transform.dimensions.height / 2
+        this.transform.canvasPosition.y -
+        this.transform.totalDimensions.height / 2
 
-      const isTop = overflowAmount < this.transform.dimensions.height / 2
+      const isTop = overflowAmount < this.transform.totalDimensions.height / 2
 
       this.transform.position = new Vector2(
         this.transform.position.x,
@@ -82,9 +87,10 @@ export class RenderOverflow
       this.drawer?.draw()
     } else if (this.isOverflowingX()) {
       const overflowAmount =
-        this.transform.canvasPosition.x - this.transform.dimensions.width / 2
+        this.transform.canvasPosition.x -
+        this.transform.totalDimensions.width / 2
 
-      const isLeft = overflowAmount < this.transform.dimensions.width / 2
+      const isLeft = overflowAmount < this.transform.totalDimensions.width / 2
 
       this.transform.position = new Vector2(
         isLeft
@@ -106,12 +112,12 @@ export class RenderOverflow
     const topEdge =
       this.game.getContext().canvas.height / 2 -
       this.transform.position.y -
-      this.transform.dimensions.height / 2
+      this.transform.totalDimensions.height / 2
 
     const bottomEdge =
       this.game.getContext().canvas.height / 2 -
       this.transform.position.y +
-      this.transform.dimensions.height / 2
+      this.transform.totalDimensions.height / 2
 
     return topEdge < 0 || bottomEdge > this.game.getContext().canvas.height
   }
@@ -125,12 +131,12 @@ export class RenderOverflow
     const leftEdge =
       this.game.getContext().canvas.width / 2 -
       this.transform.position.x -
-      this.transform.dimensions.width / 2
+      this.transform.totalDimensions.width / 2
 
     const rightEdge =
       this.game.getContext().canvas.width / 2 -
       this.transform.position.x +
-      this.transform.dimensions.width / 2
+      this.transform.totalDimensions.width / 2
 
     return leftEdge < 0 || rightEdge > this.game.getContext().canvas.width
   }

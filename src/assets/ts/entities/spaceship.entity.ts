@@ -50,7 +50,7 @@ export class Spaceship
 
   private image: HTMLImageElement
 
-  private child: IDraw
+  // private children: IDraw[] = []
 
   public get direction(): Vector2 {
     return new Vector2(
@@ -68,17 +68,32 @@ export class Spaceship
     this.image = new Image()
     this.image.src = spaceshipImg
 
-    this.child = this.instantiate({
-      entity: Child,
-      properties: [
-        {
-          for: Transform,
-          use: {
-            parent: this.transform,
-          },
-        },
-      ],
-    }) as unknown as IDraw
+    // this.children.push(
+    //   this.instantiate({
+    //     entity: Child,
+    //     properties: [
+    //       {
+    //         for: Transform,
+    //         use: {
+    //           parent: this.transform,
+    //           localPosition: new Vector2(50, 50),
+    //         },
+    //       },
+    //     ],
+    //   }) as unknown as IDraw,
+    //   this.instantiate({
+    //     entity: Child,
+    //     properties: [
+    //       {
+    //         for: Transform,
+    //         use: {
+    //           parent: this.transform,
+    //           localPosition: new Vector2(-150, -150),
+    //         },
+    //       },
+    //     ],
+    //   }) as unknown as IDraw,
+    // )
   }
 
   onLoop(): void {
@@ -93,7 +108,8 @@ export class Spaceship
   }
 
   public draw(): void {
-    this.child.draw()
+    // this.drawCircle()
+    // this.children.forEach((child) => child.draw())
     this.drawTriangle()
   }
 
@@ -106,6 +122,36 @@ export class Spaceship
 
     this.createLeftBullet()
     this.createRightBullet()
+  }
+
+  private drawCircle(): void {
+    this.game
+      .getContext()
+      .translate(
+        this.transform.canvasPosition.x,
+        this.transform.canvasPosition.y,
+      )
+    this.game.getContext().rotate(this.transform.rotation)
+
+    this.game.getContext().beginPath()
+
+    this.game.getContext().fillStyle = 'green'
+    this.game
+      .getContext()
+      .arc(0, 0, this.transform.totalDimensions.width / 2, 0, 360)
+    this.game.getContext().fill()
+    this.game.getContext().closePath()
+
+    this.game.getContext().shadowColor = 'transparent'
+    this.game.getContext().shadowBlur = 0
+
+    this.game.getContext().rotate(-this.transform.rotation)
+    this.game
+      .getContext()
+      .translate(
+        -this.transform.canvasPosition.x,
+        -this.transform.canvasPosition.y,
+      )
   }
 
   private drawTriangle(): void {
