@@ -2,7 +2,7 @@ import { hasDraw } from '../engine/utils/validations'
 
 import { AbstractComponent } from '../engine/abstract-component'
 import { Component } from '../engine/decorators/component.decorator'
-import { IOnDraw } from '../engine/interfaces/on-draw.interface'
+import { IDraw } from '../engine/interfaces/draw.interface'
 import { IOnLoop } from '../engine/interfaces/on-loop.interface'
 import { IOnStart } from '../engine/interfaces/on-start.interface'
 import { Vector2 } from '../engine/math/vector2'
@@ -20,7 +20,7 @@ export class RenderOverflow
   extends AbstractComponent
   implements IOnStart, IOnLoop
 {
-  public drawer: IOnDraw
+  public drawer: IDraw
   public transform: Transform
 
   public onStart(): void {
@@ -35,7 +35,7 @@ export class RenderOverflow
   }
 
   public onLoop(): void {
-    this.drawer?.onDraw()
+    this.drawer?.draw()
 
     if (this.isOverflowingX() && this.isOverflowingY()) {
       const overflowAmountTop =
@@ -57,15 +57,15 @@ export class RenderOverflow
 
       this.transform.position = new Vector2(this.transform.position.x, newY)
 
-      this.drawer?.onDraw()
+      this.drawer?.draw()
 
       this.transform.position = new Vector2(newX, auxY)
 
-      this.drawer?.onDraw()
+      this.drawer?.draw()
 
       this.transform.position = new Vector2(this.transform.position.x, newY)
 
-      this.drawer?.onDraw()
+      this.drawer?.draw()
     } else if (this.isOverflowingY()) {
       const overflowAmount =
         this.transform.canvasPosition.y - this.transform.dimensions.height / 2
@@ -79,7 +79,7 @@ export class RenderOverflow
           : this.transform.position.y + this.game.getContext().canvas.height,
       )
 
-      this.drawer?.onDraw()
+      this.drawer?.draw()
     } else if (this.isOverflowingX()) {
       const overflowAmount =
         this.transform.canvasPosition.x - this.transform.dimensions.width / 2
@@ -93,7 +93,7 @@ export class RenderOverflow
         this.transform.position.y,
       )
 
-      this.drawer?.onDraw()
+      this.drawer?.draw()
     }
   }
 

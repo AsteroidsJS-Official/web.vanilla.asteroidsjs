@@ -10,8 +10,8 @@ import { Rigidbody } from '../components/rigidbody.component'
 import { Transform } from '../components/transform.component'
 import { AbstractEntity } from '../engine/abstract-entity'
 import { Entity } from '../engine/decorators/entity.decorator'
+import { IDraw } from '../engine/interfaces/draw.interface'
 import { IOnAwake } from '../engine/interfaces/on-awake.interface'
-import { IOnDraw } from '../engine/interfaces/on-draw.interface'
 import { IOnLoop } from '../engine/interfaces/on-loop.interface'
 import { Vector2 } from '../engine/math/vector2'
 import { ISpaceship } from '../interfaces/spaceship.interface'
@@ -26,7 +26,7 @@ import { Child } from './child.entity'
 })
 export class Spaceship
   extends AbstractEntity
-  implements ISpaceship, IOnAwake, IOnDraw, IOnLoop
+  implements ISpaceship, IOnAwake, IDraw, IOnLoop
 {
   public readonly force = 3
 
@@ -50,7 +50,7 @@ export class Spaceship
 
   private image: HTMLImageElement
 
-  private child: IOnDraw
+  private child: IDraw
 
   public get direction(): Vector2 {
     return new Vector2(
@@ -78,7 +78,7 @@ export class Spaceship
           },
         },
       ],
-    }) as unknown as IOnDraw
+    }) as unknown as IDraw
   }
 
   onLoop(): void {
@@ -92,8 +92,8 @@ export class Spaceship
     })
   }
 
-  public onDraw(): void {
-    this.child.onDraw()
+  public draw(): void {
+    this.child.draw()
     this.drawTriangle()
   }
 

@@ -6,8 +6,8 @@ import { RenderOverflow } from '../components/render-overflow.component'
 import { Transform } from '../components/transform.component'
 import { AbstractEntity } from '../engine/abstract-entity'
 import { Entity } from '../engine/decorators/entity.decorator'
+import { IDraw } from '../engine/interfaces/draw.interface'
 import { IOnAwake } from '../engine/interfaces/on-awake.interface'
-import { IOnDraw } from '../engine/interfaces/on-draw.interface'
 import { IOnStart } from '../engine/interfaces/on-start.interface'
 import { Vector2 } from '../engine/math/vector2'
 
@@ -20,7 +20,7 @@ import { Vector2 } from '../engine/math/vector2'
 })
 export class SpaceshipVirtual
   extends AbstractEntity
-  implements IOnAwake, IOnStart, IOnDraw
+  implements IOnAwake, IOnStart, IDraw
 {
   private context: CanvasRenderingContext2D
 
@@ -72,7 +72,7 @@ export class SpaceshipVirtual
     })
   }
 
-  public onDraw(): void {
+  public draw(): void {
     this.drawTriangle()
   }
 

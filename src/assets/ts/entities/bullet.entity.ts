@@ -3,7 +3,7 @@ import { Rigidbody } from '../components/rigidbody.component'
 import { Transform } from '../components/transform.component'
 import { AbstractEntity } from '../engine/abstract-entity'
 import { Entity } from '../engine/decorators/entity.decorator'
-import { IOnDraw } from '../engine/interfaces/on-draw.interface'
+import { IDraw } from '../engine/interfaces/draw.interface'
 import { IOnLoop } from '../engine/interfaces/on-loop.interface'
 import { IOnStart } from '../engine/interfaces/on-start.interface'
 import { Rect } from '../engine/math/rect'
@@ -15,7 +15,7 @@ import { IBullet } from '../interfaces/bullet.interface'
 })
 export class Bullet
   extends AbstractEntity
-  implements IBullet, IOnDraw, IOnStart, IOnLoop
+  implements IBullet, IDraw, IOnStart, IOnLoop
 {
   public transform: Transform
   public rigidbody: Rigidbody
@@ -37,7 +37,7 @@ export class Bullet
     this.rigidbody.mass = 3
   }
 
-  onDraw(): void {
+  draw(): void {
     this.context.translate(
       this.transform.canvasPosition.x,
       this.transform.canvasPosition.y,

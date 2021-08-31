@@ -2,8 +2,8 @@
 
 import { ICollider2 } from '../../interfaces/collider2.interface'
 import { AbstractEntity } from '../abstract-entity'
+import { IDraw } from '../interfaces/draw.interface'
 import { IOnAwake } from '../interfaces/on-awake.interface'
-import { IOnDraw } from '../interfaces/on-draw.interface'
 import { IOnLoop } from '../interfaces/on-loop.interface'
 import { IOnStart } from '../interfaces/on-start.interface'
 
@@ -57,8 +57,8 @@ export function hasStart(entity: any): entity is IOnStart {
  * @returns true if the object implements the {@link IOnDraw} interface, otherwise
  * false
  */
-export function hasDraw(entity: any): entity is IOnDraw {
-  return 'onDraw' in entity
+export function hasDraw(entity: any): entity is IDraw {
+  return 'draw' in entity
 }
 
 /**
