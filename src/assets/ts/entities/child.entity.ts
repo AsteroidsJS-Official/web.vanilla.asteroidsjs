@@ -18,10 +18,17 @@ export class Child extends AbstractEntity implements IOnStart, IDraw {
   }
 
   draw(): void {
-    this.context.translate(
-      this.transform.canvasPosition.x,
-      this.transform.canvasPosition.y,
-    )
+    if (this.transform.parent) {
+      this.context.translate(
+        this.transform.parent.canvasPosition.x,
+        this.transform.parent.canvasPosition.y,
+      )
+    } else {
+      this.context.translate(
+        this.transform.canvasPosition.x,
+        this.transform.canvasPosition.y,
+      )
+    }
     this.context.rotate(this.transform.rotation)
 
     this.context.shadowColor = 'yellow'
@@ -30,7 +37,13 @@ export class Child extends AbstractEntity implements IOnStart, IDraw {
     this.context.beginPath()
 
     this.context.fillStyle = '#ffc887'
-    this.context.arc(0, 0, this.transform.dimensions.width / 2, 0, 360)
+    this.context.arc(
+      this.transform.localPosition.x,
+      -this.transform.localPosition.y,
+      this.transform.dimensions.width / 2,
+      0,
+      360,
+    )
     this.context.fill()
     this.context.closePath()
 
@@ -38,9 +51,17 @@ export class Child extends AbstractEntity implements IOnStart, IDraw {
     this.context.shadowBlur = 0
 
     this.context.rotate(-this.transform.rotation)
-    this.context.translate(
-      -this.transform.canvasPosition.x,
-      -this.transform.canvasPosition.y,
-    )
+
+    if (this.transform.parent) {
+      this.context.translate(
+        -this.transform.parent.canvasPosition.x,
+        -this.transform.parent.canvasPosition.y,
+      )
+    } else {
+      this.context.translate(
+        -this.transform.canvasPosition.x,
+        -this.transform.canvasPosition.y,
+      )
+    }
   }
 }

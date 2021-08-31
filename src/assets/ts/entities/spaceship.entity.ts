@@ -6,6 +6,7 @@ import { uuid } from '../engine/utils/validations'
 import spaceshipImg from '../../svg/spaceship.svg'
 import { Input } from '../components/input.component'
 import { RenderOverflow } from '../components/render-overflow.component'
+import { Render } from '../components/render.component'
 import { Rigidbody } from '../components/rigidbody.component'
 import { Transform } from '../components/transform.component'
 import { AbstractEntity } from '../engine/abstract-entity'
@@ -50,7 +51,7 @@ export class Spaceship
 
   private image: HTMLImageElement
 
-  // private children: IDraw[] = []
+  private children: IDraw[] = []
 
   public get direction(): Vector2 {
     return new Vector2(
@@ -68,32 +69,34 @@ export class Spaceship
     this.image = new Image()
     this.image.src = spaceshipImg
 
-    // this.children.push(
-    //   this.instantiate({
-    //     entity: Child,
-    //     properties: [
-    //       {
-    //         for: Transform,
-    //         use: {
-    //           parent: this.transform,
-    //           localPosition: new Vector2(50, 50),
-    //         },
-    //       },
-    //     ],
-    //   }) as unknown as IDraw,
-    //   this.instantiate({
-    //     entity: Child,
-    //     properties: [
-    //       {
-    //         for: Transform,
-    //         use: {
-    //           parent: this.transform,
-    //           localPosition: new Vector2(-150, -150),
-    //         },
-    //       },
-    //     ],
-    //   }) as unknown as IDraw,
-    // )
+    this.children.push(
+      this.instantiate({
+        entity: Child,
+        components: [Render],
+        properties: [
+          {
+            for: Transform,
+            use: {
+              // parent: this.transform,
+              localPosition: new Vector2(50, 50),
+            },
+          },
+        ],
+      }) as unknown as IDraw,
+      this.instantiate({
+        entity: Child,
+        components: [],
+        properties: [
+          {
+            for: Transform,
+            use: {
+              parent: this.transform,
+              localPosition: new Vector2(-100, -100),
+            },
+          },
+        ],
+      }) as unknown as IDraw,
+    )
   }
 
   onLoop(): void {
@@ -109,7 +112,11 @@ export class Spaceship
 
   public draw(): void {
     // this.drawCircle()
-    // this.children.forEach((child) => child.draw())
+    this.children.forEach(
+      (child) =>
+        (child as unknown as AbstractEntity).getComponent(Transform).parent &&
+        child.draw(),
+    )
     this.drawTriangle()
   }
 
