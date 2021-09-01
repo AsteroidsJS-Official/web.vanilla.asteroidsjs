@@ -16,7 +16,6 @@ import { Transform } from '../components/transform.component'
 import { IDraw } from '../engine/interfaces/draw.interface'
 import { IOnAwake } from '../engine/interfaces/on-awake.interface'
 import { IOnLoop } from '../engine/interfaces/on-loop.interface'
-import { ISpaceship } from '../interfaces/spaceship.interface'
 
 import { uuid } from '../engine/utils/validations'
 
@@ -27,20 +26,31 @@ import spaceshipImg from '../../svg/spaceship.svg'
  */
 @Entity({
   components: [Input, Drawer, Transform, Rigidbody, RenderOverflow],
+  properties: [
+    {
+      for: Input,
+      use: {
+        force: 3,
+        angularForce: 0.03,
+      },
+    },
+  ],
 })
 export class Spaceship
   extends AbstractEntity
-  implements ISpaceship, IOnAwake, IDraw, IOnLoop
+  implements IOnAwake, IDraw, IOnLoop
 {
-  public readonly force = 3
-
-  public readonly angularForce = 0.03
-
-  public readonly bulletVelocity = 10
-
   public isShooting = false
 
-  public lastShot: Date
+  /**
+   * Property responsible for the spaceship bullet velocity.
+   */
+  private readonly bulletVelocity = 10
+
+  /**
+   * Property responsible for the spaceship last bullet time.
+   */
+  private lastShot: Date
 
   /**
    * Property that contains the spaceship position, dimensions and rotation.
