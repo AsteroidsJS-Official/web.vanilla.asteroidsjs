@@ -18,6 +18,15 @@ export abstract class AbstractComponent {
   ) {}
 
   /**
+   * Method that returns the entity with some class or interface type
+   *
+   * @returns the entity as some specified type
+   */
+  public getEntityAs<T>(): T {
+    return this.entity.getEntityAs<T>()
+  }
+
+  /**
    * Method that can create new entities
    *
    * @param entity defines the new entity type
