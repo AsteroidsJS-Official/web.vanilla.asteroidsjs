@@ -1,13 +1,18 @@
+import { Vector2 } from '../engine/math/vector2'
+
+import { Spaceship } from '../entities/spaceship.entity'
+
 import { AbstractComponent } from '../engine/abstract-component'
 import { Component } from '../engine/decorators/component.decorator'
+import { Rigidbody } from './rigidbody.component'
+
 import { IOnAwake } from '../engine/interfaces/on-awake.interface'
 import { IOnLoop } from '../engine/interfaces/on-loop.interface'
-import { IOnStart } from '../engine/interfaces/on-start.interface'
-import { Vector2 } from '../engine/math/vector2'
 import { IGameKeys } from '../interfaces/input.interface'
-import { ISpaceship } from '../interfaces/spaceship.interface'
-import { Rigidbody } from './rigidbody.component'
+
 import { fromEvent } from 'rxjs'
+
+// TODO: put the direction property in the "Transform" component
 
 /**
  * Class that represents the component that allows  the user interaction
@@ -16,10 +21,11 @@ import { fromEvent } from 'rxjs'
 @Component({
   required: [Rigidbody],
 })
-export class Input
-  extends AbstractComponent
-  implements IOnAwake, IOnStart, IOnLoop
-{
+export class Input extends AbstractComponent implements IOnAwake, IOnLoop {
+  force: number
+
+  angularForce: number
+
   /**
    * Property that contains the pressed keys and whether they are pressed
    * or not.
@@ -38,21 +44,16 @@ export class Input
   private gameKeys: IGameKeys = {}
 
   /**
-   * Property that represents the controlled spaceship.
-   */
-  private spaceship: ISpaceship
-
-  /**
    * Property that represents the controlled entity's rigidbody.
    */
   private rigidbody: Rigidbody
 
-  public onAwake(): void {
-    this.spaceship = this.entity as unknown as ISpaceship
-    this.rigidbody = this.getComponent(Rigidbody)
-  }
+  private spaceship: Spaceship
 
-  public onStart(): void {
+  onAwake(): void {
+    this.spaceship = this.getEntityAs<Spaceship>()
+    this.rigidbody = this.getComponent(Rigidbody)
+
     this.keyPressed()
   }
 
@@ -128,18 +129,18 @@ export class Input
     if (this.gameKeys['up']) {
       this.rigidbody.resultant = Vector2.sum(
         this.rigidbody.resultant,
-        Vector2.multiply(this.spaceship.direction, this.spaceship.force),
+        Vector2.multiply(this.spaceship.direction, this.force),
       )
     }
     if (this.gameKeys['right']) {
-      this.rigidbody.angularResultant += this.spaceship.angularForce
+      this.rigidbody.angularResultant += this.angularForce
 
       if (this.gameKeys['left']) {
         this.rigidbody.angularResultant = 0
       }
     }
     if (this.gameKeys['left']) {
-      this.rigidbody.angularResultant += -this.spaceship.angularForce
+      this.rigidbody.angularResultant += -this.angularForce
 
       if (this.gameKeys['right']) {
         this.rigidbody.angularResultant = 0
