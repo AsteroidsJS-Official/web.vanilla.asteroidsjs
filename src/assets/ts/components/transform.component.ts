@@ -13,6 +13,10 @@ export class Transform extends AbstractComponent {
    */
   public dimensions = new Rect(100, 100)
 
+  public localPosition = new Vector2()
+
+  public children: Transform[] = []
+
   /**
    * Property that defines the entity rotation in radians
    */
@@ -24,45 +28,68 @@ export class Transform extends AbstractComponent {
   private _position = new Vector2()
 
   /**
+   * Property that defines an object that represents the parent transform
+   */
+  private _parent: Transform
+
+  /**
+   * Property that defines an object that represents the parent transform
+   */
+  public get parent(): Transform {
+    return this._parent
+  }
+
+  /**
+   * Property that defines an object that represents the parent transform
+   */
+  public set parent(value: Transform) {
+    value.children.push(this)
+    this._parent = value
+  }
+
+  /**
    * Property that defines the entity rotation in radians
    */
   public get rotation(): number {
-    return this._rotation
+    if (!this.parent) {
+      return this._rotation
+    }
+    return this.parent.rotation + this._rotation
   }
 
   /**
    * Property that defines the entity rotation in radians
    */
   public set rotation(value: number) {
-    this._rotation = value
-  }
-
-  /**
-   * Property that defines the entity rotation in degrees
-   */
-  public get euler(): number {
-    return (this._rotation * 180) / Math.PI
-  }
-
-  /**
-   * Property that defines the entity rotation in degrees
-   */
-  public set euler(value: number) {
-    this._rotation = (value * Math.PI) / 180
+    if (!this.parent) {
+      this._rotation = value
+      return
+    }
+    this._rotation = this.parent.rotation + value
   }
 
   /**
    * Property that defines the entity position
    */
   public get position(): Vector2 {
-    return this._position
+    if (!this.parent) {
+      return this._position
+    }
+    return Vector2.sum(this.parent.position, this.localPosition)
   }
 
   /**
    * Property that defines the entity position
    */
   public set position(value: Vector2) {
-    this._position = value
+    if (!this.parent) {
+      this._position = value
+      return
+    }
+    this.localPosition = Vector2.sum(
+      value,
+      Vector2.multiply(this.parent.position, -1),
+    )
   }
 
   /**
@@ -70,18 +97,31 @@ export class Transform extends AbstractComponent {
    */
   public get canvasPosition(): Vector2 {
     return new Vector2(
-      this.game.getContext().canvas.width / 2 + this._position.x,
-      this.game.getContext().canvas.height / 2 - this._position.y,
+      this.game.getContext().canvas.width / 2 + this.position.x,
+      this.game.getContext().canvas.height / 2 - this.position.y,
     )
   }
 
-  /**
-   * Property that defines the entity position in html canvas
-   */
-  public set canvasPosition(value: Vector2) {
-    this._position = new Vector2(
-      this.game.getContext().canvas.width / 2 - value.x,
-      this.game.getContext().canvas.height / 2 - value.y,
+  public get totalDimensions(): Rect {
+    if (!this.children.length) {
+      return this.dimensions
+    }
+
+    const childWithMaxDistance = this.children.reduce((previous, current) =>
+      current.localPosition.magnitude > previous.localPosition.magnitude
+        ? current
+        : previous,
+    )
+
+    const maxHalfOfDimension =
+      childWithMaxDistance.dimensions.height >
+      childWithMaxDistance.dimensions.width
+        ? childWithMaxDistance.dimensions.height / 2
+        : childWithMaxDistance.dimensions.width / 2
+
+    return new Rect(
+      2 * (childWithMaxDistance.localPosition.magnitude + maxHalfOfDimension),
+      2 * (childWithMaxDistance.localPosition.magnitude + maxHalfOfDimension),
     )
   }
 }

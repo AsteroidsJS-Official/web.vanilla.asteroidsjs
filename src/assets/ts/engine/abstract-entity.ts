@@ -40,10 +40,10 @@ export class AbstractEntity {
    * @returns an object that represents the component instance, attached to
    * the same parent entity
    */
-  public getProvider<T extends AbstractProvider>(component: Type<T>): T {
+  public getProvider<P extends AbstractProvider>(component: Type<P>): P {
     return this.providers.find(
       (c) => c.constructor.name === component.name,
-    ) as T
+    ) as P
   }
 
   /**
@@ -53,10 +53,38 @@ export class AbstractEntity {
    * @returns an object that represents the component instance, attached to
    * this entity
    */
-  public getComponent<T extends AbstractComponent>(component: Type<T>): T {
+  public getComponent<C extends AbstractComponent>(component: Type<C>): C {
     return this.components.find(
       (c) => c.constructor.name === component.name,
-    ) as T
+    ) as C
+  }
+
+  /**
+   * Method that returns several child components, attached to this entity
+   *
+   * @param component defines the component type
+   * @returns an array with objects that represents the component instance, attached to
+   * this entity
+   */
+  public getAllComponents<C extends AbstractComponent>(
+    component: Type<C>,
+  ): C[] {
+    return this.components.filter(
+      (c) => c.constructor.name === component.name,
+    ) as C[]
+  }
+
+  /**
+   * Method that returns several child providers, attached to this entity
+   *
+   * @param component defines the component type
+   * @returns an array with objects that represents the component instance, attached to
+   * this entity
+   */
+  public getAllProviders<P extends AbstractProvider>(provider: Type<P>): P[] {
+    return this.providers.filter(
+      (p) => p.constructor.name === provider.name,
+    ) as P[]
   }
 
   /**

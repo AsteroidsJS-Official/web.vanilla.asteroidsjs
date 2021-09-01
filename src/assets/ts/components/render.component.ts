@@ -1,7 +1,7 @@
 import { hasDraw } from '../engine/utils/validations'
 
 import { AbstractComponent } from '../engine/abstract-component'
-import { IOnDraw } from '../engine/interfaces/on-draw.interface'
+import { IDraw } from '../engine/interfaces/draw.interface'
 import { IOnLoop } from '../engine/interfaces/on-loop.interface'
 import { IOnStart } from '../engine/interfaces/on-start.interface'
 
@@ -10,7 +10,7 @@ import { IOnStart } from '../engine/interfaces/on-start.interface'
  * entity
  */
 export class Render extends AbstractComponent implements IOnStart, IOnLoop {
-  public drawer: IOnDraw
+  public drawer: IDraw
 
   public onStart(): void {
     if (!hasDraw(this.entity)) {
@@ -23,6 +23,6 @@ export class Render extends AbstractComponent implements IOnStart, IOnLoop {
   }
 
   public onLoop(): void {
-    this.drawer?.onDraw()
+    this.drawer?.draw()
   }
 }
