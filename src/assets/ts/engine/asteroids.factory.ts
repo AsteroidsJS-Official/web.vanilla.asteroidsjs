@@ -97,9 +97,7 @@ class AsteroidsApplication implements IAsteroidsApplication {
 
     if (options.use) {
       for (const key in options.use) {
-        if (key in instance) {
-          ;(instance as any)[key] = options.use[key]
-        }
+        ;(instance as any)[key] = options.use[key]
       }
     }
 
@@ -189,6 +187,15 @@ class AsteroidsApplication implements IAsteroidsApplication {
   ): C {
     const c = new component(this, entity)
     entity.components.push(c)
+
+    if (hasAwake(c)) {
+      c.onAwake()
+    }
+
+    if (hasStart(c)) {
+      c.onStart()
+    }
+
     this.components.push(c)
     return c
   }
@@ -204,7 +211,13 @@ class AsteroidsApplication implements IAsteroidsApplication {
     provider: Type<P>,
   ): P {
     const p = this.findOrCreateProvider(provider)
+
+    if (hasAwake(p)) {
+      p.onAwake()
+    }
+
     entity.providers.push(p)
+
     return p
   }
 
