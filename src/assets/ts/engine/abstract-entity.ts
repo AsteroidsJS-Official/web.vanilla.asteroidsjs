@@ -3,6 +3,7 @@ import { AbstractProvider } from './abstract-provider'
 import { AbstractComponent } from './abstract-component'
 
 import { IAsteroidsApplication } from './interfaces/asteroids-application.interface'
+import { IContext } from './interfaces/context.interface'
 import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
 import { Type } from './interfaces/type.interface'
 
@@ -32,6 +33,14 @@ export class AbstractEntity {
     options?: IInstantiateOptions<E>,
   ): E extends AbstractEntity ? E : AbstractEntity {
     return this.game.instantiate(options)
+  }
+
+  /**
+   * Method that returns the game context
+   * @returns an object that represents the game context
+   */
+  public getContext(): IContext {
+    return this.game.getContext()
   }
 
   /**
