@@ -34,7 +34,11 @@ module.exports = {
         test: /\.ts$/,
         exclude: /(node_modules|bower_components)/,
         resolve: {
-          modules: [path.resolve(__dirname, 'src'), 'node_modules'],
+          modules: [
+            path.resolve(__dirname, 'src'),
+            path.resolve(__dirname, 'libs'),
+            'node_modules',
+          ],
         },
         use: 'ts-loader',
       },
@@ -54,6 +58,9 @@ module.exports = {
   },
   resolve: {
     extensions: ['.ts', '.js'],
+    alias: {
+      '@asteroidsjs': path.join(__dirname, 'libs/asteroidsjs'),
+    },
   },
   output: {
     filename: 'index.js',
