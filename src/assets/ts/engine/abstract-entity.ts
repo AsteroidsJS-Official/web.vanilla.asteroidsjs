@@ -23,6 +23,15 @@ export class AbstractEntity {
   ) {}
 
   /**
+   * Method that returns the entity with some class or interface type
+   *
+   * @returns the entity as some specified type
+   */
+  public getEntityAs<T>(): T {
+    return this as unknown as T
+  }
+
+  /**
    * Method that can create new entities
    *
    * @param entity defines the new entity type
