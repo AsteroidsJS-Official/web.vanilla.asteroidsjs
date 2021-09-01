@@ -1,21 +1,25 @@
+import {
+  AbstractEntity,
+  Entity,
+  IDraw,
+  IOnAwake,
+  IOnLoop,
+  IOnStart,
+  isOverflowingX,
+  isOverflowingY,
+  Rect,
+} from '@asteroidsjs'
+
 import { socket } from '../socket'
 
-import { isOverflowingX, isOverflowingY } from '../engine/utils/overflow'
-
+import { Drawer } from '../components/drawer.component'
 import { RenderOverflow } from '../components/render-overflow.component'
 import { Render } from '../components/render.component'
 import { Rigidbody } from '../components/rigidbody.component'
 import { Transform } from '../components/transform.component'
-import { AbstractEntity } from '../engine/abstract-entity'
-import { Entity } from '../engine/decorators/entity.decorator'
-import { IDraw } from '../engine/interfaces/draw.interface'
-import { IOnAwake } from '../engine/interfaces/on-awake.interface'
-import { IOnLoop } from '../engine/interfaces/on-loop.interface'
-import { IOnStart } from '../engine/interfaces/on-start.interface'
-import { Rect } from '../engine/math/rect'
 
 @Entity({
-  components: [Transform, Rigidbody, Render],
+  components: [Transform, Rigidbody, Render, Drawer],
 })
 export class Asteroid
   extends AbstractEntity

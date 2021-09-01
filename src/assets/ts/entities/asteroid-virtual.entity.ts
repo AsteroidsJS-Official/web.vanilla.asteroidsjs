@@ -1,18 +1,21 @@
-import { ISocketData } from '../interfaces/socket-data.interface'
-import { socket } from '../socket'
+import {
+  AbstractEntity,
+  Entity,
+  IDraw,
+  IOnAwake,
+  IOnLoop,
+  IOnStart,
+  ISocketData,
+  isOverflowingX,
+  isOverflowingY,
+  Rect,
+} from '@asteroidsjs'
 
-import { isOverflowingX, isOverflowingY } from '../engine/utils/overflow'
+import { socket } from '../socket'
 
 import { RenderOverflow } from '../components/render-overflow.component'
 import { Render } from '../components/render.component'
 import { Transform } from '../components/transform.component'
-import { AbstractEntity } from '../engine/abstract-entity'
-import { Entity } from '../engine/decorators/entity.decorator'
-import { IDraw } from '../engine/interfaces/draw.interface'
-import { IOnAwake } from '../engine/interfaces/on-awake.interface'
-import { IOnLoop } from '../engine/interfaces/on-loop.interface'
-import { IOnStart } from '../engine/interfaces/on-start.interface'
-import { Rect } from '../engine/math/rect'
 
 @Entity({
   components: [Transform, Render],

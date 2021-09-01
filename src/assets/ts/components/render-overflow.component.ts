@@ -1,15 +1,15 @@
-import { Vector2 } from '../engine/math/vector2'
+import {
+  AbstractComponent,
+  Component,
+  IOnAwake,
+  IOnLoop,
+  Vector2,
+  isOverflowingX,
+  isOverflowingY,
+} from '@asteroidsjs'
 
-import { AbstractComponent } from '../engine/abstract-component'
-import { Component } from '../engine/decorators/component.decorator'
 import { Drawer } from './drawer.component'
 import { Transform } from './transform.component'
-
-import { IOnAwake } from '../engine/interfaces/on-awake.interface'
-import { IOnLoop } from '../engine/interfaces/on-loop.interface'
-
-import { isOverflowingX, isOverflowingY } from '../engine/utils/overflow'
-import { hasDraw } from '../engine/utils/validations'
 
 /**
  * Class that represents the component responsible for rendering the

@@ -1,15 +1,19 @@
-import { ISocketData } from '../interfaces/socket-data.interface'
+import {
+  AbstractEntity,
+  Entity,
+  IOnStart,
+  ISocketData,
+  Vector2,
+} from '@asteroidsjs'
+
 import { socket } from '../socket'
 
-import { uuid } from '../engine/utils/validations'
+import { Asteroid } from './asteroid.entity'
 
 import { Rigidbody } from '../components/rigidbody.component'
 import { Transform } from '../components/transform.component'
-import { AbstractEntity } from '../engine/abstract-entity'
-import { Entity } from '../engine/decorators/entity.decorator'
-import { IOnStart } from '../engine/interfaces/on-start.interface'
-import { Vector2 } from '../engine/math/vector2'
-import { Asteroid } from './asteroid.entity'
+
+import { uuid } from '../../../../libs/asteroidsjs/src/utils/validations'
 
 /**
  * Class that represents the first entity to be loaded into the game
