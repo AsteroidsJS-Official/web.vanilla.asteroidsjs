@@ -83,19 +83,6 @@ export class Spaceship
           },
         ],
       }) as unknown as IDraw,
-      this.instantiate({
-        entity: Child,
-        components: [],
-        properties: [
-          {
-            for: Transform,
-            use: {
-              parent: this.transform,
-              localPosition: new Vector2(-100, -100),
-            },
-          },
-        ],
-      }) as unknown as IDraw,
     )
   }
 
@@ -170,7 +157,6 @@ export class Spaceship
       )
     this.game.getContext().rotate(this.transform.rotation)
 
-    // TODO: apply color to SVG
     this.game
       .getContext()
       .drawImage(
@@ -200,7 +186,7 @@ export class Spaceship
           Math.sin(this.transform.rotation + (2 * Math.PI) / 4),
           Math.cos(this.transform.rotation + (2 * Math.PI) / 4),
         ),
-        this.transform.dimensions.width / 2 - 2,
+        this.transform.dimensions.width / 2 - 6,
       ),
     )
     const velocity = Vector2.sum(
@@ -248,7 +234,7 @@ export class Spaceship
           Math.sin(this.transform.rotation - (2 * Math.PI) / 4),
           Math.cos(this.transform.rotation - (2 * Math.PI) / 4),
         ),
-        this.transform.dimensions.width / 2,
+        this.transform.dimensions.width / 2 - 4,
       ),
     )
     const velocity = Vector2.sum(
