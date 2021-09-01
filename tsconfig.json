@@ -11,10 +11,12 @@
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@asteroidsjs": ["libs/asteroidsjs"],
+      "@asteroidsjs/*": ["libs/asteroidsjs/*"]
     },
     "lib": ["es6", "dom"]
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "libs/**/*.ts"],
   "exclude": ["node_modules", "**/*.spec.ts"]
 }

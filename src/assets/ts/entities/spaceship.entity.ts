@@ -1,10 +1,15 @@
-import { ISocketData } from '../interfaces/socket-data.interface'
+import {
+  AbstractEntity,
+  Entity,
+  IDraw,
+  IOnAwake,
+  IOnLoop,
+  ISocketData,
+  Vector2,
+} from '@asteroidsjs'
+
 import { socket } from '../socket'
 
-import { Vector2 } from '../engine/math/vector2'
-
-import { AbstractEntity } from '../engine/abstract-entity'
-import { Entity } from '../engine/decorators/entity.decorator'
 import { Bullet } from './bullet.entity'
 
 import { Drawer } from '../components/drawer.component'
@@ -13,11 +18,7 @@ import { RenderOverflow } from '../components/render-overflow.component'
 import { Rigidbody } from '../components/rigidbody.component'
 import { Transform } from '../components/transform.component'
 
-import { IDraw } from '../engine/interfaces/draw.interface'
-import { IOnAwake } from '../engine/interfaces/on-awake.interface'
-import { IOnLoop } from '../engine/interfaces/on-loop.interface'
-
-import { uuid } from '../engine/utils/validations'
+import { uuid } from '../../../../libs/asteroidsjs/src/utils/validations'
 
 import spaceshipImg from '../../svg/spaceship.svg'
 

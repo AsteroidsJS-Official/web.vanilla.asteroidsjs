@@ -1,6 +1,8 @@
-import { AbstractComponent } from '../abstract-component'
 import { AbstractProvider } from '../abstract-provider'
+
+import { AbstractComponent } from '../abstract-component'
 import { IComponentProperty } from './component-property.interface'
+
 import { Type } from './type.interface'
 
 export interface IEntityOptions {

@@ -1,18 +1,18 @@
-import { ISocketData } from '../interfaces/socket-data.interface'
+import {
+  AbstractEntity,
+  Entity,
+  IDraw,
+  IOnAwake,
+  IOnStart,
+  ISocketData,
+  Vector2,
+} from '@asteroidsjs'
+
 import { socket } from '../socket'
-
-import { Vector2 } from '../engine/math/vector2'
-
-import { AbstractEntity } from '../engine/abstract-entity'
-import { Entity } from '../engine/decorators/entity.decorator'
 
 import { Drawer } from '../components/drawer.component'
 import { RenderOverflow } from '../components/render-overflow.component'
 import { Transform } from '../components/transform.component'
-
-import { IDraw } from '../engine/interfaces/draw.interface'
-import { IOnAwake } from '../engine/interfaces/on-awake.interface'
-import { IOnStart } from '../engine/interfaces/on-start.interface'
 
 import spaceshipImg from '../../svg/spaceship.svg'
 

@@ -1,4 +1,4 @@
-import { Vector2 } from '../engine/math/vector2'
+import { Vector2 } from '@asteroidsjs'
 
 export interface IBullet {
   /**

@@ -1,4 +1,5 @@
 import { AbstractComponent } from '../abstract-component'
+
 import { Type } from './type.interface'
 
 export interface IComponentProperty {

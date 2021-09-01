@@ -1,17 +1,18 @@
-import { Rect } from '../engine/math/rect'
-import { Vector2 } from '../engine/math/vector2'
-
-import { AbstractEntity } from '../engine/abstract-entity'
-import { Entity } from '../engine/decorators/entity.decorator'
+import {
+  AbstractEntity,
+  Entity,
+  IDraw,
+  IOnAwake,
+  IOnLoop,
+  Rect,
+  Vector2,
+} from '@asteroidsjs'
 
 import { Drawer } from '../components/drawer.component'
 import { Render } from '../components/render.component'
 import { Rigidbody } from '../components/rigidbody.component'
 import { Transform } from '../components/transform.component'
 
-import { IDraw } from '../engine/interfaces/draw.interface'
-import { IOnAwake } from '../engine/interfaces/on-awake.interface'
-import { IOnLoop } from '../engine/interfaces/on-loop.interface'
 import { IBullet } from '../interfaces/bullet.interface'
 
 @Entity({
