@@ -1,5 +1,7 @@
-import { AbstractComponent } from '../abstract-component'
 import { AbstractProvider } from '../abstract-provider'
+
+import { AbstractComponent } from '../abstract-component'
+
 import { Type } from './type.interface'
 
 export interface IComponentOptions {

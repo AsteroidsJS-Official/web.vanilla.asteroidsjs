@@ -1,13 +1,15 @@
-import { Vector2 } from '../engine/math/vector2'
+import {
+  AbstractComponent,
+  Component,
+  IOnAwake,
+  IOnLoop,
+  Vector2,
+} from '@asteroidsjs'
 
 import { Spaceship } from '../entities/spaceship.entity'
 
-import { AbstractComponent } from '../engine/abstract-component'
-import { Component } from '../engine/decorators/component.decorator'
 import { Rigidbody } from './rigidbody.component'
 
-import { IOnAwake } from '../engine/interfaces/on-awake.interface'
-import { IOnLoop } from '../engine/interfaces/on-loop.interface'
 import { IGameKeys } from '../interfaces/input.interface'
 
 import { fromEvent } from 'rxjs'

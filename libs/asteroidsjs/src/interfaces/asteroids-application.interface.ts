@@ -1,8 +1,11 @@
-import { IScreen } from '../../interfaces/screen.interface'
-import { AbstractComponent } from '../abstract-component'
 import { AbstractEntity } from '../abstract-entity'
+
 import { AbstractProvider } from '../abstract-provider'
+
+import { AbstractComponent } from '../abstract-component'
+
 import { IInstantiateOptions } from './instantiate-options.interface'
+import { IScreen } from './screen.interface'
 import { Type } from './type.interface'
 
 export interface IAsteroidsApplication {

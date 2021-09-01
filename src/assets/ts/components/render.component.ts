@@ -1,9 +1,6 @@
-import { AbstractComponent } from '../engine/abstract-component'
-import { Component } from '../engine/decorators/component.decorator'
-import { Drawer } from './drawer.component'
+import { AbstractComponent, Component, IOnLoop, IOnStart } from '@asteroidsjs'
 
-import { IOnLoop } from '../engine/interfaces/on-loop.interface'
-import { IOnStart } from '../engine/interfaces/on-start.interface'
+import { Drawer } from './drawer.component'
 
 /**
  * Class that represents the component responsible for rendering the

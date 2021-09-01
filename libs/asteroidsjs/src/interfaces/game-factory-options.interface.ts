@@ -1,5 +1,6 @@
-import { IScreen } from '../../interfaces/screen.interface'
 import { AbstractEntity } from '../abstract-entity'
+
+import { IScreen } from './screen.interface'
 import { Type } from './type.interface'
 
 /**

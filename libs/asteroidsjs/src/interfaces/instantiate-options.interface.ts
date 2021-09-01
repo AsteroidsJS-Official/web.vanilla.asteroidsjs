@@ -1,5 +1,6 @@
 import { AbstractEntity } from '../abstract-entity'
 import { IEntityOptions } from './entity-options.interface'
+
 import { Type } from './type.interface'
 
 /**

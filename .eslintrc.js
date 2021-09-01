@@ -25,6 +25,7 @@ module.exports = {
         newlinesBetween: 'always',
         groups: [
           '/express/',
+          '/@asteroids/',
           '/socket/',
           '/math/',
           '/entity/',

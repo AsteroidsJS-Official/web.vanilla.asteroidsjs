@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
-import { ICollider2 } from '../../interfaces/collider2.interface'
 import { AbstractEntity } from '../abstract-entity'
+
 import { IDraw } from '../interfaces/draw.interface'
 import { IOnAwake } from '../interfaces/on-awake.interface'
 import { IOnLoop } from '../interfaces/on-loop.interface'
@@ -59,22 +59,6 @@ export function hasStart(entity: any): entity is IOnStart {
  */
 export function hasDraw(entity: any): entity is IDraw {
   return 'draw' in entity
-}
-
-/**
- * Function that validates if some object is of type "ICollider"
- *
- * @param entity defines an object that will be validated
- * @returns true if the object implements the "ICollider" interface,
- * otherwise
- * false
- */
-export function hasCollider(entity: any): entity is ICollider2 {
-  return (
-    'onStartCollide' in entity &&
-    'onStayCollide' in entity &&
-    'onEndCollide' in entity
-  )
 }
 
 /**
