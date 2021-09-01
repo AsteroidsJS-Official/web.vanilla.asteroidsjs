@@ -1,19 +1,23 @@
-import { hasStart, hasLoop, hasAwake, isEntity } from './utils/validations'
+import { AbstractEntity } from './abstract-entity'
+
+import { AbstractProvider } from './abstract-provider'
+
+import { AbstractComponent } from './abstract-component'
+import { IComponentProperty } from './interfaces/component-property.interface'
 
 import { IScreen } from '../interfaces/screen.interface'
-import { AbstractComponent } from './abstract-component'
-import { AbstractEntity } from './abstract-entity'
-import { AbstractProvider } from './abstract-provider'
+import { IAsteroidsApplication } from './interfaces/asteroids-application.interface'
+import { GameFactoryOptions } from './interfaces/game-factory-options.interface'
+import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
+import { Type } from './interfaces/type.interface'
+
+import { hasStart, hasLoop, hasAwake, isEntity } from './utils/validations'
+
 import {
   COMPONENT_OPTIONS,
   ENTITY_OPTIONS,
   PROVIDER_OPTIONS,
 } from './constants'
-import { IAsteroidsApplication } from './interfaces/asteroids-application.interface'
-import { IComponentProperty } from './interfaces/component-property.interface'
-import { GameFactoryOptions } from './interfaces/game-factory-options.interface'
-import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
-import { Type } from './interfaces/type.interface'
 
 /**
  * Class that represents the main application behaviour
@@ -142,13 +146,16 @@ class AsteroidsApplication implements IAsteroidsApplication {
     if (components && components.length) {
       instance.components = components.map((component) => {
         const i = new component(this, instance)
-        const value = properties.find((p) => p.for === component)?.use
+        const values = properties
+          .filter((p) => p.for === component)
+          ?.map((p) => p.use)
 
-        if (value) {
+        values.forEach((value) => {
           for (const key in value) {
             ;(i as any)[key] = value[key]
           }
-        }
+        })
+
         return i
       })
     }

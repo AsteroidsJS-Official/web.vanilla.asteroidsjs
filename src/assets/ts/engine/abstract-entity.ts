@@ -1,6 +1,9 @@
-import { AbstractComponent } from './abstract-component'
 import { AbstractProvider } from './abstract-provider'
+
+import { AbstractComponent } from './abstract-component'
+
 import { IAsteroidsApplication } from './interfaces/asteroids-application.interface'
+import { IContext } from './interfaces/context.interface'
 import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
 import { Type } from './interfaces/type.interface'
 
@@ -30,6 +33,14 @@ export class AbstractEntity {
     options?: IInstantiateOptions<E>,
   ): E extends AbstractEntity ? E : AbstractEntity {
     return this.game.instantiate(options)
+  }
+
+  /**
+   * Method that returns the game context
+   * @returns an object that represents the game context
+   */
+  public getContext(): IContext {
+    return this.game.getContext()
   }
 
   /**
@@ -66,9 +77,7 @@ export class AbstractEntity {
    * @returns an array with objects that represents the component instance, attached to
    * this entity
    */
-  public getAllComponents<C extends AbstractComponent>(
-    component: Type<C>,
-  ): C[] {
+  public getComponents<C extends AbstractComponent>(component: Type<C>): C[] {
     return this.components.filter(
       (c) => c.constructor.name === component.name,
     ) as C[]
@@ -81,10 +90,28 @@ export class AbstractEntity {
    * @returns an array with objects that represents the component instance, attached to
    * this entity
    */
-  public getAllProviders<P extends AbstractProvider>(provider: Type<P>): P[] {
+  public getProviders<P extends AbstractProvider>(provider: Type<P>): P[] {
     return this.providers.filter(
       (p) => p.constructor.name === provider.name,
     ) as P[]
+  }
+
+  /**
+   * Method that returns all the components attached to this entity
+   *
+   * @returns an array with objects that represents all the components
+   */
+  public getAllComponents(): AbstractComponent[] {
+    return this.components
+  }
+
+  /**
+   * Method that returns all the providers attached to this entity
+   *
+   * @returns an array with objects that represents all the providers
+   */
+  public getAllProviders(): AbstractProvider[] {
+    return this.providers
   }
 
   /**

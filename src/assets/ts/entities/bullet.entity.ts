@@ -1,25 +1,42 @@
+import { Rect } from '../engine/math/rect'
+import { Vector2 } from '../engine/math/vector2'
+
+import { AbstractEntity } from '../engine/abstract-entity'
+import { Entity } from '../engine/decorators/entity.decorator'
+
+import { Drawer } from '../components/drawer.component'
 import { Render } from '../components/render.component'
 import { Rigidbody } from '../components/rigidbody.component'
 import { Transform } from '../components/transform.component'
-import { AbstractEntity } from '../engine/abstract-entity'
-import { Entity } from '../engine/decorators/entity.decorator'
+
 import { IDraw } from '../engine/interfaces/draw.interface'
+import { IOnAwake } from '../engine/interfaces/on-awake.interface'
 import { IOnLoop } from '../engine/interfaces/on-loop.interface'
-import { IOnStart } from '../engine/interfaces/on-start.interface'
-import { Rect } from '../engine/math/rect'
-import { Vector2 } from '../engine/math/vector2'
 import { IBullet } from '../interfaces/bullet.interface'
 
 @Entity({
-  components: [Transform, Rigidbody, Render],
+  components: [Drawer, Transform, Rigidbody, Render],
+  properties: [
+    {
+      for: Transform,
+      use: {
+        dimensions: new Rect(2, 14),
+      },
+    },
+    {
+      for: Rigidbody,
+      use: {
+        mass: 3,
+      },
+    },
+  ],
 })
 export class Bullet
   extends AbstractEntity
-  implements IBullet, IDraw, IOnStart, IOnLoop
+  implements IBullet, IDraw, IOnAwake, IOnLoop
 {
   public transform: Transform
   public rigidbody: Rigidbody
-  private context: CanvasRenderingContext2D
 
   public get direction(): Vector2 {
     return new Vector2(
@@ -28,42 +45,38 @@ export class Bullet
     )
   }
 
-  onStart(): void {
-    this.context = this.game.getContext()
+  onAwake(): void {
     this.transform = this.getComponent(Transform)
     this.rigidbody = this.getComponent(Rigidbody)
-
-    this.transform.dimensions = new Rect(2, 14)
-    this.rigidbody.mass = 3
   }
 
   draw(): void {
-    this.context.translate(
+    this.getContext().translate(
       this.transform.canvasPosition.x,
       this.transform.canvasPosition.y,
     )
-    this.context.rotate(this.transform.rotation)
+    this.getContext().rotate(this.transform.rotation)
 
-    this.context.shadowColor = 'yellow'
-    this.context.shadowBlur = 25
+    this.getContext().shadowColor = 'yellow'
+    this.getContext().shadowBlur = 25
 
-    this.context.beginPath()
+    this.getContext().beginPath()
 
-    this.context.fillStyle = '#ffc887'
-    this.context.rect(
+    this.getContext().fillStyle = '#ffc887'
+    this.getContext().rect(
       0,
       0,
       this.transform.dimensions.width,
       this.transform.dimensions.height,
     )
-    this.context.fill()
-    this.context.closePath()
+    this.getContext().fill()
+    this.getContext().closePath()
 
-    this.context.shadowColor = 'transparent'
-    this.context.shadowBlur = 0
+    this.getContext().shadowColor = 'transparent'
+    this.getContext().shadowBlur = 0
 
-    this.context.rotate(-this.transform.rotation)
-    this.context.translate(
+    this.getContext().rotate(-this.transform.rotation)
+    this.getContext().translate(
       -this.transform.canvasPosition.x,
       -this.transform.canvasPosition.y,
     )
@@ -74,12 +87,12 @@ export class Bullet
       this.transform.canvasPosition.x + this.transform.dimensions.width + 50 <
         0 ||
       this.transform.canvasPosition.x - this.transform.dimensions.width - 50 >
-        this.context.canvas.width
+        this.getContext().canvas.width
     const hasOverflowY =
       this.transform.canvasPosition.y + this.transform.dimensions.height + 50 <
         0 ||
       this.transform.canvasPosition.y - this.transform.dimensions.height - 50 >
-        this.context.canvas.height
+        this.getContext().canvas.height
 
     if (hasOverflowX || hasOverflowY) {
       this.destroy(this)

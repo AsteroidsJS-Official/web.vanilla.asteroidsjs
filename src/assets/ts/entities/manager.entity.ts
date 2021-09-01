@@ -1,19 +1,22 @@
 import { ISocketData } from '../interfaces/socket-data.interface'
 import { socket } from '../socket'
 
-import { uuid } from '../engine/utils/validations'
-
-import { Rigidbody } from '../components/rigidbody.component'
-import { Transform } from '../components/transform.component'
-import { AbstractEntity } from '../engine/abstract-entity'
-import { Entity } from '../engine/decorators/entity.decorator'
-import { IOnStart } from '../engine/interfaces/on-start.interface'
 import { Rect } from '../engine/math/rect'
 import { Vector2 } from '../engine/math/vector2'
+
+import { AbstractEntity } from '../engine/abstract-entity'
+import { Entity } from '../engine/decorators/entity.decorator'
 import { BulletVirtual } from './bullet-virtual.entity'
 import { Bullet } from './bullet.entity'
 import { SpaceshipVirtual } from './spaceship-virtual.entity'
 import { Spaceship } from './spaceship.entity'
+
+import { Rigidbody } from '../components/rigidbody.component'
+import { Transform } from '../components/transform.component'
+
+import { IOnStart } from '../engine/interfaces/on-start.interface'
+
+import { uuid } from '../engine/utils/validations'
 
 /**
  * Class that represents the first entity to be loaded into the game
@@ -42,7 +45,6 @@ export class Manager extends AbstractEntity implements IOnStart {
           for: Transform,
           use: {
             rotation: 0,
-            position: new Vector2(),
             dimensions: new Rect(50, 50),
           },
         },
