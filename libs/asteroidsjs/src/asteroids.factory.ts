@@ -5,10 +5,10 @@ import { AbstractProvider } from './abstract-provider'
 import { AbstractComponent } from './abstract-component'
 import { IComponentProperty } from './interfaces/component-property.interface'
 
-import { IScreen } from '../interfaces/screen.interface'
 import { IAsteroidsApplication } from './interfaces/asteroids-application.interface'
 import { GameFactoryOptions } from './interfaces/game-factory-options.interface'
 import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
+import { IScreen } from './interfaces/screen.interface'
 import { Type } from './interfaces/type.interface'
 
 import { hasStart, hasLoop, hasAwake, isEntity } from './utils/validations'

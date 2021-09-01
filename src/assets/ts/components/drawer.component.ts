@@ -1,11 +1,8 @@
-import { AbstractComponent } from '../engine/abstract-component'
-import { Component } from '../engine/decorators/component.decorator'
+import { AbstractComponent, Component, IDraw, IOnAwake } from '@asteroidsjs'
+
 import { Transform } from './transform.component'
 
-import { IDraw } from '../engine/interfaces/draw.interface'
-import { IOnAwake } from '../engine/interfaces/on-awake.interface'
-
-import { hasDraw } from '../engine/utils/validations'
+import { hasDraw } from '../../../../libs/asteroidsjs/src/utils/validations'
 
 @Component({
   required: [Transform],

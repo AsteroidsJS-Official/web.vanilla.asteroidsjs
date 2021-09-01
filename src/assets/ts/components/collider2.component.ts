@@ -1,12 +1,16 @@
-import { AbstractComponent } from '../engine/abstract-component'
-import { Component } from '../engine/decorators/component.decorator'
-import { IOnAwake } from '../engine/interfaces/on-awake.interface'
-import { IOnLoop } from '../engine/interfaces/on-loop.interface'
-import { Vector2 } from '../engine/math/vector2'
-import { ICollider2 } from '../interfaces/collider2.interface'
-import { Collision2 } from '../interfaces/collision2.interface'
+import {
+  AbstractComponent,
+  Component,
+  IOnAwake,
+  IOnLoop,
+  Vector2,
+} from '@asteroidsjs'
+
 import { Rigidbody } from './rigidbody.component'
 import { Transform } from './transform.component'
+
+import { ICollider2 } from '../interfaces/collider2.interface'
+import { Collision2 } from '../interfaces/collision2.interface'
 
 /**
  * Class that represents a component that deals with collisions with

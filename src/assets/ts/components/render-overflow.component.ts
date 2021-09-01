@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-import { isOverflowingX, isOverflowingY } from '../engine/utils/overflow'
-import { hasDraw } from '../engine/utils/validations'
+import { Vector2 } from '../engine/math/vector2'
 
-=======
->>>>>>> feat: reorganized these classes imports
 import { AbstractComponent } from '../engine/abstract-component'
 import { Component } from '../engine/decorators/component.decorator'
 import { Drawer } from './drawer.component'
@@ -12,7 +8,8 @@ import { Transform } from './transform.component'
 import { IOnAwake } from '../engine/interfaces/on-awake.interface'
 import { IOnLoop } from '../engine/interfaces/on-loop.interface'
 
-import { Vector2 } from '../engine/math/vector2'
+import { isOverflowingX, isOverflowingY } from '../engine/utils/overflow'
+import { hasDraw } from '../engine/utils/validations'
 
 /**
  * Class that represents the component responsible for rendering the
@@ -80,13 +77,8 @@ export class RenderOverflow
 
       this.transform.position = new Vector2(this.transform.position.x, newY)
 
-<<<<<<< HEAD
       this.drawer?.draw()
     } else if (overflowingY) {
-=======
-      this.drawer.draw()
-    } else if (this.isOverflowingY()) {
->>>>>>> feat: reorganized these classes imports
       const overflowAmount =
         this.transform.canvasPosition.y -
         this.transform.totalDimensions.height / 2
@@ -100,13 +92,8 @@ export class RenderOverflow
           : this.transform.position.y + this.game.getContext().canvas.height,
       )
 
-<<<<<<< HEAD
       this.drawer?.draw()
     } else if (overflowingX) {
-=======
-      this.drawer.draw()
-    } else if (this.isOverflowingX()) {
->>>>>>> feat: reorganized these classes imports
       const overflowAmount =
         this.transform.canvasPosition.x -
         this.transform.totalDimensions.width / 2

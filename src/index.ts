@@ -1,11 +1,13 @@
 import './global.scss'
 import 'reflect-metadata'
 
+import { AsteroidsFactory } from '@asteroidsjs'
+
 import { socket } from './assets/ts/socket'
 
-import { AsteroidsFactory } from './assets/ts/engine/asteroids.factory'
 import { Manager } from './assets/ts/entities/manager.entity'
-import { IScreen } from './assets/ts/interfaces/screen.interface'
+
+import { IScreen } from '../libs/asteroidsjs/src/interfaces/screen.interface'
 
 const connectScreenData = {
   number: window.location.pathname.split('/screen/')[1].split('/')[0],
