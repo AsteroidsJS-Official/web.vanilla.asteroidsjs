@@ -26,6 +26,7 @@ module.exports = {
         groups: [
           '/express/',
           '/socket/',
+          '/math/',
           '/entity/',
           '/provider/',
           '/component/',

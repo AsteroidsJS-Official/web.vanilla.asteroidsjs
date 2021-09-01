@@ -1,11 +1,12 @@
 import { abs } from '../engine/math/utils'
+import { Vector2 } from '../engine/math/vector2'
 
 import { AbstractComponent } from '../engine/abstract-component'
 import { Component } from '../engine/decorators/component.decorator'
+import { Transform } from './transform.component'
+
 import { IOnAwake } from '../engine/interfaces/on-awake.interface'
 import { IOnLoop } from '../engine/interfaces/on-loop.interface'
-import { Vector2 } from '../engine/math/vector2'
-import { Transform } from './transform.component'
 
 /**
  * Component that adds physical behaviors such as velocity and

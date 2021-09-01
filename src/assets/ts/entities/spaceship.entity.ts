@@ -1,29 +1,32 @@
 import { ISocketData } from '../interfaces/socket-data.interface'
 import { socket } from '../socket'
 
-import { uuid } from '../engine/utils/validations'
+import { Vector2 } from '../engine/math/vector2'
 
-import spaceshipImg from '../../svg/spaceship.svg'
-import { Input } from '../components/input.component'
-import { RenderOverflow } from '../components/render-overflow.component'
-import { Render } from '../components/render.component'
-import { Rigidbody } from '../components/rigidbody.component'
-import { Transform } from '../components/transform.component'
 import { AbstractEntity } from '../engine/abstract-entity'
 import { Entity } from '../engine/decorators/entity.decorator'
+import { Bullet } from './bullet.entity'
+
+import { Drawer } from '../components/drawer.component'
+import { Input } from '../components/input.component'
+import { RenderOverflow } from '../components/render-overflow.component'
+import { Rigidbody } from '../components/rigidbody.component'
+import { Transform } from '../components/transform.component'
+
 import { IDraw } from '../engine/interfaces/draw.interface'
 import { IOnAwake } from '../engine/interfaces/on-awake.interface'
 import { IOnLoop } from '../engine/interfaces/on-loop.interface'
-import { Vector2 } from '../engine/math/vector2'
 import { ISpaceship } from '../interfaces/spaceship.interface'
-import { Bullet } from './bullet.entity'
-import { Child } from './child.entity'
+
+import { uuid } from '../engine/utils/validations'
+
+import spaceshipImg from '../../svg/spaceship.svg'
 
 /**
  * Class that represents the spaceship entity controlled by the user.
  */
 @Entity({
-  components: [Input, Transform, Rigidbody, RenderOverflow],
+  components: [Input, Drawer, Transform, Rigidbody, RenderOverflow],
 })
 export class Spaceship
   extends AbstractEntity
@@ -51,8 +54,6 @@ export class Spaceship
 
   private image: HTMLImageElement
 
-  private children: IDraw[] = []
-
   public get direction(): Vector2 {
     return new Vector2(
       Math.sin(this.transform.rotation),
@@ -68,22 +69,6 @@ export class Spaceship
   onStart(): void {
     this.image = new Image()
     this.image.src = spaceshipImg
-
-    this.children.push(
-      this.instantiate({
-        entity: Child,
-        components: [Render],
-        properties: [
-          {
-            for: Transform,
-            use: {
-              // parent: this.transform,
-              localPosition: new Vector2(50, 50),
-            },
-          },
-        ],
-      }) as unknown as IDraw,
-    )
   }
 
   onLoop(): void {
@@ -98,12 +83,6 @@ export class Spaceship
   }
 
   public draw(): void {
-    // this.drawCircle()
-    this.children.forEach(
-      (child) =>
-        (child as unknown as AbstractEntity).getComponent(Transform).parent &&
-        child.draw(),
-    )
     this.drawTriangle()
   }
 
@@ -116,36 +95,6 @@ export class Spaceship
 
     this.createLeftBullet()
     this.createRightBullet()
-  }
-
-  private drawCircle(): void {
-    this.game
-      .getContext()
-      .translate(
-        this.transform.canvasPosition.x,
-        this.transform.canvasPosition.y,
-      )
-    this.game.getContext().rotate(this.transform.rotation)
-
-    this.game.getContext().beginPath()
-
-    this.game.getContext().fillStyle = 'green'
-    this.game
-      .getContext()
-      .arc(0, 0, this.transform.totalDimensions.width / 2, 0, 360)
-    this.game.getContext().fill()
-    this.game.getContext().closePath()
-
-    this.game.getContext().shadowColor = 'transparent'
-    this.game.getContext().shadowBlur = 0
-
-    this.game.getContext().rotate(-this.transform.rotation)
-    this.game
-      .getContext()
-      .translate(
-        -this.transform.canvasPosition.x,
-        -this.transform.canvasPosition.y,
-      )
   }
 
   private drawTriangle(): void {

@@ -1,5 +1,6 @@
 import { AbstractComponent } from '../engine/abstract-component'
 import { Component } from '../engine/decorators/component.decorator'
+
 import { Rect } from '../engine/math/rect'
 import { Vector2 } from '../engine/math/vector2'
 
