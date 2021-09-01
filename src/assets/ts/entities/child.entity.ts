@@ -3,7 +3,6 @@ import { AbstractEntity } from '../engine/abstract-entity'
 import { Entity } from '../engine/decorators/entity.decorator'
 import { IDraw } from '../engine/interfaces/draw.interface'
 import { IOnStart } from '../engine/interfaces/on-start.interface'
-import { Vector2 } from '../engine/math/vector2'
 
 @Entity({
   components: [Transform],

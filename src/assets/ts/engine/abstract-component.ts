@@ -1,5 +1,7 @@
 import { AbstractEntity } from './abstract-entity'
+
 import { AbstractProvider } from './abstract-provider'
+
 import { IAsteroidsApplication } from './interfaces/asteroids-application.interface'
 import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
 import { Type } from './interfaces/type.interface'
@@ -49,6 +51,46 @@ export abstract class AbstractComponent {
    */
   public getComponent<T extends AbstractComponent>(component: Type<T>): T {
     return this.entity.getComponent(component)
+  }
+
+  /**
+   * Method that returns several child components, attached to this entity
+   *
+   * @param component defines the component type
+   * @returns an array with objects that represents the component instance, attached to
+   * this entity
+   */
+  public getComponents<C extends AbstractComponent>(component: Type<C>): C[] {
+    return this.entity.getComponents(component)
+  }
+
+  /**
+   * Method that returns several child providers, attached to this entity
+   *
+   * @param component defines the component type
+   * @returns an array with objects that represents the component instance, attached to
+   * this entity
+   */
+  public getProviders<P extends AbstractProvider>(provider: Type<P>): P[] {
+    return this.entity.getProviders(provider)
+  }
+
+  /**
+   * Method that returns all the components attached to this entity
+   *
+   * @returns an array with objects that represents all the components
+   */
+  public getAllComponents(): AbstractComponent[] {
+    return this.entity.getAllComponents()
+  }
+
+  /**
+   * Method that returns all the providers attached to this entity
+   *
+   * @returns an array with objects that represents all the providers
+   */
+  public getAllProviders(): AbstractProvider[] {
+    return this.entity.getAllProviders()
   }
 
   /**
