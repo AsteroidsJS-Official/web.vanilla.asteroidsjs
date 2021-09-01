@@ -41,8 +41,6 @@ dotenv.config()
  */
 const args = process.argv.slice(2)
 
-let currentId = 0
-
 /**
  * Represents the connected screens.
  *
@@ -199,7 +197,6 @@ function setupSocketScreen() {
      * @param {SocketData} data - The data used to create the new entity
      */
     function onInstantiate(data) {
-      data.id = ++currentId
       ioScreen.to('slave').emit('instantiate', data)
     }
     socket.on('instantiate', onInstantiate)
