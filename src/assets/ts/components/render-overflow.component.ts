@@ -1,12 +1,12 @@
-import { hasDraw } from '../engine/utils/validations'
-
 import { AbstractComponent } from '../engine/abstract-component'
 import { Component } from '../engine/decorators/component.decorator'
-import { IDraw } from '../engine/interfaces/draw.interface'
-import { IOnLoop } from '../engine/interfaces/on-loop.interface'
-import { IOnStart } from '../engine/interfaces/on-start.interface'
-import { Vector2 } from '../engine/math/vector2'
+import { Drawer } from './drawer.component'
 import { Transform } from './transform.component'
+
+import { IOnAwake } from '../engine/interfaces/on-awake.interface'
+import { IOnLoop } from '../engine/interfaces/on-loop.interface'
+
+import { Vector2 } from '../engine/math/vector2'
 
 /**
  * Class that represents the component responsible for rendering the
@@ -14,28 +14,22 @@ import { Transform } from './transform.component'
  * canvas
  */
 @Component({
-  required: [Transform],
+  required: [Transform, Drawer],
 })
 export class RenderOverflow
   extends AbstractComponent
-  implements IOnStart, IOnLoop
+  implements IOnAwake, IOnLoop
 {
-  public drawer: IDraw
+  public drawer: Drawer
   public transform: Transform
 
-  public onStart(): void {
-    if (!hasDraw(this.entity)) {
-      throw new Error(
-        `${this.entity.constructor.name} has a ${this.constructor.name} but not implements the IDraw interface`,
-      )
-    }
-
-    this.drawer = this.entity
+  public onAwake(): void {
+    this.drawer = this.getComponent(Drawer)
     this.transform = this.getComponent(Transform)
   }
 
   public onLoop(): void {
-    this.drawer?.draw()
+    this.drawer.draw()
 
     if (this.isOverflowingX() && this.isOverflowingY()) {
       const overflowAmountTop =
@@ -61,15 +55,15 @@ export class RenderOverflow
 
       this.transform.position = new Vector2(this.transform.position.x, newY)
 
-      this.drawer?.draw()
+      this.drawer.draw()
 
       this.transform.position = new Vector2(newX, auxY)
 
-      this.drawer?.draw()
+      this.drawer.draw()
 
       this.transform.position = new Vector2(this.transform.position.x, newY)
 
-      this.drawer?.draw()
+      this.drawer.draw()
     } else if (this.isOverflowingY()) {
       const overflowAmount =
         this.transform.canvasPosition.y -
@@ -84,7 +78,7 @@ export class RenderOverflow
           : this.transform.position.y + this.game.getContext().canvas.height,
       )
 
-      this.drawer?.draw()
+      this.drawer.draw()
     } else if (this.isOverflowingX()) {
       const overflowAmount =
         this.transform.canvasPosition.x -
@@ -99,7 +93,7 @@ export class RenderOverflow
         this.transform.position.y,
       )
 
-      this.drawer?.draw()
+      this.drawer.draw()
     }
   }
 

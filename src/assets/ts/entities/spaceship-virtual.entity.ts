@@ -1,22 +1,27 @@
 import { ISocketData } from '../interfaces/socket-data.interface'
 import { socket } from '../socket'
 
-import spaceshipImg from '../../svg/spaceship.svg'
-import { RenderOverflow } from '../components/render-overflow.component'
-import { Transform } from '../components/transform.component'
+import { Vector2 } from '../engine/math/vector2'
+
 import { AbstractEntity } from '../engine/abstract-entity'
 import { Entity } from '../engine/decorators/entity.decorator'
+
+import { Drawer } from '../components/drawer.component'
+import { RenderOverflow } from '../components/render-overflow.component'
+import { Transform } from '../components/transform.component'
+
 import { IDraw } from '../engine/interfaces/draw.interface'
 import { IOnAwake } from '../engine/interfaces/on-awake.interface'
 import { IOnStart } from '../engine/interfaces/on-start.interface'
-import { Vector2 } from '../engine/math/vector2'
+
+import spaceshipImg from '../../svg/spaceship.svg'
 
 /**
  * Class that represents the virtual spaceship entity, used for rendering
  * uncontrollable spaceships.
  */
 @Entity({
-  components: [Transform, RenderOverflow],
+  components: [Drawer, Transform, RenderOverflow],
 })
 export class SpaceshipVirtual
   extends AbstractEntity

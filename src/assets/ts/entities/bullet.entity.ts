@@ -1,21 +1,39 @@
+import { Rect } from '../engine/math/rect'
+import { Vector2 } from '../engine/math/vector2'
+
+import { AbstractEntity } from '../engine/abstract-entity'
+import { Entity } from '../engine/decorators/entity.decorator'
+
+import { Drawer } from '../components/drawer.component'
 import { Render } from '../components/render.component'
 import { Rigidbody } from '../components/rigidbody.component'
 import { Transform } from '../components/transform.component'
-import { AbstractEntity } from '../engine/abstract-entity'
-import { Entity } from '../engine/decorators/entity.decorator'
+
 import { IDraw } from '../engine/interfaces/draw.interface'
+import { IOnAwake } from '../engine/interfaces/on-awake.interface'
 import { IOnLoop } from '../engine/interfaces/on-loop.interface'
-import { IOnStart } from '../engine/interfaces/on-start.interface'
-import { Rect } from '../engine/math/rect'
-import { Vector2 } from '../engine/math/vector2'
 import { IBullet } from '../interfaces/bullet.interface'
 
 @Entity({
-  components: [Transform, Rigidbody, Render],
+  components: [Drawer, Transform, Rigidbody, Render],
+  properties: [
+    {
+      for: Transform,
+      use: {
+        dimensions: new Rect(2, 14),
+      },
+    },
+    {
+      for: Rigidbody,
+      use: {
+        mass: 3,
+      },
+    },
+  ],
 })
 export class Bullet
   extends AbstractEntity
-  implements IBullet, IDraw, IOnStart, IOnLoop
+  implements IBullet, IDraw, IOnAwake, IOnLoop
 {
   public transform: Transform
   public rigidbody: Rigidbody
@@ -28,13 +46,10 @@ export class Bullet
     )
   }
 
-  onStart(): void {
+  onAwake(): void {
     this.context = this.game.getContext()
     this.transform = this.getComponent(Transform)
     this.rigidbody = this.getComponent(Rigidbody)
-
-    this.transform.dimensions = new Rect(2, 14)
-    this.rigidbody.mass = 3
   }
 
   draw(): void {
