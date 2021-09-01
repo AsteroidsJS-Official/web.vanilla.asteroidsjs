@@ -10,8 +10,11 @@ import { Entity } from '../engine/decorators/entity.decorator'
 import { IOnStart } from '../engine/interfaces/on-start.interface'
 import { Rect } from '../engine/math/rect'
 import { Vector2 } from '../engine/math/vector2'
+import { AsteroidVirtual } from './asteroid-virtual.entity'
+import { Asteroid } from './asteroid.entity'
 import { BulletVirtual } from './bullet-virtual.entity'
 import { Bullet } from './bullet.entity'
+import { ManagerAsteroids } from './manager-asteroids.entity'
 import { SpaceshipVirtual } from './spaceship-virtual.entity'
 import { Spaceship } from './spaceship.entity'
 
@@ -31,7 +34,12 @@ export class Manager extends AbstractEntity implements IOnStart {
   }
 
   private master(): void {
+    this.instantiate({
+      entity: ManagerAsteroids,
+    })
+
     const id = uuid()
+
     this.instantiate({
       use: {
         id,
@@ -106,6 +114,24 @@ export class Manager extends AbstractEntity implements IOnStart {
                 for: Rigidbody,
                 use: {
                   velocity: data.velocity,
+                },
+              },
+            ],
+          })
+          break
+        case Asteroid.name:
+          this.instantiate({
+            use: {
+              id,
+              asteroidSize: data.asteroidSize,
+            },
+            entity: AsteroidVirtual,
+            properties: [
+              {
+                for: Transform,
+                use: {
+                  rotation: data.rotation,
+                  position: data.position,
                 },
               },
             ],
