@@ -23,7 +23,16 @@ module.exports = {
       'warn',
       {
         newlinesBetween: 'always',
-        groups: ['/express/', '/socket/', '/utils/', ['index']],
+        groups: [
+          '/express/',
+          '/socket/',
+          '/entity/',
+          '/provider/',
+          '/component/',
+          '/interface/',
+          '/utils/',
+          ['index'],
+        ],
         alphabetize: {
           order: 'asc',
           ignoreCase: true,
