@@ -56,9 +56,7 @@ export class ManagerAsteroids extends AbstractEntity implements IOnStart {
 
     const direction = new Vector2(Math.sin(rotation), Math.cos(rotation))
 
-    const velocity = Vector2.multiply(new Vector2(x, y), -0.003)
-
-    console.log(velocity)
+    const velocity = Vector2.multiply(new Vector2(x, y).normalized, -2)
 
     this.instantiate({
       use: {
