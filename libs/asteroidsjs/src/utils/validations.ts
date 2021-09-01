@@ -4,6 +4,8 @@ import { AbstractEntity } from '../abstract-entity'
 
 import { IDraw } from '../interfaces/draw.interface'
 import { IOnAwake } from '../interfaces/on-awake.interface'
+import { IOnFixedLoop } from '../interfaces/on-fixed-loop.interface'
+import { IOnLateLoop } from '../interfaces/on-late-loop.interface'
 import { IOnLoop } from '../interfaces/on-loop.interface'
 import { IOnStart } from '../interfaces/on-start.interface'
 
@@ -26,6 +28,28 @@ export function isEntity(entity: any): entity is AbstractEntity {
  */
 export function hasLoop(entity: any): entity is IOnLoop {
   return 'onLoop' in entity
+}
+
+/**
+ * Function that validates if some object is of type {@link IOnLateLoop}
+ *
+ * @param entity defines an object that will be validated
+ * @returns true if the object implements the {@link IOnLateLoop} interface, otherwise
+ * false
+ */
+export function hasLateLoop(entity: any): entity is IOnLateLoop {
+  return 'onLateLoop' in entity
+}
+
+/**
+ * Function that validates if some object is of type {@link IOnFixedLoop}
+ *
+ * @param entity defines an object that will be validated
+ * @returns true if the object implements the {@link IOnFixedLoop} interface, otherwise
+ * false
+ */
+export function hasFixedLoop(entity: any): entity is IOnFixedLoop {
+  return 'onFixedLoop' in entity
 }
 
 /**

@@ -11,7 +11,14 @@ import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
 import { IScreen } from './interfaces/screen.interface'
 import { Type } from './interfaces/type.interface'
 
-import { hasStart, hasLoop, hasAwake, isEntity } from './utils/validations'
+import {
+  hasStart,
+  hasLoop,
+  hasAwake,
+  isEntity,
+  hasFixedLoop,
+  hasLateLoop,
+} from './utils/validations'
 
 import {
   COMPONENT_OPTIONS,
@@ -70,6 +77,14 @@ class AsteroidsApplication implements IAsteroidsApplication {
     this.bootstrap.forEach((entity) => this.instantiate({ entity }))
 
     setInterval(() => {
+      ;[...this.entities, ...this.components].forEach((value) => {
+        if (hasFixedLoop(value)) {
+          value.onFixedLoop()
+        }
+      })
+    }, 100 / 18)
+
+    setInterval(() => {
       this.context.clearRect(
         0,
         0,
@@ -79,6 +94,11 @@ class AsteroidsApplication implements IAsteroidsApplication {
       ;[...this.entities, ...this.components].forEach((value) => {
         if (hasLoop(value)) {
           value.onLoop()
+        }
+      })
+      ;[...this.entities, ...this.components].forEach((value) => {
+        if (hasLateLoop(value)) {
+          value.onLateLoop()
         }
       })
     }, 100 / 6)

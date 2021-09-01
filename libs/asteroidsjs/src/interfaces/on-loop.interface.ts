@@ -1,5 +1,5 @@
 /**
- * Interface that represents some class that has a `loop` method that is
+ * Interface that represents some class that has a `onLoop` method that is
  * called every game cycle
  */
 export interface IOnLoop {
