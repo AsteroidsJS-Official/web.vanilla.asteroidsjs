@@ -3,11 +3,13 @@ import { socket } from '../socket'
 import { isOverflowingX, isOverflowingY } from '../engine/utils/overflow'
 import { uuid } from '../engine/utils/validations'
 
-import asteroid0 from '../../svg/asteroid-0.svg'
-import asteroid1 from '../../svg/asteroid-1.svg'
-import asteroid2 from '../../svg/asteroid-2.svg'
-import asteroid3 from '../../svg/asteroid-3.svg'
-import asteroid4 from '../../svg/asteroid-4.svg'
+import asteroidLg1 from '../../svg/asteroid-lg-1.svg'
+import asteroidLg2 from '../../svg/asteroid-lg-2.svg'
+import asteroidLg3 from '../../svg/asteroid-lg-3.svg'
+import asteroidMd1 from '../../svg/asteroid-md-1.svg'
+import asteroidMd2 from '../../svg/asteroid-md-2.svg'
+import asteroidSm from '../../svg/asteroid-sm.svg'
+import asteroidXs from '../../svg/asteroid-xs.svg'
 import { RenderOverflow } from '../components/render-overflow.component'
 import { Render } from '../components/render.component'
 import { Rigidbody } from '../components/rigidbody.component'
@@ -48,15 +50,17 @@ export class Asteroid
   public onStart(): void {
     this.image = new Image()
     if (this._asteroidSize === 0) {
-      this.image.src = asteroid0
+      this.image.src = asteroidXs
     } else if (this._asteroidSize === 1) {
-      this.image.src = asteroid1
+      this.image.src = asteroidSm
     } else if (this._asteroidSize === 2) {
-      this.image.src = asteroid2
-    } else if (this._asteroidSize === 3) {
-      this.image.src = asteroid3
+      const mediumAsteroids = [asteroidMd1, asteroidMd2]
+      this.image.src =
+        mediumAsteroids[Math.floor(Math.random() * mediumAsteroids.length)]
     } else {
-      this.image.src = asteroid4
+      const largeAsteroids = [asteroidLg1, asteroidLg2, asteroidLg3]
+      this.image.src =
+        largeAsteroids[Math.floor(Math.random() * largeAsteroids.length)]
     }
 
     this.transform.dimensions = new Rect(
@@ -166,6 +170,9 @@ export class Asteroid
     //   .getContext()
     //   .arc(0, 0, this.transform.dimensions.width / 2, 0, 2 * Math.PI)
     // this.game.getContext().fill()
+    this.game.getContext().shadowColor = 'black'
+    this.game.getContext().shadowBlur = 5
+
     this.game
       .getContext()
       .drawImage(
@@ -175,6 +182,9 @@ export class Asteroid
         this.transform.dimensions.width,
         this.transform.dimensions.height,
       )
+
+    this.game.getContext().shadowColor = 'transparent'
+    this.game.getContext().shadowBlur = 0
 
     this.game.getContext().rotate(-this.transform.rotation)
     this.game
