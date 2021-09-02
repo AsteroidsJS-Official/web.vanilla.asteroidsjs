@@ -18,9 +18,7 @@ import { Asteroid } from './asteroid.entity'
 export class ManagerAsteroids extends AbstractEntity implements IOnStart {
   public onStart(): void {
     for (let i = 0; i < 3; i++) {
-      setTimeout(() => {
-        this.generateAsteroid()
-      }, 100)
+      this.generateAsteroid()
     }
     setInterval(() => {
       this.generateAsteroid()
@@ -52,9 +50,7 @@ export class ManagerAsteroids extends AbstractEntity implements IOnStart {
           : canvasHeight / 2 + offset
     }
 
-    const rotation = Math.floor(Math.random() * 2 * Math.PI)
-
-    const direction = new Vector2(Math.sin(rotation), Math.cos(rotation))
+    const rotation = Math.random() * 2 * Math.PI
 
     const velocity = Vector2.multiply(new Vector2(x, y).normalized, -2)
 
