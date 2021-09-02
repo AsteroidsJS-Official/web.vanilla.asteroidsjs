@@ -26,9 +26,9 @@ export class ManagerAsteroids extends AbstractEntity implements IOnStart {
         this.generateAsteroid()
       }, 100)
     }
-    setInterval(() => {
-      this.generateAsteroid()
-    }, 10000)
+    // setInterval(() => {
+    //   this.generateAsteroid()
+    // }, 10000)
   }
 
   private generateAsteroid(): void {

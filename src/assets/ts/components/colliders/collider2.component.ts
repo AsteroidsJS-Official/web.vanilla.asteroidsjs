@@ -6,13 +6,13 @@ import {
   Vector2,
 } from '@asteroidsjs'
 
-import { Rigidbody } from './rigidbody.component'
-import { Transform } from './transform.component'
+import { Rigidbody } from '../rigidbody.component'
+import { Transform } from '../transform.component'
 
-import { ICollision2 } from '../interfaces/collision2.interface'
-import { IOnTriggerEnter } from '../interfaces/on-trigger-enter.interface'
-import { IOnTriggerExit } from '../interfaces/on-trigger-exit.interface'
-import { IOnTriggerStay } from '../interfaces/on-trigger-stay.interface'
+import { ICollision2 } from '../../interfaces/collision2.interface'
+import { IOnTriggerEnter } from '../../interfaces/on-trigger-enter.interface'
+import { IOnTriggerExit } from '../../interfaces/on-trigger-exit.interface'
+import { IOnTriggerStay } from '../../interfaces/on-trigger-stay.interface'
 
 /**
  * Class that represents a component that deals with collisions with
@@ -24,25 +24,25 @@ import { IOnTriggerStay } from '../interfaces/on-trigger-stay.interface'
 @Component({
   required: [Transform, Rigidbody],
 })
-export class CircleCollider2
+export class Collider2
   extends AbstractComponent
   implements IOnAwake, IOnFixedLoop
 {
   /**
    * Property that defines an instance of the {@link Rigidbody} component
    */
-  private rigidbody: Rigidbody
+  protected rigidbody: Rigidbody
 
   /**
    * Property that defines an instance of the {@link Transform} component
    */
-  private transform: Transform
+  protected transform: Transform
 
   /**
    * Property that defines an array with all the entity collisions with
    * others rigidbodies
    */
-  private collisions: ICollision2[] = []
+  protected collisions: ICollision2[] = []
 
   onAwake(): void {
     this.rigidbody = this.getComponent(Rigidbody)
@@ -111,10 +111,16 @@ export class CircleCollider2
    * @returns true if the distance between their centers is sufficient to
    * consider the collision
    */
-  private isColliding(transform1: Transform, transform2: Transform): boolean {
-    return (
-      Vector2.distance(transform1.position, transform2.position) <
-      (transform1.dimensions.width + transform2.dimensions.width) / 2
+  protected isColliding(transform1: Transform, transform2: Transform): boolean {
+    return !(
+      transform1.position.x >
+        transform2.position.x + transform2.dimensions.width ||
+      transform1.position.x + transform1.dimensions.width <
+        transform2.position.x ||
+      transform1.position.y >
+        transform2.position.y + transform2.dimensions.height ||
+      transform1.position.y + transform1.dimensions.height <
+        transform2.position.y
     )
   }
 
@@ -125,7 +131,7 @@ export class CircleCollider2
    * @returns true if the object implements the {@link IOnTriggerEnter} interface, otherwise
    * false
    */
-  private hasOnTriggerEnter(entity: any): entity is IOnTriggerEnter {
+  protected hasOnTriggerEnter(entity: any): entity is IOnTriggerEnter {
     return 'onTriggerEnter' in entity
   }
 
@@ -136,7 +142,7 @@ export class CircleCollider2
    * @returns true if the object implements the {@link IOnTriggerStay} interface, otherwise
    * false
    */
-  private hasOnTriggerStay(entity: any): entity is IOnTriggerStay {
+  protected hasOnTriggerStay(entity: any): entity is IOnTriggerStay {
     return 'onTriggerStay' in entity
   }
 
@@ -147,7 +153,7 @@ export class CircleCollider2
    * @returns true if the object implements the {@link IOnTriggerExit} interface, otherwise
    * false
    */
-  private hasOnTriggerExit(entity: any): entity is IOnTriggerExit {
+  protected hasOnTriggerExit(entity: any): entity is IOnTriggerExit {
     return 'onTriggerExit' in entity
   }
 }

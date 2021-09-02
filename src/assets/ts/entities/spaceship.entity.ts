@@ -12,7 +12,7 @@ import { socket } from '../socket'
 
 import { Bullet } from './bullet.entity'
 
-import { CircleCollider2 } from '../components/circle-collider2.component'
+import { Collider2 } from '../components/colliders/collider2.component'
 import { Drawer } from '../components/drawer.component'
 import { Input } from '../components/input.component'
 import { RenderOverflow } from '../components/render-overflow.component'
@@ -31,14 +31,7 @@ import spaceshipImg from '../../svg/spaceship.svg'
  * Class that represents the spaceship entity controlled by the user.
  */
 @Entity({
-  components: [
-    Input,
-    Drawer,
-    Transform,
-    Rigidbody,
-    RenderOverflow,
-    CircleCollider2,
-  ],
+  components: [Input, Drawer, Transform, Rigidbody, RenderOverflow, Collider2],
   properties: [
     {
       for: Input,
