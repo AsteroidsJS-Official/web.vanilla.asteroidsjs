@@ -15,7 +15,19 @@ export class Drawer extends AbstractComponent implements IOnAwake, IDraw {
   }
 
   draw(): void {
-    ;[...this.transform.children.map((t) => t.entity), this.entity]
+    const entities = [
+      this.entity,
+      ...this.transform.children.map((t) => t.entity),
+    ]
+    const components: AbstractComponent[] = []
+    entities
+      .map((e) => e.getAllComponents())
+      .forEach((array) =>
+        components.push(
+          ...array.filter((c) => c.constructor.name !== Drawer.name),
+        ),
+      )
+    ;[...entities, ...components]
       .filter((instance) => hasDraw(instance))
       .forEach((instance) => (instance as any).draw())
   }

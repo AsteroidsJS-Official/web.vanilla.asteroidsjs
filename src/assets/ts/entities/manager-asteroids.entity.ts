@@ -10,10 +10,13 @@ import { socket } from '../socket'
 
 import { Asteroid } from './asteroid.entity'
 
+import { Collider2 } from '../components/colliders/collider2.component'
 import { Rigidbody } from '../components/rigidbody.component'
 import { Transform } from '../components/transform.component'
 
 import { uuid } from '../../../../libs/asteroidsjs/src/utils/validations'
+
+import { AsteroidSizeEnum } from '../enums/asteroid.enum'
 
 /**
  * Class that represents the first entity to be loaded into the game
@@ -21,11 +24,11 @@ import { uuid } from '../../../../libs/asteroidsjs/src/utils/validations'
 @Entity()
 export class ManagerAsteroids extends AbstractEntity implements IOnStart {
   public onStart(): void {
-    for (let i = 0; i < 3; i++) {
-      setTimeout(() => {
-        this.generateAsteroid()
-      }, 100)
-    }
+    this.generateAsteroid()
+    // for (let i = 0; i < 3; i++) {
+    //   setTimeout(() => {
+    //   }, 100)
+    // }
     // setInterval(() => {
     //   this.generateAsteroid()
     // }, 10000)
@@ -58,33 +61,32 @@ export class ManagerAsteroids extends AbstractEntity implements IOnStart {
 
     const rotation = Math.floor(Math.random() * 2 * Math.PI)
 
-    const direction = new Vector2(Math.sin(rotation), Math.cos(rotation))
-
     const velocity = Vector2.multiply(new Vector2(x, y).normalized, -2)
 
     this.instantiate({
       use: {
         id,
-        asteroidSize,
+        asteroidSize: AsteroidSizeEnum.large,
       },
       entity: Asteroid,
+      components: [Collider2],
       properties: [
         {
           for: Transform,
           use: {
             rotation,
-            position: new Vector2(x, y),
+            position: new Vector2(0, 300),
           },
         },
-        {
-          for: Rigidbody,
-          use: {
-            velocity,
-            friction: 0,
-            mass: 15 * (asteroidSize + 1),
-            maxAngularVelocity: 0.09,
-          },
-        },
+        // {
+        //   for: Rigidbody,
+        //   use: {
+        //     velocity,
+        //     friction: 0,
+        //     mass: 15 * (asteroidSize + 1),
+        //     maxAngularVelocity: 0.09,
+        //   },
+        // },
       ],
     })
 

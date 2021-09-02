@@ -47,6 +47,7 @@ export class Manager extends AbstractEntity implements IOnStart {
     this.instantiate({
       use: {
         id,
+        tag: `${Spaceship.name}|${id}`,
       },
       entity: Spaceship,
       properties: [

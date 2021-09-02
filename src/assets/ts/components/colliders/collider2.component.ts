@@ -1,8 +1,12 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+
 import {
   AbstractComponent,
   Component,
+  IDraw,
   IOnAwake,
   IOnFixedLoop,
+  Rect,
   Vector2,
 } from '@asteroidsjs'
 
@@ -26,7 +30,7 @@ import { IOnTriggerStay } from '../../interfaces/on-trigger-stay.interface'
 })
 export class Collider2
   extends AbstractComponent
-  implements IOnAwake, IOnFixedLoop
+  implements IOnAwake, IOnFixedLoop, IDraw
 {
   /**
    * Property that defines an instance of the {@link Rigidbody} component
@@ -44,19 +48,56 @@ export class Collider2
    */
   protected collisions: ICollision2[] = []
 
+  private _position: Vector2
+
+  private _dimensions: Rect
+
+  get position(): Vector2 {
+    return this._position ?? this.transform.position
+  }
+
+  set position(value: Vector2) {
+    this._position = value
+  }
+
+  get dimensions(): Rect {
+    return this._dimensions ?? this.transform.dimensions
+  }
+
+  set dimensions(value: Rect) {
+    this._dimensions = value
+  }
+
   onAwake(): void {
     this.rigidbody = this.getComponent(Rigidbody)
     this.transform = this.getComponent(Transform)
   }
 
+  draw(): void {
+    this.getContext().translate(
+      this.transform.canvasPosition.x,
+      this.transform.canvasPosition.y,
+    )
+
+    this.getContext().beginPath()
+    this.getContext().fillStyle = '#05FF0020'
+    this.getContext().rect(
+      -this.dimensions.width / 2,
+      -this.dimensions.height / 2,
+      this.dimensions.width,
+      this.dimensions.height,
+    )
+    this.getContext().fill()
+
+    this.getContext().translate(
+      -this.transform.canvasPosition.x,
+      -this.transform.canvasPosition.y,
+    )
+  }
+
   onFixedLoop(): void {
     this.collisions.forEach((collision, i) => {
-      if (
-        this.isColliding(
-          collision.rigidbody1.getComponent(Transform),
-          collision.rigidbody2.getComponent(Transform),
-        )
-      ) {
+      if (this.isColliding(collision.rigidbody2.getComponent(Transform))) {
         return
       }
 
@@ -73,7 +114,7 @@ export class Collider2
     const transforms = rigidbodies.map((r) => r.getComponent(Transform))
 
     transforms.forEach((transform, i) => {
-      if (!this.isColliding(this.transform, transform)) {
+      if (!this.isColliding(transform)) {
         return
       }
 
@@ -106,21 +147,16 @@ export class Collider2
   /**
    * Method that check if two transforms are colliding
    *
-   * @param transform1 defines the first transform
    * @param transform2 defines the second transform
    * @returns true if the distance between their centers is sufficient to
    * consider the collision
    */
-  protected isColliding(transform1: Transform, transform2: Transform): boolean {
+  protected isColliding(transform2: Transform): boolean {
     return !(
-      transform1.position.x >
-        transform2.position.x + transform2.dimensions.width ||
-      transform1.position.x + transform1.dimensions.width <
-        transform2.position.x ||
-      transform1.position.y >
-        transform2.position.y + transform2.dimensions.height ||
-      transform1.position.y + transform1.dimensions.height <
-        transform2.position.y
+      this.position.x > transform2.position.x + transform2.dimensions.width ||
+      this.position.x + this.dimensions.width < transform2.position.x ||
+      this.position.y > transform2.position.y + transform2.dimensions.height ||
+      this.position.y + this.dimensions.height < transform2.position.y
     )
   }
 
