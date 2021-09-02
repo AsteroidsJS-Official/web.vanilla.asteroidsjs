@@ -1,6 +1,7 @@
 import { socket } from '../socket'
 
 import { isOverflowingX, isOverflowingY } from '../engine/utils/overflow'
+import { uuid } from '../engine/utils/validations'
 
 import { RenderOverflow } from '../components/render-overflow.component'
 import { Render } from '../components/render.component'
@@ -13,6 +14,7 @@ import { IOnAwake } from '../engine/interfaces/on-awake.interface'
 import { IOnLoop } from '../engine/interfaces/on-loop.interface'
 import { IOnStart } from '../engine/interfaces/on-start.interface'
 import { Rect } from '../engine/math/rect'
+import { Vector2 } from '../engine/math/vector2'
 
 @Entity({
   components: [Transform, Rigidbody, Render],
@@ -38,9 +40,17 @@ export class Asteroid
 
   public onStart(): void {
     this.transform.dimensions = new Rect(
-      15 * (this._asteroidSize + 2),
-      15 * (this._asteroidSize + 2),
+      10 * ((this._asteroidSize + 2) * 2),
+      10 * ((this._asteroidSize + 2) * 2),
     )
+
+    setTimeout(() => {
+      if (this._asteroidSize > 0) {
+        this.generateAsteroidFragments(2)
+      }
+
+      this.destroy(this)
+    }, 6000)
   }
 
   public onLoop(): void {
@@ -76,6 +86,48 @@ export class Asteroid
 
   public draw(): void {
     this.drawCircle()
+  }
+
+  /**
+   * Generates two new asteroids from the current asteroid.
+   *
+   * @param amount The amount of fragments to be generated.
+   */
+  private generateAsteroidFragments(amount: number): void {
+    for (let i = 0; i < amount; i++) {
+      const id = uuid()
+      const rotation = Math.random() * 2 * Math.PI
+      const direction = new Vector2(Math.sin(rotation), Math.cos(rotation))
+
+      this.instantiate({
+        use: {
+          id,
+          asteroidSize: this._asteroidSize - 1,
+        },
+        entity: Asteroid,
+        properties: [
+          {
+            for: Transform,
+            use: {
+              rotation,
+              position: new Vector2(
+                this.transform.position.x,
+                this.transform.position.y,
+              ),
+            },
+          },
+          {
+            for: Rigidbody,
+            use: {
+              velocity: Vector2.multiply(direction.normalized, 2),
+              friction: 0,
+              mass: 15 * this._asteroidSize,
+              maxAngularVelocity: 0.09,
+            },
+          },
+        ],
+      })
+    }
   }
 
   private drawCircle(): void {
