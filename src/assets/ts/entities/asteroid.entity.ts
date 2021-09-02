@@ -3,6 +3,11 @@ import { socket } from '../socket'
 import { isOverflowingX, isOverflowingY } from '../engine/utils/overflow'
 import { uuid } from '../engine/utils/validations'
 
+import asteroid0 from '../../svg/asteroid-0.svg'
+import asteroid1 from '../../svg/asteroid-1.svg'
+import asteroid2 from '../../svg/asteroid-2.svg'
+import asteroid3 from '../../svg/asteroid-3.svg'
+import asteroid4 from '../../svg/asteroid-4.svg'
 import { RenderOverflow } from '../components/render-overflow.component'
 import { Render } from '../components/render.component'
 import { Rigidbody } from '../components/rigidbody.component'
@@ -29,6 +34,8 @@ export class Asteroid
 
   private _asteroidSize: number
 
+  private image: HTMLImageElement
+
   public set asteroidSize(size: number) {
     this._asteroidSize = size
   }
@@ -39,6 +46,19 @@ export class Asteroid
   }
 
   public onStart(): void {
+    this.image = new Image()
+    if (this._asteroidSize === 0) {
+      this.image.src = asteroid0
+    } else if (this._asteroidSize === 1) {
+      this.image.src = asteroid1
+    } else if (this._asteroidSize === 2) {
+      this.image.src = asteroid2
+    } else if (this._asteroidSize === 3) {
+      this.image.src = asteroid3
+    } else {
+      this.image.src = asteroid4
+    }
+
     this.transform.dimensions = new Rect(
       10 * ((this._asteroidSize + 2) * 2),
       10 * ((this._asteroidSize + 2) * 2),
@@ -123,6 +143,7 @@ export class Asteroid
               friction: 0,
               mass: 15 * this._asteroidSize,
               maxAngularVelocity: 0.09,
+              angularVelocity: 0.05 / this._asteroidSize,
             },
           },
         ],
@@ -137,14 +158,25 @@ export class Asteroid
         this.transform.canvasPosition.x,
         this.transform.canvasPosition.y,
       )
+    this.game.getContext().rotate(this.transform.rotation)
 
-    this.game.getContext().beginPath()
-    this.game.getContext().fillStyle = '#484848'
+    // this.game.getContext().beginPath()
+    // this.game.getContext().fillStyle = '#484848'
+    // this.game
+    //   .getContext()
+    //   .arc(0, 0, this.transform.dimensions.width / 2, 0, 2 * Math.PI)
+    // this.game.getContext().fill()
     this.game
       .getContext()
-      .arc(0, 0, this.transform.dimensions.width / 2, 0, 2 * Math.PI)
-    this.game.getContext().fill()
+      .drawImage(
+        this.image,
+        0 - this.transform.dimensions.width / 2,
+        0 - this.transform.dimensions.height / 2,
+        this.transform.dimensions.width,
+        this.transform.dimensions.height,
+      )
 
+    this.game.getContext().rotate(-this.transform.rotation)
     this.game
       .getContext()
       .translate(
