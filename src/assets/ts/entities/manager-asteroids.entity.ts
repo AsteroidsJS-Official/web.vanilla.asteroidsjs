@@ -75,6 +75,7 @@ export class ManagerAsteroids extends AbstractEntity implements IOnStart {
             friction: 0,
             mass: 15 * (asteroidSize + 1),
             maxAngularVelocity: 0.09,
+            angularVelocity: 0.05 / (asteroidSize + 1),
           },
         },
       ],
@@ -87,6 +88,7 @@ export class ManagerAsteroids extends AbstractEntity implements IOnStart {
         position: new Vector2(x, y),
         rotation,
         asteroidSize,
+        angularVelocity: 0.05 / (asteroidSize + 1),
       },
     } as ISocketData)
   }
