@@ -3,7 +3,7 @@ import {
   Entity,
   IDraw,
   IOnAwake,
-  IOnLoop,
+  IOnLateLoop,
   ISocketData,
   Vector2,
 } from '@asteroidsjs'
@@ -12,11 +12,16 @@ import { socket } from '../socket'
 
 import { Bullet } from './bullet.entity'
 
+import { CircleCollider2 } from '../components/circle-collider2.component'
 import { Drawer } from '../components/drawer.component'
 import { Input } from '../components/input.component'
 import { RenderOverflow } from '../components/render-overflow.component'
 import { Rigidbody } from '../components/rigidbody.component'
 import { Transform } from '../components/transform.component'
+
+import { IOnTriggerEnter } from '../interfaces/on-trigger-enter.interface'
+import { IOnTriggerExit } from '../interfaces/on-trigger-exit.interface'
+import { IOnTriggerStay } from '../interfaces/on-trigger-stay.interface'
 
 import { uuid } from '../../../../libs/asteroidsjs/src/utils/validations'
 
@@ -26,7 +31,14 @@ import spaceshipImg from '../../svg/spaceship.svg'
  * Class that represents the spaceship entity controlled by the user.
  */
 @Entity({
-  components: [Input, Drawer, Transform, Rigidbody, RenderOverflow],
+  components: [
+    Input,
+    Drawer,
+    Transform,
+    Rigidbody,
+    RenderOverflow,
+    CircleCollider2,
+  ],
   properties: [
     {
       for: Input,
@@ -39,7 +51,13 @@ import spaceshipImg from '../../svg/spaceship.svg'
 })
 export class Spaceship
   extends AbstractEntity
-  implements IOnAwake, IDraw, IOnLoop
+  implements
+    IOnAwake,
+    IDraw,
+    IOnLateLoop,
+    IOnTriggerEnter,
+    IOnTriggerStay,
+    IOnTriggerExit
 {
   public isShooting = false
 
@@ -82,7 +100,19 @@ export class Spaceship
     this.image.src = spaceshipImg
   }
 
-  onLoop(): void {
+  onTriggerEnter(): void {
+    console.log('enter')
+  }
+
+  onTriggerStay(): void {
+    console.log('stay')
+  }
+
+  onTriggerExit(): void {
+    console.log('exit')
+  }
+
+  onLateLoop(): void {
     socket.emit('update-slaves', {
       id: this.id,
       data: {
@@ -94,21 +124,6 @@ export class Spaceship
   }
 
   public draw(): void {
-    this.drawTriangle()
-  }
-
-  public shoot(): void {
-    if (this.lastShot && new Date().getTime() - this.lastShot.getTime() < 300) {
-      return
-    }
-
-    this.lastShot = new Date()
-
-    this.createLeftBullet()
-    this.createRightBullet()
-  }
-
-  private drawTriangle(): void {
     this.getContext().translate(
       this.transform.canvasPosition.x,
       this.transform.canvasPosition.y,
@@ -128,6 +143,17 @@ export class Spaceship
       -this.transform.canvasPosition.x,
       -this.transform.canvasPosition.y,
     )
+  }
+
+  public shoot(): void {
+    if (this.lastShot && new Date().getTime() - this.lastShot.getTime() < 300) {
+      return
+    }
+
+    this.lastShot = new Date()
+
+    this.createLeftBullet()
+    this.createRightBullet()
   }
 
   private createRightBullet(): void {

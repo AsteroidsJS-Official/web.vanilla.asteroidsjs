@@ -1,4 +1,9 @@
-import { AbstractComponent, Component, IOnLoop, IOnStart } from '@asteroidsjs'
+import {
+  AbstractComponent,
+  Component,
+  IOnStart,
+  IOnLateLoop,
+} from '@asteroidsjs'
 
 import { Drawer } from './drawer.component'
 
@@ -9,14 +14,14 @@ import { Drawer } from './drawer.component'
 @Component({
   required: [Drawer],
 })
-export class Render extends AbstractComponent implements IOnStart, IOnLoop {
+export class Render extends AbstractComponent implements IOnStart, IOnLateLoop {
   public drawer: Drawer
 
   public onStart(): void {
     this.drawer = this.getComponent(Drawer)
   }
 
-  public onLoop(): void {
+  public onLateLoop(): void {
     this.drawer.draw()
   }
 }

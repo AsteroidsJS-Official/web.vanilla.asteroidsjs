@@ -6,7 +6,7 @@ import { Rigidbody } from '../components/rigidbody.component'
  * Interface that represents a collision between two {@link Rigidbody}
  * entities
  */
-export interface Collision2 {
+export interface ICollision2 {
   /**
    * Property that defines the collision point
    *

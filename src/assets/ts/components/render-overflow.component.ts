@@ -2,7 +2,7 @@ import {
   AbstractComponent,
   Component,
   IOnAwake,
-  IOnLoop,
+  IOnLateLoop,
   Vector2,
   isOverflowingX,
   isOverflowingY,
@@ -21,7 +21,7 @@ import { Transform } from './transform.component'
 })
 export class RenderOverflow
   extends AbstractComponent
-  implements IOnAwake, IOnLoop
+  implements IOnAwake, IOnLateLoop
 {
   public drawer: Drawer
   public transform: Transform
@@ -31,7 +31,7 @@ export class RenderOverflow
     this.transform = this.getComponent(Transform)
   }
 
-  public onLoop(): void {
+  public onLateLoop(): void {
     this.drawer.draw()
 
     const overflowingX = isOverflowingX(
