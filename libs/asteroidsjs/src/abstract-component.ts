@@ -12,6 +12,21 @@ import { Type } from './interfaces/type.interface'
  * can be used to add new behaviours to these entities
  */
 export abstract class AbstractComponent {
+  /**
+   * Property that defines the entity unique id
+   */
+  public get id(): number | string {
+    return this.entity.id
+  }
+
+  /**
+   * Property that defines some tag allowing to differ thngs in collider
+   * behaviours
+   */
+  public get tag(): string {
+    return this.entity.tag
+  }
+
   public constructor(
     public readonly game: IAsteroidsApplication,
     public readonly entity: AbstractEntity,

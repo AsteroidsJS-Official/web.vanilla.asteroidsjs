@@ -16,6 +16,12 @@ export class AbstractEntity {
    */
   public id: number | string
 
+  /**
+   * Property that defines some tag allowing to differ thngs in collider
+   * behaviours
+   */
+  public tag: string
+
   public constructor(
     public readonly game: IAsteroidsApplication,
     public components: AbstractComponent[] = [],
