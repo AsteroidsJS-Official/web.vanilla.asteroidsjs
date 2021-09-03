@@ -25,3 +25,98 @@
     opacity: 0.8;
   }
 }
+
+.background {
+  position: relative;
+
+  width: 100vw;
+  height: 100vh;
+}
+
+button {
+  background-color: transparent;
+  outline: none;
+  box-shadow: none;
+  border: none;
+
+  cursor: pointer;
+
+  & svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  &.play-singleplayer-button,
+  &.play-local-multiplayer-button,
+  &.play-online-multiplayer-button {
+    font-family: 'Neptunus';
+    font-size: 34px;
+    color: #ffffff;
+    letter-spacing: 0.035em;
+
+    transition: color 0.2s;
+  }
+
+  &.play-singleplayer-button:hover {
+    color: #48bdff;
+  }
+
+  &.play-local-multiplayer-button:hover {
+    color: #ff9c41;
+  }
+
+  &.play-online-multiplayer-button:hover {
+    color: #ff371c;
+  }
+
+  &.login-button {
+    margin-top: 10px;
+
+    color: #c4c4c4;
+    font-size: 0.9rem;
+    font-family: 'Neptunus';
+
+    transition: color 0.2s;
+
+    &:hover {
+      color: #ffffff;
+    }
+  }
+
+  &.settings-button {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+
+    width: 40px;
+    height: 40px;
+
+    & svg {
+      color: #c4c4c4;
+
+      transition: color 0.2s,
+        transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    &:hover svg {
+      color: #fff;
+
+      transform: rotateZ(90deg);
+    }
+  }
+
+  &.color-button {
+    width: 20px;
+    height: 20px;
+
+    border-radius: 1px;
+
+    &.active {
+      border: 3px solid #fcff68;
+    }
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+}
