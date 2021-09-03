@@ -14,7 +14,7 @@ import { Drawer } from '../components/drawer.component'
 import { RenderOverflow } from '../components/render-overflow.component'
 import { Transform } from '../components/transform.component'
 
-import spaceshipImg from '../../svg/spaceship.svg'
+import spaceshipImg from '../../svg/spaceship-blue.svg'
 
 /**
  * Class that represents the virtual spaceship entity, used for rendering

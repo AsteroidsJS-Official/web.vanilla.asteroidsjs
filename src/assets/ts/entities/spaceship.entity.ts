@@ -20,7 +20,7 @@ import { Transform } from '../components/transform.component'
 
 import { uuid } from '../../../../libs/asteroidsjs/src/utils/validations'
 
-import spaceshipImg from '../../svg/spaceship.svg'
+import spaceshipImg from '../../svg/spaceship-blue.svg'
 
 /**
  * Class that represents the spaceship entity controlled by the user.
