@@ -5,6 +5,7 @@ const path = require('path')
 const TerserWebpackPlugin = require('terser-webpack-plugin')
 const webpack = require('webpack')
 const WebpackShellPluginNext = require('webpack-shell-plugin-next')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 const htmlFiles = fs
   .readdirSync(path.resolve(__dirname, './src/assets/html/'))
@@ -47,12 +48,33 @@ module.exports = {
         use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
       },
       {
-        test: /\.(png|jpe?g|gif|svg)$/i,
+        test: /\.(png|jpe?g|gif)$/i,
         use: [
           {
             loader: 'file-loader',
+            options: {
+              name: 'assets/images/[name].[ext]',
+            },
           },
         ],
+      },
+      {
+        test: /\.svg$/i,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: 'assets/svg/[name].[ext]',
+            },
+          },
+        ],
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/i,
+        type: 'asset/resource',
+        generator: {
+          filename: 'assets/fonts/[name][ext][query]',
+        },
       },
     ],
   },
@@ -79,6 +101,14 @@ module.exports = {
         }
       : undefined,
   plugins: [
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: path.resolve(__dirname, './src/assets/svg'),
+          to: path.resolve(__dirname, './dist/assets/svg'),
+        },
+      ],
+    }),
     new MiniCssExtractPlugin({
       filename: 'global.css',
     }),
