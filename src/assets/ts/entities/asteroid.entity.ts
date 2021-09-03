@@ -19,7 +19,7 @@ import { Rigidbody } from '../components/rigidbody.component'
 import { Transform } from '../components/transform.component'
 
 @Entity({
-  components: [Transform, Rigidbody, Render, Drawer],
+  components: [Transform, Rigidbody, Drawer, Render],
 })
 export class Asteroid
   extends AbstractEntity

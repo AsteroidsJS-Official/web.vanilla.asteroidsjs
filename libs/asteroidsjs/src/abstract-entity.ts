@@ -79,7 +79,7 @@ export class AbstractEntity {
    * @returns an object that represents the component instance, attached to
    * this entity
    */
-  public getComponent<C extends AbstractComponent>(component: Type<C>): C {
+  public getComponent<C extends AbstractComponent>(component?: Type<C>): C {
     return this.components.find(
       (c) => c.constructor.name === component.name,
     ) as C

@@ -10,8 +10,8 @@ import { socket } from '../socket'
 
 import { Asteroid } from './asteroid.entity'
 
-import { Collider2 } from '../components/colliders/collider2.component'
-import { Rigidbody } from '../components/rigidbody.component'
+import { CircleCollider2 } from '../components/colliders/circle-collider2.component'
+import { RectCollider2 } from '../components/colliders/rect-collider2.component'
 import { Transform } from '../components/transform.component'
 
 import { uuid } from '../../../../libs/asteroidsjs/src/utils/validations'
@@ -25,9 +25,9 @@ import { AsteroidSizeEnum } from '../enums/asteroid.enum'
 export class ManagerAsteroids extends AbstractEntity implements IOnStart {
   public onStart(): void {
     this.generateAsteroid()
-    // for (let i = 0; i < 3; i++) {
-    //   setTimeout(() => {
-    //   }, 100)
+    // for (let i = 0; i < 100; i++) {
+    // setTimeout(() => {
+    // }, 100)
     // }
     // setInterval(() => {
     //   this.generateAsteroid()
@@ -69,7 +69,7 @@ export class ManagerAsteroids extends AbstractEntity implements IOnStart {
         asteroidSize: AsteroidSizeEnum.large,
       },
       entity: Asteroid,
-      components: [Collider2],
+      components: [CircleCollider2],
       properties: [
         {
           for: Transform,

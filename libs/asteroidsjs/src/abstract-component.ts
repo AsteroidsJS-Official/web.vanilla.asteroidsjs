@@ -15,21 +15,19 @@ export abstract class AbstractComponent {
   /**
    * Property that defines the entity unique id
    */
-  public get id(): number | string {
-    return this.entity.id
-  }
+  id: number | string
 
   /**
    * Property that defines some tag allowing to differ thngs in collider
    * behaviours
    */
-  public get tag(): string {
+  get tag(): string {
     return this.entity.tag
   }
 
-  public constructor(
-    public readonly game: IAsteroidsApplication,
-    public readonly entity: AbstractEntity,
+  constructor(
+    readonly game: IAsteroidsApplication,
+    readonly entity: AbstractEntity,
   ) {}
 
   /**
@@ -37,7 +35,7 @@ export abstract class AbstractComponent {
    *
    * @returns the entity as some specified type
    */
-  public getEntityAs<T>(): T {
+  getEntityAs<T>(): T {
     return this.entity.getEntityAs<T>()
   }
 
@@ -48,7 +46,7 @@ export abstract class AbstractComponent {
    * @param components defines the new entity component dependencies
    * @returns the created entity
    */
-  public instantiate<E extends AbstractEntity>(
+  instantiate<E extends AbstractEntity>(
     options?: IInstantiateOptions<E>,
   ): E extends AbstractEntity ? E : AbstractEntity {
     return this.entity.instantiate(options)
@@ -58,7 +56,7 @@ export abstract class AbstractComponent {
    * Method that returns the game context
    * @returns an object that represents the game context
    */
-  public getContext(): IContext {
+  getContext(): IContext {
     return this.game.getContext()
   }
 
@@ -70,7 +68,7 @@ export abstract class AbstractComponent {
    * @returns an object that represents the component instance, attached to
    * the same parent entity
    */
-  public getProvider<T extends AbstractProvider>(component: Type<T>): T {
+  getProvider<T extends AbstractProvider>(component: Type<T>): T {
     return this.entity.getProvider(component)
   }
 
@@ -82,7 +80,7 @@ export abstract class AbstractComponent {
    * @returns an object that represents the component instance, attached to
    * the same parent entity
    */
-  public getComponent<T extends AbstractComponent>(component: Type<T>): T {
+  getComponent<T extends AbstractComponent>(component: Type<T>): T {
     return this.entity.getComponent(component)
   }
 
@@ -93,7 +91,7 @@ export abstract class AbstractComponent {
    * @returns an array with objects that represents the component instance, attached to
    * this entity
    */
-  public getComponents<C extends AbstractComponent>(component: Type<C>): C[] {
+  getComponents<C extends AbstractComponent>(component: Type<C>): C[] {
     return this.entity.getComponents(component)
   }
 
@@ -104,7 +102,7 @@ export abstract class AbstractComponent {
    * @returns an array with objects that represents the component instance, attached to
    * this entity
    */
-  public getProviders<P extends AbstractProvider>(provider: Type<P>): P[] {
+  getProviders<P extends AbstractProvider>(provider: Type<P>): P[] {
     return this.entity.getProviders(provider)
   }
 
@@ -113,7 +111,7 @@ export abstract class AbstractComponent {
    *
    * @returns an array with objects that represents all the components
    */
-  public getAllComponents(): AbstractComponent[] {
+  getAllComponents(): AbstractComponent[] {
     return this.entity.getAllComponents()
   }
 
@@ -122,7 +120,7 @@ export abstract class AbstractComponent {
    *
    * @returns an array with objects that represents all the providers
    */
-  public getAllProviders(): AbstractProvider[] {
+  getAllProviders(): AbstractProvider[] {
     return this.entity.getAllProviders()
   }
 
@@ -132,7 +130,7 @@ export abstract class AbstractComponent {
    * @param provider defines the provider type
    * @returns an object that represents the provider instance
    */
-  public addProvider<P extends AbstractProvider>(provider: Type<P>): P {
+  addProvider<P extends AbstractProvider>(provider: Type<P>): P {
     return this.game.addProvider(this.entity, provider)
   }
 
@@ -142,7 +140,7 @@ export abstract class AbstractComponent {
    * @param component defines the component type
    * @returns an array of objects with the passed type
    */
-  public find<C extends AbstractComponent>(component: Type<C>): C[] {
+  find<C extends AbstractComponent>(component: Type<C>): C[] {
     return this.game.find(component)
   }
 
@@ -151,9 +149,7 @@ export abstract class AbstractComponent {
    *
    * @param instance defines the instance that will be destroyed
    */
-  public destroy<T extends AbstractEntity | AbstractComponent>(
-    instance: T,
-  ): void {
+  destroy<T extends AbstractEntity | AbstractComponent>(instance: T): void {
     this.game.destroy(instance)
   }
 }

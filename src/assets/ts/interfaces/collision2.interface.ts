@@ -1,9 +1,7 @@
-import { Vector2 } from '@asteroidsjs'
-
-import { Rigidbody } from '../components/rigidbody.component'
+import { AbstractEntity, Vector2 } from '@asteroidsjs'
 
 /**
- * Interface that represents a collision between two {@link Rigidbody}
+ * Interface that represents a collision between two {@link AbstractEntity}
  * entities
  */
 export interface ICollision2 {
@@ -16,13 +14,13 @@ export interface ICollision2 {
 
   /**
    * Property that defines an object that represents one of the two
-   * rigidbodies that have collided
+   * entities that have collided
    */
-  rigidbody1: Rigidbody
+  entity1: AbstractEntity
 
   /**
    * Property that defines an object that represents one of the two
-   * rigidbodies that have collided
+   * entities that have collided
    */
-  rigidbody2: Rigidbody
+  entity2: AbstractEntity
 }
