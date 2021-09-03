@@ -1,5 +1,7 @@
 @import './assets/scss/screen.scss';
+@import './assets/scss/menu.scss';
 @import './assets/scss/buttons.scss';
+@import './assets/scss/inputs.scss';
 
 * {
   box-sizing: border-box;
@@ -7,4 +9,10 @@
   padding: 0;
 
   overflow: hidden;
+}
+
+@font-face {
+  font-family: 'Neptunus';
+  src: url('./assets/fonts/Neptunus/Neptunus.ttf');
+  font-weight: normal;
 }
