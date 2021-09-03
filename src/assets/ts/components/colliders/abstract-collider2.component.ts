@@ -2,12 +2,12 @@
 
 import {
   AbstractComponent,
-  Component,
-  IDraw,
   IOnAwake,
   IOnFixedLoop,
-  Rect,
+  IDraw,
   Vector2,
+  Rect,
+  AbstractEntity,
 } from '@asteroidsjs'
 
 import { Rigidbody } from '../rigidbody.component'
@@ -25,10 +25,7 @@ import { IOnTriggerStay } from '../../interfaces/on-trigger-stay.interface'
  * A collider only interacts with entities that have the {@link Rigidbody}
  * component in order to make this behaviour more performatic
  */
-@Component({
-  required: [Transform, Rigidbody],
-})
-export class Collider2
+export abstract class AbstractCollider
   extends AbstractComponent
   implements IOnAwake, IOnFixedLoop, IDraw
 {
@@ -48,56 +45,54 @@ export class Collider2
    */
   protected collisions: ICollision2[] = []
 
+  /**
+   * Property that represents the collider posision relative to it entity
+   */
   private _position: Vector2
 
+  /**
+   * Property that represents the collider dimensions
+   */
   private _dimensions: Rect
 
+  /**
+   * Property that represents the collider posision relative to it entity
+   */
   get position(): Vector2 {
     return this._position ?? this.transform.position
   }
 
+  /**
+   * Property that represents the collider posision relative to it entity
+   */
   set position(value: Vector2) {
     this._position = value
   }
 
+  /**
+   * Property that represents the collider dimensions
+   */
   get dimensions(): Rect {
     return this._dimensions ?? this.transform.dimensions
   }
 
+  /**
+   * Property that represents the collider dimensions
+   */
   set dimensions(value: Rect) {
     this._dimensions = value
   }
+
+  abstract draw(): void
 
   onAwake(): void {
     this.rigidbody = this.getComponent(Rigidbody)
     this.transform = this.getComponent(Transform)
   }
 
-  draw(): void {
-    this.getContext().translate(
-      this.transform.canvasPosition.x,
-      this.transform.canvasPosition.y,
-    )
-
-    this.getContext().beginPath()
-    this.getContext().fillStyle = '#05FF0020'
-    this.getContext().rect(
-      -this.dimensions.width / 2,
-      -this.dimensions.height / 2,
-      this.dimensions.width,
-      this.dimensions.height,
-    )
-    this.getContext().fill()
-
-    this.getContext().translate(
-      -this.transform.canvasPosition.x,
-      -this.transform.canvasPosition.y,
-    )
-  }
-
   onFixedLoop(): void {
     this.collisions.forEach((collision, i) => {
-      if (this.isColliding(collision.rigidbody2.getComponent(Transform))) {
+      if (this.isColliding(collision.entity2)) {
         return
       }
 
@@ -111,24 +106,22 @@ export class Collider2
     const rigidbodies = this.find(Rigidbody).filter(
       (r) => r.entity != this.entity,
     )
-    const transforms = rigidbodies.map((r) => r.getComponent(Transform))
 
-    transforms.forEach((transform, i) => {
-      if (!this.isColliding(transform)) {
+    rigidbodies.forEach((rigidbody) => {
+      if (!this.isColliding(rigidbody.entity)) {
         return
       }
 
-      const rigidbody = rigidbodies[i]
       let collision = this.collisions.find(
         (collision) =>
-          collision.rigidbody1 === this.rigidbody &&
-          collision.rigidbody2 === rigidbody,
+          collision.entity1 === this.entity &&
+          collision.entity2 === rigidbody.entity,
       )
 
       if (!collision) {
         collision = {
-          rigidbody1: this.rigidbody,
-          rigidbody2: rigidbody,
+          entity1: this.entity,
+          entity2: rigidbody.entity,
         }
 
         this.collisions.push(collision)
@@ -142,22 +135,6 @@ export class Collider2
         }
       }
     })
-  }
-
-  /**
-   * Method that check if two transforms are colliding
-   *
-   * @param transform2 defines the second transform
-   * @returns true if the distance between their centers is sufficient to
-   * consider the collision
-   */
-  protected isColliding(transform2: Transform): boolean {
-    return !(
-      this.position.x > transform2.position.x + transform2.dimensions.width ||
-      this.position.x + this.dimensions.width < transform2.position.x ||
-      this.position.y > transform2.position.y + transform2.dimensions.height ||
-      this.position.y + this.dimensions.height < transform2.position.y
-    )
   }
 
   /**
@@ -192,4 +169,13 @@ export class Collider2
   protected hasOnTriggerExit(entity: any): entity is IOnTriggerExit {
     return 'onTriggerExit' in entity
   }
+
+  /**
+   * Method that check if two rididbodies are colliding
+   *
+   * @param entity defines the second rigidbody
+   * @returns true if the distance between their centers is sufficient to
+   * consider the collision
+   */
+  protected abstract isColliding(entity: AbstractEntity): boolean
 }

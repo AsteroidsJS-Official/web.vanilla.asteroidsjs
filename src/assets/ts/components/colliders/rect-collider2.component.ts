@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+
 import { abs, AbstractEntity, Component, Vector2 } from '@asteroidsjs'
 
 import { Rigidbody } from '../rigidbody.component'
 import { Transform } from '../transform.component'
 import { AbstractCollider } from './abstract-collider2.component'
-import { RectCollider2 } from './rect-collider2.component'
+import { CircleCollider2 } from './circle-collider2.component'
 
 /**
  * Class that represents a component that deals with collisions with
@@ -15,7 +17,7 @@ import { RectCollider2 } from './rect-collider2.component'
 @Component({
   required: [Transform, Rigidbody],
 })
-export class CircleCollider2 extends AbstractCollider {
+export class RectCollider2 extends AbstractCollider {
   draw(): void {
     this.getContext().translate(
       this.transform.canvasPosition.x,
@@ -24,7 +26,12 @@ export class CircleCollider2 extends AbstractCollider {
 
     this.getContext().beginPath()
     this.getContext().fillStyle = '#05FF0020'
-    this.getContext().arc(0, 0, this.dimensions.width / 2, 0, 2 * Math.PI)
+    this.getContext().rect(
+      -this.dimensions.width / 2,
+      -this.dimensions.height / 2,
+      this.dimensions.width,
+      this.dimensions.height,
+    )
     this.getContext().fill()
 
     this.getContext().translate(
@@ -34,9 +41,9 @@ export class CircleCollider2 extends AbstractCollider {
   }
 
   /**
-   * Method that check if two transforms are colliding
+   * Method that check if two rididbodies are colliding
    *
-   * @param entity defines the second transform
+   * @param entity defines the second rigidbody
    * @returns true if the distance between their centers is sufficient to
    * consider the collision
    */
@@ -58,6 +65,21 @@ export class CircleCollider2 extends AbstractCollider {
   }
 
   private isCollidingWithRect(entity: AbstractCollider): boolean {
+    const transform = entity.getComponent(Transform)
+
+    return !(
+      this.position.x + this.dimensions.width / 2 <
+        transform.position.x - transform.dimensions.width / 2 ||
+      this.position.x - this.dimensions.width / 2 >
+        transform.position.x + transform.dimensions.width / 2 ||
+      this.position.y + this.dimensions.height / 2 <
+        transform.position.y - transform.dimensions.height / 2 ||
+      this.position.y - this.dimensions.height / 2 >
+        transform.position.y + transform.dimensions.height / 2
+    )
+  }
+
+  private isCollidingWithCircle(entity: AbstractCollider): boolean {
     const transform = entity.getComponent(Transform)
     const diff = new Vector2(
       abs(this.position.x - transform.position.x),
@@ -85,13 +107,5 @@ export class CircleCollider2 extends AbstractCollider {
       Math.pow(diff.y - transform.dimensions.height / 2, 2)
 
     return square <= Math.pow(this.dimensions.width / 2, 2)
-  }
-
-  private isCollidingWithCircle(entity: AbstractCollider): boolean {
-    const transform = entity.getComponent(Transform)
-    return (
-      Vector2.distance(this.position, transform.position) <
-      (this.dimensions.width + transform.dimensions.width) / 2
-    )
   }
 }
