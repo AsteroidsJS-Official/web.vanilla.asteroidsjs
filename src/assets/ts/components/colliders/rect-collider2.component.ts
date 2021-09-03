@@ -19,10 +19,8 @@ import { CircleCollider2 } from './circle-collider2.component'
 })
 export class RectCollider2 extends AbstractCollider {
   draw(): void {
-    this.getContext().translate(
-      this.transform.canvasPosition.x,
-      this.transform.canvasPosition.y,
-    )
+    this.getContext().translate(this.canvasPosition.x, this.canvasPosition.y)
+    this.getContext().rotate(this.transform.rotation)
 
     this.getContext().beginPath()
     this.getContext().fillStyle = '#05FF0020'
@@ -34,10 +32,8 @@ export class RectCollider2 extends AbstractCollider {
     )
     this.getContext().fill()
 
-    this.getContext().translate(
-      -this.transform.canvasPosition.x,
-      -this.transform.canvasPosition.y,
-    )
+    this.getContext().rotate(-this.transform.rotation)
+    this.getContext().translate(-this.canvasPosition.x, -this.canvasPosition.y)
   }
 
   /**
@@ -64,6 +60,12 @@ export class RectCollider2 extends AbstractCollider {
     )
   }
 
+  /**
+   * Method that check if the two rect colliders are colliding
+   *
+   * @param entity defines the second entity
+   * @returns true if the two entities are colliding, otherwise false
+   */
   private isCollidingWithRect(entity: AbstractCollider): boolean {
     const transform = entity.getComponent(Transform)
 
@@ -79,6 +81,13 @@ export class RectCollider2 extends AbstractCollider {
     )
   }
 
+  /**
+   * Method that check if the this circular collider is colliding with
+   * some rect collider
+   *
+   * @param entity defines the second entity
+   * @returns true if the two entities are colliding, otherwise false
+   */
   private isCollidingWithCircle(entity: AbstractCollider): boolean {
     const transform = entity.getComponent(Transform)
     const diff = new Vector2(

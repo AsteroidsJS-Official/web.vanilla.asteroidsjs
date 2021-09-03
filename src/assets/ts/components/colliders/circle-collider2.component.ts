@@ -17,28 +17,23 @@ import { RectCollider2 } from './rect-collider2.component'
 })
 export class CircleCollider2 extends AbstractCollider {
   draw(): void {
-    this.getContext().translate(
-      this.transform.canvasPosition.x,
-      this.transform.canvasPosition.y,
-    )
+    this.getContext().translate(this.canvasPosition.x, this.canvasPosition.y)
+    this.getContext().rotate(this.transform.rotation)
 
     this.getContext().beginPath()
     this.getContext().fillStyle = '#05FF0020'
-    this.getContext().arc(0, 0, this.dimensions.width / 2, 0, 2 * Math.PI)
+    this.getContext().arc(0, 0, this.dimensions.width / 2, 0, 360)
     this.getContext().fill()
 
-    this.getContext().translate(
-      -this.transform.canvasPosition.x,
-      -this.transform.canvasPosition.y,
-    )
+    this.getContext().rotate(-this.transform.rotation)
+    this.getContext().translate(-this.canvasPosition.x, -this.canvasPosition.y)
   }
 
   /**
-   * Method that check if two transforms are colliding
+   * Method that check if some entity is colliding with this entity
    *
-   * @param entity defines the second transform
-   * @returns true if the distance between their centers is sufficient to
-   * consider the collision
+   * @param entity defines the second entity
+   * @returns true if the two entities are colliding, otherwise false
    */
   protected isColliding(entity: AbstractEntity): boolean {
     if (entity === this.entity) {
@@ -57,6 +52,13 @@ export class CircleCollider2 extends AbstractCollider {
     )
   }
 
+  /**
+   * Method that check if the this circular collider is colliding with
+   * some rect collider
+   *
+   * @param entity defines the second entity
+   * @returns true if the two entities are colliding, otherwise false
+   */
   private isCollidingWithRect(entity: AbstractCollider): boolean {
     const transform = entity.getComponent(Transform)
     const diff = new Vector2(
@@ -87,6 +89,12 @@ export class CircleCollider2 extends AbstractCollider {
     return square <= Math.pow(this.dimensions.width / 2, 2)
   }
 
+  /**
+   * Method that check if the two circle colliders are colliding
+   *
+   * @param entity defines the second entity
+   * @returns true if the two entities are colliding, otherwise false
+   */
   private isCollidingWithCircle(entity: AbstractCollider): boolean {
     const transform = entity.getComponent(Transform)
     return (

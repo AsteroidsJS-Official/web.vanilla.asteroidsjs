@@ -8,11 +8,18 @@ export class Transform extends AbstractComponent {
   /**
    * Property that defines the entity dimensions such as width and height
    */
-  public dimensions = new Rect(100, 100)
+  dimensions = new Rect(100, 100)
 
-  public localPosition = new Vector2()
+  /**
+   * Property that defines the child position relative to it parent
+   */
+  localPosition = new Vector2()
 
-  public children: Transform[] = []
+  /**
+   * Property that defines an array of transforms that are this transform
+   * children
+   */
+  children: Transform[] = []
 
   /**
    * Property that defines the entity rotation in radians
@@ -32,14 +39,14 @@ export class Transform extends AbstractComponent {
   /**
    * Property that defines an object that represents the parent transform
    */
-  public get parent(): Transform {
+  get parent(): Transform {
     return this._parent
   }
 
   /**
    * Property that defines an object that represents the parent transform
    */
-  public set parent(value: Transform) {
+  set parent(value: Transform) {
     value.children.push(this)
     this._parent = value
   }
@@ -47,7 +54,7 @@ export class Transform extends AbstractComponent {
   /**
    * Property that defines the entity rotation in radians
    */
-  public get rotation(): number {
+  get rotation(): number {
     if (!this.parent) {
       return this._rotation
     }
@@ -57,7 +64,7 @@ export class Transform extends AbstractComponent {
   /**
    * Property that defines the entity rotation in radians
    */
-  public set rotation(value: number) {
+  set rotation(value: number) {
     if (!this.parent) {
       this._rotation = value
       return
@@ -68,7 +75,7 @@ export class Transform extends AbstractComponent {
   /**
    * Property that defines the entity position
    */
-  public get position(): Vector2 {
+  get position(): Vector2 {
     if (!this.parent) {
       return this._position
     }
@@ -78,7 +85,7 @@ export class Transform extends AbstractComponent {
   /**
    * Property that defines the entity position
    */
-  public set position(value: Vector2) {
+  set position(value: Vector2) {
     if (!this.parent) {
       this._position = value
       return
@@ -92,14 +99,17 @@ export class Transform extends AbstractComponent {
   /**
    * Property that defines the entity position in html canvas
    */
-  public get canvasPosition(): Vector2 {
+  get canvasPosition(): Vector2 {
     return new Vector2(
-      this.game.getContext().canvas.width / 2 + this.position.x,
-      this.game.getContext().canvas.height / 2 - this.position.y,
+      this.getContext().canvas.width / 2 + this.position.x,
+      this.getContext().canvas.height / 2 - this.position.y,
     )
   }
 
-  public get totalDimensions(): Rect {
+  /**
+   * Property that defines the sum of all the children dimensions
+   */
+  get totalDimensions(): Rect {
     if (!this.children.length) {
       return this.dimensions
     }
