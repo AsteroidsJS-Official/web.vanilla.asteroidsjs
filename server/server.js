@@ -116,11 +116,20 @@ function setupServer() {
       'Origin, X-Requested-With, Content-Type, Accept',
     )
 
-    if (Object.keys(screens).map((s) => +s).length === +screenAmount) {
+    if (Object.keys(screens).length === +screenAmount) {
       res.send('Screen limit reached!')
     } else {
       res.sendFile(path.resolve(__dirname, '../dist/index.html'))
     }
+  })
+
+  router.get('/screen/:screenNumber/game', (_, res) => {
+    res.header('Access-Control-Allow-Origin', '*')
+    res.header(
+      'Access-Control-Allow-Headers',
+      'Origin, X-Requested-With, Content-Type, Accept',
+    )
+    res.sendFile(path.resolve(__dirname, '../dist/assets/html/game.html'))
   })
 
   app.use('/', router)
