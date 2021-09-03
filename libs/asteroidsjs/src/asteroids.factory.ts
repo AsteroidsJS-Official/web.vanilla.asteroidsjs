@@ -161,35 +161,34 @@ class AsteroidsApplication implements IAsteroidsApplication {
         this.findOrCreateProvider(provider),
       )
     }
+
     if (components && components.length) {
-      instance.components = components.map((component) => {
-        const i = new component(this, instance)
-        const values = properties
-          .filter((p) => p.for === component)
-          ?.map((p) => p.use)
-
-        values.forEach((value) => {
-          for (const key in value) {
-            ;(i as any)[key] = value[key]
-          }
-        })
-
-        return i
-      })
+      instance.components = components.map(
+        (component) => new component(this, instance),
+      )
     }
 
-    instance.providers.forEach((provider) => {
-      if (hasAwake(provider)) {
-        provider.onAwake()
-      }
-    })
-
-    const instances = [instance, ...instance.components]
+    const instances = [instance, ...instance.components, ...instance.providers]
     instances.forEach((value) => {
       if (hasAwake(value)) {
         value.onAwake()
       }
     })
+
+    if (instance.components && instance.components.length) {
+      instance.components.forEach((c) => {
+        const values = properties
+          .filter((p) => p.for.name === c.constructor.name)
+          ?.map((p) => p.use)
+
+        values.forEach((value) => {
+          for (const key in value) {
+            ;(c as any)[key] = value[key]
+          }
+        })
+      })
+    }
+
     instances.forEach((value) => {
       if (hasStart(value)) {
         value.onStart()
