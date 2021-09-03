@@ -11,7 +11,7 @@ import {
 import { socket } from '../socket'
 
 import { Drawer } from '../components/drawer.component'
-import { RenderOverflow } from '../components/render-overflow.component'
+import { RenderOverflow } from '../components/renderers/render-overflow.component'
 import { Transform } from '../components/transform.component'
 
 import spaceshipImg from '../../svg/spaceship.svg'

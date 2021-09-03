@@ -13,10 +13,9 @@ import { socket } from '../socket'
 import { Bullet } from './bullet.entity'
 
 import { CircleCollider2 } from '../components/colliders/circle-collider2.component'
-import { RectCollider2 } from '../components/colliders/rect-collider2.component'
 import { Drawer } from '../components/drawer.component'
 import { Input } from '../components/input.component'
-import { RenderOverflow } from '../components/render-overflow.component'
+import { RenderOverflow } from '../components/renderers/render-overflow.component'
 import { Rigidbody } from '../components/rigidbody.component'
 import { Transform } from '../components/transform.component'
 

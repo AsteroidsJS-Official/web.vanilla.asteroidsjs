@@ -9,7 +9,7 @@ import {
 } from '@asteroidsjs'
 
 import { Drawer } from '../components/drawer.component'
-import { Render } from '../components/render.component'
+import { Render } from '../components/renderers/render.component'
 import { Rigidbody } from '../components/rigidbody.component'
 import { Transform } from '../components/transform.component'
 

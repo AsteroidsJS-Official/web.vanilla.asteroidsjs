@@ -8,8 +8,8 @@ import {
   isOverflowingY,
 } from '@asteroidsjs'
 
-import { Drawer } from './drawer.component'
-import { Transform } from './transform.component'
+import { Drawer } from '../drawer.component'
+import { Transform } from '../transform.component'
 
 /**
  * Class that represents the component responsible for rendering the

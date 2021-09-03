@@ -13,8 +13,8 @@ import {
 import { socket } from '../socket'
 
 import { Drawer } from '../components/drawer.component'
-import { RenderOverflow } from '../components/render-overflow.component'
-import { Render } from '../components/render.component'
+import { RenderOverflow } from '../components/renderers/render-overflow.component'
+import { Render } from '../components/renderers/render.component'
 import { Rigidbody } from '../components/rigidbody.component'
 import { Transform } from '../components/transform.component'
 

@@ -5,7 +5,7 @@ import {
   IOnLateLoop,
 } from '@asteroidsjs'
 
-import { Drawer } from './drawer.component'
+import { Drawer } from '../drawer.component'
 
 /**
  * Class that represents the component responsible for rendering the
