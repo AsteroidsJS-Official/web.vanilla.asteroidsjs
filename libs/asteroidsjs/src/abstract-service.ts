@@ -5,7 +5,8 @@ import { Type } from './interfaces/type.interface'
  * Class that represents some service in the game
  */
 export abstract class AbstractService {
-  public constructor(
+  constructor(
+    readonly id: string | number,
     public game: IAsteroidsApplication,
     public services: AbstractService[] = [],
   ) {}
@@ -18,7 +19,7 @@ export abstract class AbstractService {
    * @returns an object that represents the component instance, attached to
    * the same parent entity
    */
-  public getService<T extends AbstractService>(service: Type<T>): T {
+  getService<T extends AbstractService>(service: Type<T>): T {
     return this.services.find((c) => c.constructor.name === service.name) as T
   }
 }

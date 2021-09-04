@@ -10,12 +10,7 @@ import { Type } from './interfaces/type.interface'
 /**
  * Class that represents some object in the game
  */
-export class AbstractEntity {
-  /**
-   * Property that defines the entity unique id
-   */
-  id: number | string
-
+export abstract class AbstractEntity {
   /**
    * Property that defines some tag allowing to differ thngs in collider
    * behaviours
@@ -23,6 +18,7 @@ export class AbstractEntity {
   tag: string
 
   constructor(
+    readonly id: string | number,
     readonly game: IAsteroidsApplication,
     public components: AbstractComponent[] = [],
     public services: AbstractService[] = [],
