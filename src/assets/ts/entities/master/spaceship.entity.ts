@@ -13,7 +13,7 @@ import { socket } from '../../socket'
 
 import { Bullet } from './bullet.entity'
 
-import { RectCollider2 } from '../../components/colliders/rect-collider2.component'
+import { CircleCollider2 } from '../../components/colliders/circle-collider2.component'
 import { Drawer } from '../../components/drawer.component'
 import { Input } from '../../components/input.component'
 import { RenderOverflow } from '../../components/renderers/render-overflow.component'
@@ -30,25 +30,27 @@ import spaceshipImg from '../../../svg/spaceship.svg'
  */
 @Entity({
   components: [
-    Input,
     Drawer,
-    Transform,
-    Rigidbody,
     RenderOverflow,
-    RectCollider2,
-  ],
-  properties: [
     {
-      for: Input,
+      class: CircleCollider2,
       use: {
-        force: 3,
-        angularForce: 0.03,
+        localPosition: new Vector2(0, 25),
       },
     },
     {
-      for: RectCollider2,
+      id: '__spaceship_transform__',
+      class: Transform,
+    },
+    {
+      id: '__spaceship_rigidbody__',
+      class: Rigidbody,
+    },
+    {
+      class: Input,
       use: {
-        localPosition: new Vector2(-50, 50),
+        force: 3,
+        angularForce: 0.03,
       },
     },
   ],
@@ -172,16 +174,16 @@ export class Spaceship
         tag: `${Bullet.name}|${rightBulletId}`,
       },
       entity: Bullet,
-      properties: [
+      components: [
         {
-          for: Transform,
+          id: '__bullet_transform__',
           use: {
             position,
             rotation,
           },
         },
         {
-          for: Rigidbody,
+          id: '__bullet_rigidbody__',
           use: {
             velocity,
           },
@@ -223,16 +225,16 @@ export class Spaceship
         tag: `${Bullet.name}|${leftBulletId}`,
       },
       entity: Bullet,
-      properties: [
+      components: [
         {
-          for: Transform,
+          id: '__bullet_transform__',
           use: {
             position,
             rotation,
           },
         },
         {
-          for: Rigidbody,
+          id: '__bullet_rigidbody__',
           use: {
             velocity,
           },

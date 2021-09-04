@@ -1,7 +1,6 @@
 import {
   AbstractEntity,
   Entity,
-  generateUUID,
   IOnStart,
   ISocketData,
   Rect,
@@ -18,8 +17,7 @@ import { AsteroidVirtual } from './virtual/asteroid-virtual.entity'
 import { BulletVirtual } from './virtual/bullet-virtual.entity'
 import { SpaceshipVirtual } from './virtual/spaceship-virtual.entity'
 
-import { Rigidbody } from '../components/rigidbody.component'
-import { Transform } from '../components/transform.component'
+import { RectCollider2 } from '../components/colliders/rect-collider2.component'
 
 /**
  * Class that represents the first entity to be loaded into the game
@@ -27,13 +25,7 @@ import { Transform } from '../components/transform.component'
 @Entity()
 export class Manager extends AbstractEntity implements IOnStart {
   public onStart(): void {
-    if (this.game.getScreen().number === 1) {
-      setTimeout(() => {
-        this.master()
-      }, 100)
-    } else {
-      this.virtual()
-    }
+    this.master()
   }
 
   private master(): void {
@@ -41,24 +33,33 @@ export class Manager extends AbstractEntity implements IOnStart {
       entity: ManagerAsteroids,
     })
 
-    const id = generateUUID()
-
-    this.instantiate({
+    const spaceship = this.instantiate({
       use: {
-        id,
-        tag: `${Spaceship.name}|${id}`,
+        tag: `${Spaceship.name}`,
       },
       entity: Spaceship,
-      properties: [
+      components: [
         {
-          for: Transform,
+          class: RectCollider2,
+          use: {
+            localPosition: new Vector2(-50, -50),
+          },
+        },
+        {
+          class: RectCollider2,
+          use: {
+            localPosition: new Vector2(50, -50),
+          },
+        },
+        {
+          id: '__spaceship_transform__',
           use: {
             rotation: 0,
             dimensions: new Rect(50, 50),
           },
         },
         {
-          for: Rigidbody,
+          id: '__spaceship_rigidbody__',
           use: {
             friction: 0.03,
             mass: 10,
@@ -70,7 +71,7 @@ export class Manager extends AbstractEntity implements IOnStart {
     })
 
     socket.emit('instantiate', {
-      id,
+      id: spaceship.id,
       type: Spaceship.name,
       data: {
         position: new Vector2(),
@@ -88,9 +89,9 @@ export class Manager extends AbstractEntity implements IOnStart {
               id,
             },
             entity: SpaceshipVirtual,
-            properties: [
+            components: [
               {
-                for: Transform,
+                id: '__spaceship_virtual_transform__',
                 use: {
                   rotation: data.rotation,
                   position: data.position,
@@ -106,16 +107,16 @@ export class Manager extends AbstractEntity implements IOnStart {
               id,
             },
             entity: BulletVirtual,
-            properties: [
+            components: [
               {
-                for: Transform,
+                id: '__bullet_virtual_transform__',
                 use: {
                   rotation: data.rotation,
                   position: data.position,
                 },
               },
               {
-                for: Rigidbody,
+                id: '__bullet_virtual_rigidbody__',
                 use: {
                   velocity: data.velocity,
                 },
@@ -130,9 +131,9 @@ export class Manager extends AbstractEntity implements IOnStart {
               asteroidSize: data.asteroidSize,
             },
             entity: AsteroidVirtual,
-            properties: [
+            components: [
               {
-                for: Transform,
+                id: '__asteroid_virtual_transform__',
                 use: {
                   rotation: data.rotation,
                   position: data.position,

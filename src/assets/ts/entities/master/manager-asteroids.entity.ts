@@ -12,7 +12,6 @@ import { socket } from '../../socket'
 import { Asteroid } from './asteroid.entity'
 
 import { RectCollider2 } from '../../components/colliders/rect-collider2.component'
-import { Transform } from '../../components/transform.component'
 
 import { AsteroidSizeEnum } from '../../enums/asteroid.enum'
 
@@ -56,10 +55,10 @@ export class ManagerAsteroids extends AbstractEntity implements IOnStart {
         asteroidSize: AsteroidSizeEnum.large,
       },
       entity: Asteroid,
-      components: [RectCollider2],
-      properties: [
+      components: [
+        RectCollider2,
         {
-          for: Transform,
+          id: '__asteroid_transform__',
           use: {
             position: new Vector2(0, 300),
           },

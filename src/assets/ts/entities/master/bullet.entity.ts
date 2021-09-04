@@ -16,16 +16,19 @@ import { Transform } from '../../components/transform.component'
 import { IBullet } from '../../interfaces/bullet.interface'
 
 @Entity({
-  components: [Drawer, Transform, Rigidbody, Render],
-  properties: [
+  components: [
+    Drawer,
+    Render,
     {
-      for: Transform,
+      id: '__bullet_transform__',
+      class: Transform,
       use: {
         dimensions: new Rect(2, 14),
       },
     },
     {
-      for: Rigidbody,
+      id: '__bullet_rigidbody__',
+      class: Rigidbody,
       use: {
         mass: 3,
       },
