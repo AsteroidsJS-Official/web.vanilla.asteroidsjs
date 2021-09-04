@@ -5,29 +5,26 @@ import {
   IOnAwake,
   IOnLoop,
   IOnStart,
+  ISocketData,
   isOverflowingX,
   isOverflowingY,
   Rect,
 } from '@asteroidsjs'
 
-import { socket } from '../socket'
+import { socket } from '../../socket'
 
-import { Drawer } from '../components/drawer.component'
-import { RenderOverflow } from '../components/renderers/render-overflow.component'
-import { Render } from '../components/renderers/render.component'
-import { Rigidbody } from '../components/rigidbody.component'
-import { Transform } from '../components/transform.component'
+import { RenderOverflow } from '../../components/renderers/render-overflow.component'
+import { Render } from '../../components/renderers/render.component'
+import { Transform } from '../../components/transform.component'
 
 @Entity({
-  components: [Transform, Rigidbody, Drawer, Render],
+  components: [Transform, Render],
 })
-export class Asteroid
+export class AsteroidVirtual
   extends AbstractEntity
   implements IOnAwake, IOnStart, IDraw, IOnLoop
 {
   private transform: Transform
-
-  private rigidbody: Rigidbody
 
   private _asteroidSize: number
 
@@ -37,7 +34,6 @@ export class Asteroid
 
   public onAwake(): void {
     this.transform = this.getComponent(Transform)
-    this.rigidbody = this.getComponent(Rigidbody)
   }
 
   public onStart(): void {
@@ -45,6 +41,14 @@ export class Asteroid
       15 * (this._asteroidSize + 2),
       15 * (this._asteroidSize + 2),
     )
+
+    socket.on('update-screen', ({ id, data }: ISocketData) => {
+      if (this.id !== id) {
+        return
+      }
+      this.transform.position = data.position
+      this.transform.rotation = data.rotation
+    })
   }
 
   public onLoop(): void {
@@ -68,14 +72,6 @@ export class Asteroid
       this.addComponent(RenderOverflow)
       this.destroy(this.getComponent(Render))
     }
-
-    socket.emit('update-slaves', {
-      id: this.id,
-      data: {
-        position: this.transform.position,
-        rotation: this.transform.rotation,
-      },
-    })
   }
 
   public draw(): void {

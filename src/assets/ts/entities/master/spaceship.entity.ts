@@ -1,6 +1,7 @@
 import {
   AbstractEntity,
   Entity,
+  generateUUID,
   IDraw,
   IOnAwake,
   IOnLateLoop,
@@ -8,23 +9,21 @@ import {
   Vector2,
 } from '@asteroidsjs'
 
-import { socket } from '../socket'
+import { socket } from '../../socket'
 
 import { Bullet } from './bullet.entity'
 
-import { RectCollider2 } from '../components/colliders/rect-collider2.component'
-import { Drawer } from '../components/drawer.component'
-import { Input } from '../components/input.component'
-import { RenderOverflow } from '../components/renderers/render-overflow.component'
-import { Rigidbody } from '../components/rigidbody.component'
-import { Transform } from '../components/transform.component'
+import { RectCollider2 } from '../../components/colliders/rect-collider2.component'
+import { Drawer } from '../../components/drawer.component'
+import { Input } from '../../components/input.component'
+import { RenderOverflow } from '../../components/renderers/render-overflow.component'
+import { Rigidbody } from '../../components/rigidbody.component'
+import { Transform } from '../../components/transform.component'
 
-import { ICollision2 } from '../interfaces/collision2.interface'
-import { IOnTriggerEnter } from '../interfaces/on-trigger-enter.interface'
+import { ICollision2 } from '../../interfaces/collision2.interface'
+import { IOnTriggerEnter } from '../../interfaces/on-trigger-enter.interface'
 
-import { uuid } from '../../../../libs/asteroidsjs/src/utils/validations'
-
-import spaceshipImg from '../../svg/spaceship.svg'
+import spaceshipImg from '../../../svg/spaceship.svg'
 
 /**
  * Class that represents the spaceship entity controlled by the user.
@@ -151,7 +150,7 @@ export class Spaceship
   }
 
   private createRightBullet(): void {
-    const rightBulletId = uuid()
+    const rightBulletId = generateUUID()
     const rotation = this.transform.rotation
     const position = Vector2.sum(
       this.transform.position,
@@ -202,7 +201,7 @@ export class Spaceship
   }
 
   private createLeftBullet(): void {
-    const leftBulletId = uuid()
+    const leftBulletId = generateUUID()
     const rotation = this.transform.rotation
     const position = Vector2.sum(
       this.transform.position,

@@ -1,22 +1,20 @@
 import {
   AbstractEntity,
   Entity,
+  generateUUID,
   IOnStart,
   ISocketData,
   Vector2,
 } from '@asteroidsjs'
 
-import { socket } from '../socket'
+import { socket } from '../../socket'
 
 import { Asteroid } from './asteroid.entity'
 
-import { CircleCollider2 } from '../components/colliders/circle-collider2.component'
-import { RectCollider2 } from '../components/colliders/rect-collider2.component'
-import { Transform } from '../components/transform.component'
+import { RectCollider2 } from '../../components/colliders/rect-collider2.component'
+import { Transform } from '../../components/transform.component'
 
-import { uuid } from '../../../../libs/asteroidsjs/src/utils/validations'
-
-import { AsteroidSizeEnum } from '../enums/asteroid.enum'
+import { AsteroidSizeEnum } from '../../enums/asteroid.enum'
 
 /**
  * Class that represents the first entity to be loaded into the game
@@ -25,17 +23,10 @@ import { AsteroidSizeEnum } from '../enums/asteroid.enum'
 export class ManagerAsteroids extends AbstractEntity implements IOnStart {
   public onStart(): void {
     this.generateAsteroid()
-    // for (let i = 0; i < 100; i++) {
-    // setTimeout(() => {
-    // }, 100)
-    // }
-    // setInterval(() => {
-    //   this.generateAsteroid()
-    // }, 10000)
   }
 
   private generateAsteroid(): void {
-    const id = uuid()
+    const id = generateUUID()
     const sizes = [0, 1, 2, 3, 4]
     const asteroidSize = sizes[Math.floor(Math.random() * sizes.length)]
 

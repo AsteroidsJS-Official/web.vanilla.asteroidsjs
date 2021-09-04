@@ -8,12 +8,12 @@ import {
   Vector2,
 } from '@asteroidsjs'
 
-import { Drawer } from '../components/drawer.component'
-import { Render } from '../components/renderers/render.component'
-import { Rigidbody } from '../components/rigidbody.component'
-import { Transform } from '../components/transform.component'
+import { Drawer } from '../../components/drawer.component'
+import { Render } from '../../components/renderers/render.component'
+import { Rigidbody } from '../../components/rigidbody.component'
+import { Transform } from '../../components/transform.component'
 
-import { IBullet } from '../interfaces/bullet.interface'
+import { IBullet } from '../../interfaces/bullet.interface'
 
 @Entity({
   components: [Drawer, Transform, Rigidbody, Render],
@@ -32,7 +32,7 @@ import { IBullet } from '../interfaces/bullet.interface'
     },
   ],
 })
-export class Bullet
+export class BulletVirtual
   extends AbstractEntity
   implements IBullet, IDraw, IOnAwake, IOnLoop
 {
@@ -62,7 +62,6 @@ export class Bullet
     this.getContext().shadowBlur = 25
 
     this.getContext().beginPath()
-
     this.getContext().fillStyle = '#ffc887'
     this.getContext().rect(
       0,

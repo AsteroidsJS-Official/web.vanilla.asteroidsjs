@@ -1,6 +1,7 @@
 import {
   AbstractEntity,
   Entity,
+  generateUUID,
   IOnStart,
   ISocketData,
   Rect,
@@ -9,18 +10,16 @@ import {
 
 import { socket } from '../socket'
 
-import { AsteroidVirtual } from './asteroid-virtual.entity'
-import { Asteroid } from './asteroid.entity'
-import { BulletVirtual } from './bullet-virtual.entity'
-import { Bullet } from './bullet.entity'
-import { ManagerAsteroids } from './manager-asteroids.entity'
-import { SpaceshipVirtual } from './spaceship-virtual.entity'
-import { Spaceship } from './spaceship.entity'
+import { Asteroid } from './master/asteroid.entity'
+import { Bullet } from './master/bullet.entity'
+import { ManagerAsteroids } from './master/manager-asteroids.entity'
+import { Spaceship } from './master/spaceship.entity'
+import { AsteroidVirtual } from './virtual/asteroid-virtual.entity'
+import { BulletVirtual } from './virtual/bullet-virtual.entity'
+import { SpaceshipVirtual } from './virtual/spaceship-virtual.entity'
 
 import { Rigidbody } from '../components/rigidbody.component'
 import { Transform } from '../components/transform.component'
-
-import { uuid } from '../../../../libs/asteroidsjs/src/utils/validations'
 
 /**
  * Class that represents the first entity to be loaded into the game
@@ -42,7 +41,7 @@ export class Manager extends AbstractEntity implements IOnStart {
       entity: ManagerAsteroids,
     })
 
-    const id = uuid()
+    const id = generateUUID()
 
     this.instantiate({
       use: {
