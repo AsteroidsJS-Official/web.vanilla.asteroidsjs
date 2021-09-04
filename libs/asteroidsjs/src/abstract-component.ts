@@ -1,6 +1,6 @@
 import { AbstractEntity } from './abstract-entity'
 
-import { AbstractProvider } from './abstract-provider'
+import { AbstractService } from './abstract-service'
 
 import { IAsteroidsApplication } from './interfaces/asteroids-application.interface'
 import { IContext } from './interfaces/context.interface'
@@ -12,9 +12,18 @@ import { Type } from './interfaces/type.interface'
  * can be used to add new behaviours to these entities
  */
 export abstract class AbstractComponent {
-  public constructor(
-    public readonly game: IAsteroidsApplication,
-    public readonly entity: AbstractEntity,
+  /**
+   * Property that defines some tag allowing to differ thngs in collider
+   * behaviours
+   */
+  get tag(): string {
+    return this.entity.tag
+  }
+
+  constructor(
+    readonly id: string | number,
+    readonly game: IAsteroidsApplication,
+    readonly entity: AbstractEntity,
   ) {}
 
   /**
@@ -22,7 +31,7 @@ export abstract class AbstractComponent {
    *
    * @returns the entity as some specified type
    */
-  public getEntityAs<T>(): T {
+  getEntityAs<T>(): T {
     return this.entity.getEntityAs<T>()
   }
 
@@ -33,7 +42,7 @@ export abstract class AbstractComponent {
    * @param components defines the new entity component dependencies
    * @returns the created entity
    */
-  public instantiate<E extends AbstractEntity>(
+  instantiate<E extends AbstractEntity>(
     options?: IInstantiateOptions<E>,
   ): E extends AbstractEntity ? E : AbstractEntity {
     return this.entity.instantiate(options)
@@ -43,7 +52,7 @@ export abstract class AbstractComponent {
    * Method that returns the game context
    * @returns an object that represents the game context
    */
-  public getContext(): IContext {
+  getContext(): IContext {
     return this.game.getContext()
   }
 
@@ -55,8 +64,8 @@ export abstract class AbstractComponent {
    * @returns an object that represents the component instance, attached to
    * the same parent entity
    */
-  public getProvider<T extends AbstractProvider>(component: Type<T>): T {
-    return this.entity.getProvider(component)
+  getService<T extends AbstractService>(component: Type<T>): T {
+    return this.entity.getService(component)
   }
 
   /**
@@ -67,7 +76,7 @@ export abstract class AbstractComponent {
    * @returns an object that represents the component instance, attached to
    * the same parent entity
    */
-  public getComponent<T extends AbstractComponent>(component: Type<T>): T {
+  getComponent<T extends AbstractComponent>(component: Type<T>): T {
     return this.entity.getComponent(component)
   }
 
@@ -78,19 +87,19 @@ export abstract class AbstractComponent {
    * @returns an array with objects that represents the component instance, attached to
    * this entity
    */
-  public getComponents<C extends AbstractComponent>(component: Type<C>): C[] {
+  getComponents<C extends AbstractComponent>(component: Type<C>): C[] {
     return this.entity.getComponents(component)
   }
 
   /**
-   * Method that returns several child providers, attached to this entity
+   * Method that returns several child services, attached to this entity
    *
    * @param component defines the component type
    * @returns an array with objects that represents the component instance, attached to
    * this entity
    */
-  public getProviders<P extends AbstractProvider>(provider: Type<P>): P[] {
-    return this.entity.getProviders(provider)
+  getServices<P extends AbstractService>(service: Type<P>): P[] {
+    return this.entity.getServices(service)
   }
 
   /**
@@ -98,27 +107,27 @@ export abstract class AbstractComponent {
    *
    * @returns an array with objects that represents all the components
    */
-  public getAllComponents(): AbstractComponent[] {
+  getAllComponents(): AbstractComponent[] {
     return this.entity.getAllComponents()
   }
 
   /**
-   * Method that returns all the providers attached to this entity
+   * Method that returns all the services attached to this entity
    *
-   * @returns an array with objects that represents all the providers
+   * @returns an array with objects that represents all the services
    */
-  public getAllProviders(): AbstractProvider[] {
-    return this.entity.getAllProviders()
+  getAllServices(): AbstractService[] {
+    return this.entity.getAllServices()
   }
 
   /**
-   * Method that adds a new provider to a specific entity instance
+   * Method that adds a new service to a specific entity instance
    *
-   * @param provider defines the provider type
-   * @returns an object that represents the provider instance
+   * @param service defines the service type
+   * @returns an object that represents the service instance
    */
-  public addProvider<P extends AbstractProvider>(provider: Type<P>): P {
-    return this.game.addProvider(this.entity, provider)
+  addService<P extends AbstractService>(service: Type<P>): P {
+    return this.game.addService(this.entity, service)
   }
 
   /**
@@ -127,7 +136,7 @@ export abstract class AbstractComponent {
    * @param component defines the component type
    * @returns an array of objects with the passed type
    */
-  public find<C extends AbstractComponent>(component: Type<C>): C[] {
+  find<C extends AbstractComponent>(component: Type<C>): C[] {
     return this.game.find(component)
   }
 
@@ -136,9 +145,7 @@ export abstract class AbstractComponent {
    *
    * @param instance defines the instance that will be destroyed
    */
-  public destroy<T extends AbstractEntity | AbstractComponent>(
-    instance: T,
-  ): void {
+  destroy<T extends AbstractEntity | AbstractComponent>(instance: T): void {
     this.game.destroy(instance)
   }
 }

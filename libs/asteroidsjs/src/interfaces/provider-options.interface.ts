@@ -1,7 +1,7 @@
-import { AbstractProvider } from '../abstract-provider'
+import { AbstractService } from '../abstract-service'
 
 import { Type } from './type.interface'
 
-export interface IProviderOptions {
-  providers?: Type<AbstractProvider>[]
+export interface IServiceOptions {
+  services?: Type<AbstractService>[]
 }

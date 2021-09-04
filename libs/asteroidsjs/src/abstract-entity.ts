@@ -24,15 +24,6 @@ export abstract class AbstractEntity {
     public services: AbstractService[] = [],
   ) {}
 
-  /**public
-   * Method that returns the entity with some class or interface type
-   *
-   * @returns the entity as some specified type
-   */
-  getEntityAs<T>(): T {
-    return this as unknown as T
-  }
-
   /**
    * Method that returns the entity with some class or interface type
    *

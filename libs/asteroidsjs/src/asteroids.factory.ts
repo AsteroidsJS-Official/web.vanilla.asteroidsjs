@@ -1,23 +1,28 @@
 import { AbstractEntity } from './abstract-entity'
 
-import { AbstractProvider } from './abstract-provider'
+import { AbstractService } from './abstract-service'
 
 import { AbstractComponent } from './abstract-component'
-import { IComponentProperty } from './interfaces/component-property.interface'
 
 import { IAsteroidsApplication } from './interfaces/asteroids-application.interface'
 import { GameFactoryOptions } from './interfaces/game-factory-options.interface'
 import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
+import { IProvider } from './interfaces/provider.interface'
 import { IScreen } from './interfaces/screen.interface'
 import { Type } from './interfaces/type.interface'
 
-import { hasStart, hasLoop, hasAwake, isEntity } from './utils/validations'
-
 import {
-  COMPONENT_OPTIONS,
-  ENTITY_OPTIONS,
-  PROVIDER_OPTIONS,
-} from './constants'
+  hasStart,
+  hasLoop,
+  hasAwake,
+  isEntity,
+  hasFixedLoop,
+  hasLateLoop,
+} from './utils/validations'
+
+import { COMPONENT_OPTIONS, ENTITY_OPTIONS, SERVICE_OPTIONS } from './constants'
+
+import { Entity, generateUUID } from '..'
 
 /**
  * Class that represents the main application behaviour
@@ -36,13 +41,14 @@ class AsteroidsApplication implements IAsteroidsApplication {
   private components: AbstractComponent[] = []
 
   /**
-   * Property that defines an array of providers, that represents all the
-   * instantiated providers in the game
+   * Property that defines an array of services, that represents all the
+   * instantiated services in the game
    */
-  private providers: AbstractProvider[] = []
+  private services: AbstractService[] = []
 
   /**
    * Property that returns the canvas context
+   *
    * @returns the canvas context
    */
   public getContext(): CanvasRenderingContext2D {
@@ -51,6 +57,7 @@ class AsteroidsApplication implements IAsteroidsApplication {
 
   /**
    * Property that returns the screen data
+   *
    * @returns the screen data
    */
   public getScreen(): IScreen {
@@ -70,6 +77,14 @@ class AsteroidsApplication implements IAsteroidsApplication {
     this.bootstrap.forEach((entity) => this.instantiate({ entity }))
 
     setInterval(() => {
+      ;[...this.entities, ...this.components].forEach((value) => {
+        if (hasFixedLoop(value)) {
+          value.onFixedLoop()
+        }
+      })
+    }, 100 / 18)
+
+    setInterval(() => {
       this.context.clearRect(
         0,
         0,
@@ -81,14 +96,19 @@ class AsteroidsApplication implements IAsteroidsApplication {
           value.onLoop()
         }
       })
+      ;[...this.entities, ...this.components].forEach((value) => {
+        if (hasLateLoop(value)) {
+          value.onLateLoop()
+        }
+      })
     }, 100 / 6)
   }
 
   /**
    * Method that can create new entities
    *
-   * @param entity defines the new entity type
-   * @param components defines the new entity component dependencies
+   * @param options defines an object that contains all the options needed
+   * to create a new entity
    * @returns the created entity
    */
   public instantiate<E extends AbstractEntity>(
@@ -96,82 +116,78 @@ class AsteroidsApplication implements IAsteroidsApplication {
   ): E extends AbstractEntity ? E : AbstractEntity {
     const instance =
       options && options.entity
-        ? new options.entity(this)
-        : new AbstractEntity(this)
+        ? new options.entity(generateUUID(), this)
+        : new DefaultEntity(generateUUID(), this)
 
     if (options.use) {
       for (const key in options.use) {
-        if (key in instance) {
-          ;(instance as any)[key] = options.use[key]
-        }
+        ;(instance as any)[key] = options.use[key]
       }
     }
 
-    const components = [
-      ...new Set([
-        ...this.getComponents(options.entity),
-        ...(options.components ?? []),
-      ]),
-    ]
-    const providers = [
-      ...new Set([
-        ...this.getProviders(options.entity),
-        ...(options.providers ?? []),
-      ]),
-    ]
-    const properties = [
-      ...this.getProperties(options.entity),
-      ...(options.properties ?? []),
-    ]
+    // convert all the components and providers to providers
+    const components = this.toProviders([
+      ...(this.getComponentsInMetadata(options.entity) ?? []),
+      ...(options.components ?? []),
+    ])
 
-    if (components && components.length) {
-      const requiredComponents: Type<AbstractComponent>[] = []
-      components.forEach((component) => {
-        requiredComponents.push(...this.getRequiredComponents(component))
-      })
-      requiredComponents.forEach((component) => {
-        if (!components.includes(component)) {
-          throw new Error(
-            `Component ${component.name} is required in ${options.entity.name} entity`,
-          )
-        }
-      })
+    // convert all the services and providers to providers
+    const services = this.toProviders([
+      ...(this.getServicesInMetadata(options.entity) ?? []),
+      ...(options.services ?? []),
+    ])
+
+    if (services && services.length) {
+      // creates the services
+      instance.services = services
+        .filter((p) => !!p.class)
+        .map((provider) => this.findOrCreateService(provider.class))
     }
 
-    if (providers && providers.length) {
-      instance.providers = providers.map((provider) =>
-        this.findOrCreateProvider(provider),
-      )
-    }
     if (components && components.length) {
-      instance.components = components.map((component) => {
-        const i = new component(this, instance)
-        const values = properties
-          .filter((p) => p.for === component)
-          ?.map((p) => p.use)
-
-        values.forEach((value) => {
-          for (const key in value) {
-            ;(i as any)[key] = value[key]
+      // validate the `required` property in all the components passed as dependency
+      components
+        .filter((c) => !!c.class)
+        .map((c) => this.getRequiredComponentsInMetadata(c.class) ?? [])
+        .flat()
+        .forEach((r) => {
+          if (!components.find((c) => c.class === r)) {
+            throw new Error(
+              `Component ${r.name} is required in ${options.entity.name} entity`,
+            )
           }
         })
 
-        return i
-      })
+      // creates the components
+      instance.components = components
+        .filter((c) => !!c.class)
+        .map((c) => new c.class(c.id, this, instance))
     }
 
-    instance.providers.forEach((provider) => {
-      if (hasAwake(provider)) {
-        provider.onAwake()
-      }
-    })
+    const instances = [instance, ...instance.components, ...instance.services]
 
-    const instances = [instance, ...instance.components]
+    // invoke the `onAwake` method for the entity and it components and services
     instances.forEach((value) => {
       if (hasAwake(value)) {
         value.onAwake()
       }
     })
+
+    // set all the components or services properties
+    if (instance.components && instance.components.length) {
+      instance.components.forEach((c) => {
+        components
+          .filter((p) => p.id === c.id)
+          .filter((provider) => !!provider.use)
+          .forEach((provider) => {
+            for (const key in provider.use) {
+              ;(c as any)[key] = provider.use[key]
+            }
+          })
+      })
+    }
+
+    // invoke the `onStart` method for the entity and it components and services
     instances.forEach((value) => {
       if (hasStart(value)) {
         value.onStart()
@@ -194,25 +210,40 @@ class AsteroidsApplication implements IAsteroidsApplication {
     entity: E,
     component: Type<C>,
   ): C {
-    const c = new component(this, entity)
+    const c = new component(generateUUID(), this, entity)
     entity.components.push(c)
+
+    if (hasAwake(c)) {
+      c.onAwake()
+    }
+
+    if (hasStart(c)) {
+      c.onStart()
+    }
+
     this.components.push(c)
     return c
   }
 
   /**
-   * Method that adds a new provider to a specific entity instance
+   * Method that adds a new service to a specific entity instance
    *
-   * @param provider defines the provider type
-   * @returns an object that represents the provider instance
+   * @param service defines the service type
+   * @returns an object that represents the service instance
    */
-  public addProvider<E extends AbstractEntity, P extends AbstractProvider>(
+  public addService<E extends AbstractEntity, P extends AbstractService>(
     entity: E,
-    provider: Type<P>,
+    service: Type<P>,
   ): P {
-    const p = this.findOrCreateProvider(provider)
-    entity.providers.push(p)
-    return p
+    const p = this.findOrCreateService(service)
+
+    if (hasAwake(p)) {
+      p.onAwake()
+    }
+
+    entity.services.push(p)
+
+    return p as P
   }
 
   /**
@@ -245,49 +276,93 @@ class AsteroidsApplication implements IAsteroidsApplication {
     )
   }
 
-  private getComponents<E extends AbstractEntity>(
+  /**
+   * Method that, given an array of components or services or provider
+   * objects with references to components or services converts their all
+   * in providers, to make easier working with their properties and ids
+   *
+   * @param providers defines an array of types or providers
+   * @returns an array with all the providers passed in providers
+   */
+  private toProviders<T = AbstractComponent | AbstractService>(
+    providers: (Type<T> | IProvider<T>)[],
+  ): IProvider<T>[] {
+    return providers.map((p) => {
+      if ('class' in p || 'id' in p) {
+        return {
+          ...p,
+          id: p.id ?? generateUUID(),
+        }
+      }
+      return {
+        id: generateUUID(),
+        class: p,
+      }
+    })
+  }
+
+  /**
+   * Method that, given an entity, it takes from the metadata all it
+   * components, passed in the "components" property
+   *
+   * @param entity defines the entity type
+   * @returns an array with all the component types
+   */
+  private getComponentsInMetadata<E extends AbstractEntity>(
     entity: Type<E>,
   ): Type<AbstractComponent>[] {
-    return Reflect.getMetadata(ENTITY_OPTIONS, entity)?.components ?? []
+    return Reflect.getMetadata(ENTITY_OPTIONS, entity)?.components
   }
 
-  private getProviders<
-    T extends AbstractEntity | AbstractProvider | AbstractComponent,
-  >(target: Type<T>): Type<AbstractProvider>[] {
+  /**
+   * Method that, given an entity, or a component or a service it can take
+   * from the metadata all it services, passed in the "providers" property
+   *
+   * @param target defines the entity or component or service type
+   * @returns an array with all the service types
+   */
+  private getServicesInMetadata<
+    T extends AbstractEntity | AbstractService | AbstractComponent,
+  >(target: Type<T>): Type<AbstractService>[] {
     return (
-      Reflect.getMetadata(ENTITY_OPTIONS, target)?.providers ??
-      Reflect.getMetadata(PROVIDER_OPTIONS, target)?.providers ??
-      Reflect.getMetadata(COMPONENT_OPTIONS, target)?.providers ??
-      []
+      Reflect.getMetadata(ENTITY_OPTIONS, target)?.services ??
+      Reflect.getMetadata(SERVICE_OPTIONS, target)?.services ??
+      Reflect.getMetadata(COMPONENT_OPTIONS, target)?.services
     )
   }
 
-  private getProperties<E extends AbstractEntity>(
-    target: Type<E>,
-  ): IComponentProperty[] {
-    return Reflect.getMetadata(ENTITY_OPTIONS, target)?.properties ?? []
-  }
-
-  private findOrCreateProvider<P extends AbstractProvider>(
-    provider: Type<P>,
-  ): P {
-    let instance = this.providers.find(
-      (p) => p.constructor.name === provider.name,
+  /**
+   * Method that creates a new service and resolve all it dependecies
+   *
+   * @param service defines the service type
+   * @returns an object that represents the created service
+   */
+  private findOrCreateService(service: Type<AbstractService>): AbstractService {
+    let instance = this.services.find(
+      (p) => p.constructor.name === service.name,
     )
     if (!instance) {
-      const providers = this.getProviders(provider).map((p) =>
-        this.findOrCreateProvider(p),
+      const services = this.getServicesInMetadata(service).map((p) =>
+        this.findOrCreateService(p),
       )
-      instance = new provider(this, providers)
-      this.providers.push(instance)
+      instance = new service(generateUUID(), this, services)
+      this.services.push(instance)
     }
-    return instance as P
+    return instance
   }
 
-  private getRequiredComponents(
+  /**
+   * Method that, given an component, founds all it required components,
+   * that must be passed as dependency for the parent entity in order to
+   * make this component work as expected
+   *
+   * @param component defines the component type
+   * @returns an array with all the required components
+   */
+  private getRequiredComponentsInMetadata(
     component: Type<AbstractComponent>,
   ): Type<AbstractComponent>[] {
-    return Reflect.getMetadata(COMPONENT_OPTIONS, component)?.required ?? []
+    return Reflect.getMetadata(COMPONENT_OPTIONS, component)?.required
   }
 }
 
@@ -317,3 +392,10 @@ export class AsteroidsFactory {
     )
   }
 }
+
+/**
+ * Class that represents an empty entity, used to instantiate an entity
+ * with only components, without any logic or behaviour inside of it
+ */
+@Entity()
+export class DefaultEntity extends AbstractEntity {}
