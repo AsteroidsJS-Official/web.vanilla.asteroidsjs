@@ -1,6 +1,6 @@
 import { AbstractEntity } from './abstract-entity'
 
-import { AbstractProvider } from './abstract-provider'
+import { AbstractService } from './abstract-service'
 
 import { AbstractComponent } from './abstract-component'
 import { IComponentProperty } from './interfaces/component-property.interface'
@@ -20,11 +20,7 @@ import {
   hasLateLoop,
 } from './utils/validations'
 
-import {
-  COMPONENT_OPTIONS,
-  ENTITY_OPTIONS,
-  PROVIDER_OPTIONS,
-} from './constants'
+import { COMPONENT_OPTIONS, ENTITY_OPTIONS, SERVICE_OPTIONS } from './constants'
 
 /**
  * Class that represents the main application behaviour
@@ -43,10 +39,10 @@ class AsteroidsApplication implements IAsteroidsApplication {
   private components: AbstractComponent[] = []
 
   /**
-   * Property that defines an array of providers, that represents all the
-   * instantiated providers in the game
+   * Property that defines an array of services, that represents all the
+   * instantiated services in the game
    */
-  private providers: AbstractProvider[] = []
+  private services: AbstractService[] = []
 
   /**
    * Property that returns the canvas context
@@ -131,10 +127,10 @@ class AsteroidsApplication implements IAsteroidsApplication {
         ...(options.components ?? []),
       ]),
     ]
-    const providers = [
+    const services = [
       ...new Set([
-        ...this.getProviders(options.entity),
-        ...(options.providers ?? []),
+        ...this.getServices(options.entity),
+        ...(options.services ?? []),
       ]),
     ]
     const properties = [
@@ -156,9 +152,9 @@ class AsteroidsApplication implements IAsteroidsApplication {
       })
     }
 
-    if (providers && providers.length) {
-      instance.providers = providers.map((provider) =>
-        this.findOrCreateProvider(provider),
+    if (services && services.length) {
+      instance.services = services.map((service) =>
+        this.findOrCreateService(service),
       )
     }
 
@@ -168,7 +164,7 @@ class AsteroidsApplication implements IAsteroidsApplication {
       )
     }
 
-    const instances = [instance, ...instance.components, ...instance.providers]
+    const instances = [instance, ...instance.components, ...instance.services]
     instances.forEach((value) => {
       if (hasAwake(value)) {
         value.onAwake()
@@ -227,22 +223,22 @@ class AsteroidsApplication implements IAsteroidsApplication {
   }
 
   /**
-   * Method that adds a new provider to a specific entity instance
+   * Method that adds a new service to a specific entity instance
    *
-   * @param provider defines the provider type
-   * @returns an object that represents the provider instance
+   * @param service defines the service type
+   * @returns an object that represents the service instance
    */
-  public addProvider<E extends AbstractEntity, P extends AbstractProvider>(
+  public addService<E extends AbstractEntity, P extends AbstractService>(
     entity: E,
-    provider: Type<P>,
+    service: Type<P>,
   ): P {
-    const p = this.findOrCreateProvider(provider)
+    const p = this.findOrCreateService(service)
 
     if (hasAwake(p)) {
       p.onAwake()
     }
 
-    entity.providers.push(p)
+    entity.services.push(p)
 
     return p
   }
@@ -283,13 +279,13 @@ class AsteroidsApplication implements IAsteroidsApplication {
     return Reflect.getMetadata(ENTITY_OPTIONS, entity)?.components ?? []
   }
 
-  private getProviders<
-    T extends AbstractEntity | AbstractProvider | AbstractComponent,
-  >(target: Type<T>): Type<AbstractProvider>[] {
+  private getServices<
+    T extends AbstractEntity | AbstractService | AbstractComponent,
+  >(target: Type<T>): Type<AbstractService>[] {
     return (
-      Reflect.getMetadata(ENTITY_OPTIONS, target)?.providers ??
-      Reflect.getMetadata(PROVIDER_OPTIONS, target)?.providers ??
-      Reflect.getMetadata(COMPONENT_OPTIONS, target)?.providers ??
+      Reflect.getMetadata(ENTITY_OPTIONS, target)?.services ??
+      Reflect.getMetadata(SERVICE_OPTIONS, target)?.services ??
+      Reflect.getMetadata(COMPONENT_OPTIONS, target)?.services ??
       []
     )
   }
@@ -300,18 +296,16 @@ class AsteroidsApplication implements IAsteroidsApplication {
     return Reflect.getMetadata(ENTITY_OPTIONS, target)?.properties ?? []
   }
 
-  private findOrCreateProvider<P extends AbstractProvider>(
-    provider: Type<P>,
-  ): P {
-    let instance = this.providers.find(
-      (p) => p.constructor.name === provider.name,
+  private findOrCreateService<P extends AbstractService>(service: Type<P>): P {
+    let instance = this.services.find(
+      (p) => p.constructor.name === service.name,
     )
     if (!instance) {
-      const providers = this.getProviders(provider).map((p) =>
-        this.findOrCreateProvider(p),
+      const services = this.getServices(service).map((p) =>
+        this.findOrCreateService(p),
       )
-      instance = new provider(this, providers)
-      this.providers.push(instance)
+      instance = new service(this, services)
+      this.services.push(instance)
     }
     return instance as P
   }

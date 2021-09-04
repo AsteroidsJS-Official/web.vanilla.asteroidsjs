@@ -1,9 +1,10 @@
-import { COMPONENT_OPTIONS } from '../constants'
 import { IComponentOptions } from '../interfaces/component-options.interface'
+
+import { COMPONENT_OPTIONS } from '../constants'
 
 export function Component(options?: IComponentOptions): ClassDecorator {
   options ??= {}
-  options.providers ??= []
+  options.services ??= []
   options.required ?? []
 
   return (target) => {

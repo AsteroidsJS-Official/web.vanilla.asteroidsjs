@@ -1,6 +1,6 @@
 import { AbstractEntity } from '../abstract-entity'
 
-import { AbstractProvider } from '../abstract-provider'
+import { AbstractService } from '../abstract-service'
 
 import { AbstractComponent } from '../abstract-component'
 
@@ -23,9 +23,9 @@ export interface IAsteroidsApplication {
 
   destroy<T extends AbstractEntity | AbstractComponent>(instance: T): void
 
-  addProvider<E extends AbstractEntity, P extends AbstractProvider>(
+  addService<E extends AbstractEntity, P extends AbstractService>(
     entity: E,
-    provider: Type<P>,
+    service: Type<P>,
   ): P
 
   addComponent<E extends AbstractEntity, C extends AbstractComponent>(

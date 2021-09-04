@@ -1,10 +1,11 @@
-import { ENTITY_OPTIONS } from '../constants'
 import { IEntityOptions } from '../interfaces/entity-options.interface'
+
+import { ENTITY_OPTIONS } from '../constants'
 
 export function Entity(options?: IEntityOptions): ClassDecorator {
   options ??= {}
   options.components ??= []
-  options.providers ??= []
+  options.services ??= []
   options.properties ??= []
 
   return (target) => {

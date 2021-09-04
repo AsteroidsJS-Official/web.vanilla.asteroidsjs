@@ -1,6 +1,6 @@
 import { AbstractEntity } from './abstract-entity'
 
-import { AbstractProvider } from './abstract-provider'
+import { AbstractService } from './abstract-service'
 
 import { IAsteroidsApplication } from './interfaces/asteroids-application.interface'
 import { IContext } from './interfaces/context.interface'
@@ -68,8 +68,8 @@ export abstract class AbstractComponent {
    * @returns an object that represents the component instance, attached to
    * the same parent entity
    */
-  getProvider<T extends AbstractProvider>(component: Type<T>): T {
-    return this.entity.getProvider(component)
+  getService<T extends AbstractService>(component: Type<T>): T {
+    return this.entity.getService(component)
   }
 
   /**
@@ -96,14 +96,14 @@ export abstract class AbstractComponent {
   }
 
   /**
-   * Method that returns several child providers, attached to this entity
+   * Method that returns several child services, attached to this entity
    *
    * @param component defines the component type
    * @returns an array with objects that represents the component instance, attached to
    * this entity
    */
-  getProviders<P extends AbstractProvider>(provider: Type<P>): P[] {
-    return this.entity.getProviders(provider)
+  getServices<P extends AbstractService>(service: Type<P>): P[] {
+    return this.entity.getServices(service)
   }
 
   /**
@@ -116,22 +116,22 @@ export abstract class AbstractComponent {
   }
 
   /**
-   * Method that returns all the providers attached to this entity
+   * Method that returns all the services attached to this entity
    *
-   * @returns an array with objects that represents all the providers
+   * @returns an array with objects that represents all the services
    */
-  getAllProviders(): AbstractProvider[] {
-    return this.entity.getAllProviders()
+  getAllServices(): AbstractService[] {
+    return this.entity.getAllServices()
   }
 
   /**
-   * Method that adds a new provider to a specific entity instance
+   * Method that adds a new service to a specific entity instance
    *
-   * @param provider defines the provider type
-   * @returns an object that represents the provider instance
+   * @param service defines the service type
+   * @returns an object that represents the service instance
    */
-  addProvider<P extends AbstractProvider>(provider: Type<P>): P {
-    return this.game.addProvider(this.entity, provider)
+  addService<P extends AbstractService>(service: Type<P>): P {
+    return this.game.addService(this.entity, service)
   }
 
   /**

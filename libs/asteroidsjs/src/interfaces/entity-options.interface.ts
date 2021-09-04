@@ -1,4 +1,4 @@
-import { AbstractProvider } from '../abstract-provider'
+import { AbstractService } from '../abstract-service'
 
 import { AbstractComponent } from '../abstract-component'
 import { IComponentProperty } from './component-property.interface'
@@ -15,10 +15,10 @@ export interface IEntityOptions {
   components?: Type<AbstractComponent>[]
 
   /**
-   * Property that defines an array with all the provider classes that
+   * Property that defines an array with all the service classes that
    * will be instantiated and passed as dependency to the new entity
    */
-  providers?: Type<AbstractProvider>[]
+  services?: Type<AbstractService>[]
 
   /**
    * Property that defines an array with all the properties that will be
