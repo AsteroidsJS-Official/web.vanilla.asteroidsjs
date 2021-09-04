@@ -31,7 +31,7 @@ export class Vector3 {
    */
   public get normalized(): Vector3 {
     const result = 1 / this.magnitude
-    return new Vector3(this.x / result, this.y / result, this.z / result)
+    return new Vector3(this.x * result, this.y * result, this.z * result)
   }
 
   public constructor(public x = 0, public y = 0, public z = 0) {}

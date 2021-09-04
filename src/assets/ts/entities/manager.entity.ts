@@ -9,15 +9,15 @@ import {
 
 import { socket } from '../socket'
 
-import { BulletVirtual } from './bullet-virtual.entity'
-import { Bullet } from './bullet.entity'
-import { SpaceshipVirtual } from './spaceship-virtual.entity'
-import { Spaceship } from './spaceship.entity'
+import { Asteroid } from './master/asteroid.entity'
+import { Bullet } from './master/bullet.entity'
+import { ManagerAsteroids } from './master/manager-asteroids.entity'
+import { Spaceship } from './master/spaceship.entity'
+import { AsteroidVirtual } from './virtual/asteroid-virtual.entity'
+import { BulletVirtual } from './virtual/bullet-virtual.entity'
+import { SpaceshipVirtual } from './virtual/spaceship-virtual.entity'
 
-import { Rigidbody } from '../components/rigidbody.component'
-import { Transform } from '../components/transform.component'
-
-import { uuid } from '../../../../libs/asteroidsjs/src/utils/validations'
+import { RectCollider2 } from '../components/colliders/rect-collider2.component'
 
 /**
  * Class that represents the first entity to be loaded into the game
@@ -25,35 +25,45 @@ import { uuid } from '../../../../libs/asteroidsjs/src/utils/validations'
 @Entity()
 export class Manager extends AbstractEntity implements IOnStart {
   public onStart(): void {
-    if (this.game.getScreen().number === 1) {
-      setTimeout(() => {
-        this.master()
-      }, 100)
-    } else {
-      this.virtual()
-    }
+    this.master()
   }
 
   private master(): void {
-    const id = uuid()
     this.instantiate({
+      entity: ManagerAsteroids,
+    })
+
+    const spaceship = this.instantiate({
       use: {
-        id,
+        tag: `${Spaceship.name}`,
       },
       entity: Spaceship,
-      properties: [
+      components: [
         {
-          for: Transform,
+          class: RectCollider2,
+          use: {
+            localPosition: new Vector2(-50, -50),
+          },
+        },
+        {
+          class: RectCollider2,
+          use: {
+            localPosition: new Vector2(50, -50),
+          },
+        },
+        {
+          id: '__spaceship_transform__',
           use: {
             rotation: 0,
             dimensions: new Rect(50, 50),
           },
         },
         {
-          for: Rigidbody,
+          id: '__spaceship_rigidbody__',
           use: {
-            friction: 0.005,
+            friction: 0.03,
             mass: 10,
+            maxVelocity: 8,
             maxAngularVelocity: 0.09,
           },
         },
@@ -61,7 +71,7 @@ export class Manager extends AbstractEntity implements IOnStart {
     })
 
     socket.emit('instantiate', {
-      id,
+      id: spaceship.id,
       type: Spaceship.name,
       data: {
         position: new Vector2(),
@@ -79,9 +89,9 @@ export class Manager extends AbstractEntity implements IOnStart {
               id,
             },
             entity: SpaceshipVirtual,
-            properties: [
+            components: [
               {
-                for: Transform,
+                id: '__spaceship_virtual_transform__',
                 use: {
                   rotation: data.rotation,
                   position: data.position,
@@ -97,18 +107,36 @@ export class Manager extends AbstractEntity implements IOnStart {
               id,
             },
             entity: BulletVirtual,
-            properties: [
+            components: [
               {
-                for: Transform,
+                id: '__bullet_virtual_transform__',
                 use: {
                   rotation: data.rotation,
                   position: data.position,
                 },
               },
               {
-                for: Rigidbody,
+                id: '__bullet_virtual_rigidbody__',
                 use: {
                   velocity: data.velocity,
+                },
+              },
+            ],
+          })
+          break
+        case Asteroid.name:
+          this.instantiate({
+            use: {
+              id,
+              asteroidSize: data.asteroidSize,
+            },
+            entity: AsteroidVirtual,
+            components: [
+              {
+                id: '__asteroid_virtual_transform__',
+                use: {
+                  rotation: data.rotation,
+                  position: data.position,
                 },
               },
             ],

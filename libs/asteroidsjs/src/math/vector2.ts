@@ -28,8 +28,10 @@ export class Vector2 {
    * const normalizedVector = vector.nomalized // { x: 0.6, y: 0.8 }
    */
   public get normalized(): Vector2 {
-    const result = 1 / this.magnitude
-    return new Vector2(this.x / result, this.y / result)
+    if (!this.magnitude) {
+      return new Vector2(0, 0)
+    }
+    return new Vector2(this.x / this.magnitude, this.y / this.magnitude)
   }
 
   public constructor(public x = 0, public y = 0) {}

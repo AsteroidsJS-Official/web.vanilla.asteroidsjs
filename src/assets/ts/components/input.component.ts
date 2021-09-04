@@ -6,7 +6,7 @@ import {
   Vector2,
 } from '@asteroidsjs'
 
-import { Spaceship } from '../entities/spaceship.entity'
+import { Spaceship } from '../entities/master/spaceship.entity'
 
 import { Rigidbody } from './rigidbody.component'
 

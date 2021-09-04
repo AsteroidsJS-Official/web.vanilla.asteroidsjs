@@ -29,7 +29,7 @@ module.exports = {
           '/socket/',
           '/math/',
           '/entity/',
-          '/provider/',
+          '/service/',
           '/component/',
           '/interface/',
           '/utils/',

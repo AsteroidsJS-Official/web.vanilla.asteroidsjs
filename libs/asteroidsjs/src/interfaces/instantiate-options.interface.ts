@@ -14,5 +14,9 @@ export interface IInstantiateOptions<E extends AbstractEntity>
    */
   entity?: Type<E>
 
+  /**
+   * Property that defines properties that will be used to set values to
+   * this entity
+   */
   use?: Partial<E>
 }

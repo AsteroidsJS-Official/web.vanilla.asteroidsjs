@@ -131,6 +131,7 @@ export class Rigidbody extends AbstractComponent implements IOnAwake, IOnLoop {
       this.transform.position,
       this.velocity,
     )
+
     this.velocity = Vector2.sum(this.velocity, aceleration)
   }
 
