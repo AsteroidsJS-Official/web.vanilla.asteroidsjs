@@ -12,7 +12,7 @@ import { socket } from '../socket'
 
 import { Bullet } from './bullet.entity'
 
-import { CircleCollider2 } from '../components/colliders/circle-collider2.component'
+import { RectCollider2 } from '../components/colliders/rect-collider2.component'
 import { Drawer } from '../components/drawer.component'
 import { Input } from '../components/input.component'
 import { RenderOverflow } from '../components/renderers/render-overflow.component'
@@ -36,7 +36,7 @@ import spaceshipImg from '../../svg/spaceship.svg'
     Transform,
     Rigidbody,
     RenderOverflow,
-    CircleCollider2,
+    RectCollider2,
   ],
   properties: [
     {
@@ -44,6 +44,12 @@ import spaceshipImg from '../../svg/spaceship.svg'
       use: {
         force: 3,
         angularForce: 0.03,
+      },
+    },
+    {
+      for: RectCollider2,
+      use: {
+        localPosition: new Vector2(-50, 50),
       },
     },
   ],

@@ -20,7 +20,6 @@ import { CircleCollider2 } from './circle-collider2.component'
 export class RectCollider2 extends AbstractCollider {
   draw(): void {
     this.getContext().translate(this.canvasPosition.x, this.canvasPosition.y)
-    this.getContext().rotate(this.transform.rotation)
 
     this.getContext().beginPath()
     this.getContext().fillStyle = '#05FF0020'
@@ -32,7 +31,6 @@ export class RectCollider2 extends AbstractCollider {
     )
     this.getContext().fill()
 
-    this.getContext().rotate(-this.transform.rotation)
     this.getContext().translate(-this.canvasPosition.x, -this.canvasPosition.y)
   }
 

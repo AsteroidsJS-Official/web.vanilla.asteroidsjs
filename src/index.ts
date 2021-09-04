@@ -2,12 +2,11 @@ import './global.scss'
 import 'reflect-metadata'
 
 import { AsteroidsFactory } from '@asteroidsjs'
+import { IScreen } from '@asteroidsjs'
 
 import { socket } from './assets/ts/socket'
 
 import { Manager } from './assets/ts/entities/manager.entity'
-
-import { IScreen } from '../libs/asteroidsjs/src/interfaces/screen.interface'
 
 const connectScreenData = {
   number: window.location.pathname.split('/screen/')[1].split('/')[0],
@@ -85,9 +84,3 @@ function bootstrap(response: IScreen, displacement: number): void {
   })
   game.start()
 }
-
-// bootstrap: [Manager],
-// screenNumber: response.number,
-// width: response.width,
-// height: response.height,
-// displacement,

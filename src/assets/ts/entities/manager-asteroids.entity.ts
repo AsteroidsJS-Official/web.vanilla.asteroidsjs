@@ -59,34 +59,20 @@ export class ManagerAsteroids extends AbstractEntity implements IOnStart {
           : canvasHeight / 2 + offset
     }
 
-    const rotation = Math.floor(Math.random() * 2 * Math.PI)
-
-    const velocity = Vector2.multiply(new Vector2(x, y).normalized, -2)
-
     this.instantiate({
       use: {
         id,
         asteroidSize: AsteroidSizeEnum.large,
       },
       entity: Asteroid,
-      components: [CircleCollider2],
+      components: [RectCollider2],
       properties: [
         {
           for: Transform,
           use: {
-            rotation,
             position: new Vector2(0, 300),
           },
         },
-        // {
-        //   for: Rigidbody,
-        //   use: {
-        //     velocity,
-        //     friction: 0,
-        //     mass: 15 * (asteroidSize + 1),
-        //     maxAngularVelocity: 0.09,
-        //   },
-        // },
       ],
     })
 
@@ -95,7 +81,6 @@ export class ManagerAsteroids extends AbstractEntity implements IOnStart {
       type: Asteroid.name,
       data: {
         position: new Vector2(x, y),
-        rotation,
         asteroidSize,
       },
     } as ISocketData)

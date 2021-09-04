@@ -8,6 +8,8 @@ import {
   Vector2,
   Rect,
   AbstractEntity,
+  vector2ToAngle,
+  angleToVector2,
 } from '@asteroidsjs'
 
 import { Rigidbody } from '../rigidbody.component'
@@ -30,6 +32,11 @@ export abstract class AbstractCollider
   implements IOnAwake, IOnFixedLoop, IDraw
 {
   /**
+   * Property that represents the collider posision relative to it entity
+   */
+  localPosition = new Vector2()
+
+  /**
    * Property that defines an instance of the {@link Rigidbody} component
    */
   protected rigidbody: Rigidbody
@@ -46,11 +53,6 @@ export abstract class AbstractCollider
   protected collisions: ICollision2[] = []
 
   /**
-   * Property that represents the collider posision relative to it entity
-   */
-  private _position: Vector2
-
-  /**
    * Property that represents the collider dimensions
    */
   private _dimensions: Rect
@@ -59,14 +61,16 @@ export abstract class AbstractCollider
    * Property that represents the collider posision relative to it entity
    */
   get position(): Vector2 {
-    return this._position ?? this.transform.position
-  }
-
-  /**
-   * Property that represents the collider posision relative to it entity
-   */
-  set position(value: Vector2) {
-    this._position = value
+    return Vector2.sum(
+      this.transform.position,
+      Vector2.multiply(
+        angleToVector2(
+          vector2ToAngle(this.localPosition.normalized) -
+            this.transform.rotation,
+        ),
+        this.localPosition.magnitude,
+      ),
+    )
   }
 
   /**
@@ -81,6 +85,16 @@ export abstract class AbstractCollider
    */
   set dimensions(value: Rect) {
     this._dimensions = value
+  }
+
+  /**
+   * Property that defines the entity position in html canvas
+   */
+  get canvasPosition(): Vector2 {
+    return new Vector2(
+      this.getContext().canvas.width / 2 + this.position.x,
+      this.getContext().canvas.height / 2 - this.position.y,
+    )
   }
 
   abstract draw(): void
