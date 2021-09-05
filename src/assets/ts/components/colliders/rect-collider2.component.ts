@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
-import { abs, AbstractEntity, Component, Vector2 } from '@asteroidsjs'
+import { abs, AbstractEntity, Component, Rect, Vector2 } from '@asteroidsjs'
 
 import { Rigidbody } from '../rigidbody.component'
 import { Transform } from '../transform.component'
@@ -49,24 +49,31 @@ export class RectCollider2 extends AbstractCollider {
     const rectColliders = entity.getComponents(RectCollider2) ?? []
     const circleColliders = entity.getComponents(CircleCollider2) ?? []
 
-    if (rectColliders.some((collider) => this.isCollidingWithRect(collider))) {
-      return true
+    if (rectColliders && rectColliders.length) {
+      return rectColliders.some((collider) =>
+        this.isCollidingWithRect(collider),
+      )
     }
 
-    return circleColliders.some((collider) =>
-      this.isCollidingWithCircle(collider),
-    )
+    if (circleColliders && circleColliders.length) {
+      return circleColliders.some((collider) =>
+        this.isCollidingWithCircle(collider),
+      )
+    }
+
+    return this.isCollidingWithRect(entity.getComponent(Transform))
   }
 
   /**
    * Method that check if the two rect colliders are colliding
    *
-   * @param entity defines the second entity
+   * @param transform defines the second entity
    * @returns true if the two entities are colliding, otherwise false
    */
-  private isCollidingWithRect(entity: AbstractCollider): boolean {
-    const transform = entity.getComponent(Transform)
-
+  private isCollidingWithRect(transform: {
+    position: Vector2
+    dimensions: Rect
+  }): boolean {
     return !(
       this.position.x + this.dimensions.width / 2 <
         transform.position.x - transform.dimensions.width / 2 ||
@@ -83,35 +90,34 @@ export class RectCollider2 extends AbstractCollider {
    * Method that check if the this circular collider is colliding with
    * some rect collider
    *
-   * @param entity defines the second entity
+   * @param collider defines the second entity
    * @returns true if the two entities are colliding, otherwise false
    */
-  private isCollidingWithCircle(entity: AbstractCollider): boolean {
-    const transform = entity.getComponent(Transform)
+  private isCollidingWithCircle(collider: AbstractCollider): boolean {
     const diff = new Vector2(
-      abs(this.position.x - transform.position.x),
-      abs(this.position.y - transform.position.y),
+      abs(this.position.x - collider.position.x),
+      abs(this.position.y - collider.position.y),
     )
 
-    if (diff.x > transform.dimensions.width / 2 + this.dimensions.width / 2) {
+    if (diff.x > collider.dimensions.width / 2 + this.dimensions.width / 2) {
       return false
     }
 
-    if (diff.y > transform.dimensions.height / 2 + this.dimensions.height / 2) {
+    if (diff.y > collider.dimensions.height / 2 + this.dimensions.height / 2) {
       return false
     }
 
-    if (diff.x <= transform.dimensions.width / 2) {
+    if (diff.x <= collider.dimensions.width / 2) {
       return true
     }
 
-    if (diff.y <= transform.dimensions.height / 2) {
+    if (diff.y <= collider.dimensions.height / 2) {
       return true
     }
 
     const square =
-      Math.pow(diff.x - transform.dimensions.width / 2, 2) +
-      Math.pow(diff.y - transform.dimensions.height / 2, 2)
+      Math.pow(diff.x - collider.dimensions.width / 2, 2) +
+      Math.pow(diff.y - collider.dimensions.height / 2, 2)
 
     return square <= Math.pow(this.dimensions.width / 2, 2)
   }
