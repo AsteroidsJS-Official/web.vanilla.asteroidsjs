@@ -192,14 +192,24 @@ function setupSocketScreen() {
     socket.on('get-screens', getScreens)
 
     /**
-     * Creates a new entity
+     * Creates a new entity.
      *
-     * @param {SocketData} data - The data used to create the new entity
+     * @param {SocketData} data - The data used to create the new entity.
      */
     function onInstantiate(data) {
       ioScreen.to('slave').emit('instantiate', data)
     }
     socket.on('instantiate', onInstantiate)
+
+    /**
+     * Destroys an entity.
+     *
+     * @param {string} id - The entity id to be destroyed.
+     */
+    function onDestroy(id) {
+      ioScreen.to('slave').emit('destroy', id)
+    }
+    socket.on('destroy', onDestroy)
 
     /**
      * Destroyes some entity
