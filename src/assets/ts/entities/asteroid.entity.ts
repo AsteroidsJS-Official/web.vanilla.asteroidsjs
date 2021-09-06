@@ -18,6 +18,7 @@ import { AbstractEntity } from '../engine/abstract-entity'
 import { Entity } from '../engine/decorators/entity.decorator'
 import { IDraw } from '../engine/interfaces/draw.interface'
 import { IOnAwake } from '../engine/interfaces/on-awake.interface'
+import { IOnDestroy } from '../engine/interfaces/on-destory.interface'
 import { IOnLoop } from '../engine/interfaces/on-loop.interface'
 import { IOnStart } from '../engine/interfaces/on-start.interface'
 import { Rect } from '../engine/math/rect'
@@ -28,7 +29,7 @@ import { Vector2 } from '../engine/math/vector2'
 })
 export class Asteroid
   extends AbstractEntity
-  implements IOnAwake, IOnStart, IDraw, IOnLoop
+  implements IOnAwake, IOnStart, IDraw, IOnLoop, IOnDestroy
 {
   private transform: Transform
 
@@ -36,7 +37,7 @@ export class Asteroid
 
   private _asteroidSize: number
 
-  private image: HTMLImageElement
+  public image: HTMLImageElement
 
   public set asteroidSize(size: number) {
     this._asteroidSize = size
@@ -77,6 +78,10 @@ export class Asteroid
     }, 6000)
   }
 
+  public onDestroy(): void {
+    socket.emit('destroy', this.id)
+  }
+
   public onLoop(): void {
     const overflowingX = isOverflowingX(
       this.game.getContext().canvas.width,
@@ -109,7 +114,7 @@ export class Asteroid
   }
 
   public draw(): void {
-    this.drawCircle()
+    this.drawAsteroid()
   }
 
   /**
@@ -122,8 +127,12 @@ export class Asteroid
       const id = uuid()
       const rotation = Math.random() * 2 * Math.PI
       const direction = new Vector2(Math.sin(rotation), Math.cos(rotation))
+      const position = new Vector2(
+        this.transform.position.x,
+        this.transform.position.y,
+      )
 
-      this.instantiate({
+      const fragment = this.instantiate({
         use: {
           id,
           asteroidSize: this._asteroidSize - 1,
@@ -134,10 +143,7 @@ export class Asteroid
             for: Transform,
             use: {
               rotation,
-              position: new Vector2(
-                this.transform.position.x,
-                this.transform.position.y,
-              ),
+              position,
             },
           },
           {
@@ -152,10 +158,21 @@ export class Asteroid
           },
         ],
       })
+
+      socket.emit('instantiate', {
+        id,
+        type: Asteroid.name,
+        data: {
+          asteroidSize: fragment._asteroidSize,
+          image: fragment.image.src,
+          rotation,
+          position,
+        },
+      })
     }
   }
 
-  private drawCircle(): void {
+  private drawAsteroid(): void {
     this.game
       .getContext()
       .translate(
@@ -164,12 +181,6 @@ export class Asteroid
       )
     this.game.getContext().rotate(this.transform.rotation)
 
-    // this.game.getContext().beginPath()
-    // this.game.getContext().fillStyle = '#484848'
-    // this.game
-    //   .getContext()
-    //   .arc(0, 0, this.transform.dimensions.width / 2, 0, 2 * Math.PI)
-    // this.game.getContext().fill()
     this.game.getContext().shadowColor = 'black'
     this.game.getContext().shadowBlur = 5
 

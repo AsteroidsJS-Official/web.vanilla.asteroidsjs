@@ -25,6 +25,12 @@ export class AsteroidVirtual
 
   private _asteroidSize: number
 
+  private _image = new Image()
+
+  public set image(src: string) {
+    this._image.src = src
+  }
+
   public set asteroidSize(size: number) {
     this._asteroidSize = size
   }
@@ -35,8 +41,8 @@ export class AsteroidVirtual
 
   public onStart(): void {
     this.transform.dimensions = new Rect(
-      15 * (this._asteroidSize + 2),
-      15 * (this._asteroidSize + 2),
+      10 * ((this._asteroidSize + 2) * 2),
+      10 * ((this._asteroidSize + 2) * 2),
     )
 
     socket.on('update-screen', ({ id, data }: ISocketData) => {
@@ -45,6 +51,12 @@ export class AsteroidVirtual
       }
       this.transform.position = data.position
       this.transform.rotation = data.rotation
+    })
+
+    socket.on('destroy', (id: string) => {
+      if (id === this.id) {
+        this.destroy(this)
+      }
     })
   }
 
@@ -72,24 +84,35 @@ export class AsteroidVirtual
   }
 
   public draw(): void {
-    this.drawCircle()
+    this.drawAsteroid()
   }
 
-  private drawCircle(): void {
+  private drawAsteroid(): void {
     this.game
       .getContext()
       .translate(
         this.transform.canvasPosition.x,
         this.transform.canvasPosition.y,
       )
+    this.game.getContext().rotate(this.transform.rotation)
 
-    this.game.getContext().beginPath()
-    this.game.getContext().fillStyle = '#484848'
+    this.game.getContext().shadowColor = 'black'
+    this.game.getContext().shadowBlur = 5
+
     this.game
       .getContext()
-      .arc(0, 0, this.transform.dimensions.width / 2, 0, 2 * Math.PI)
-    this.game.getContext().fill()
+      .drawImage(
+        this._image,
+        0 - this.transform.dimensions.width / 2,
+        0 - this.transform.dimensions.height / 2,
+        this.transform.dimensions.width,
+        this.transform.dimensions.height,
+      )
 
+    this.game.getContext().shadowColor = 'transparent'
+    this.game.getContext().shadowBlur = 0
+
+    this.game.getContext().rotate(-this.transform.rotation)
     this.game
       .getContext()
       .translate(
