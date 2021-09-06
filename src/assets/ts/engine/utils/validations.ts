@@ -6,6 +6,7 @@ import { IDraw } from '../interfaces/draw.interface'
 import { IOnAwake } from '../interfaces/on-awake.interface'
 import { IOnLoop } from '../interfaces/on-loop.interface'
 import { IOnStart } from '../interfaces/on-start.interface'
+import { IOnDestroy } from './../interfaces/on-destory.interface'
 
 /**
  * Function that validates if some object is of type {@link Entity}
@@ -48,6 +49,17 @@ export function hasAwake(entity: any): entity is IOnAwake {
  */
 export function hasStart(entity: any): entity is IOnStart {
   return 'onStart' in entity
+}
+
+/**
+ * Function that validates if some object is of type {@link IOnDestroy}
+ *
+ * @param entity defines an object that will be validated
+ * @returns true if the object implements the {@link IOnDestroy} interface, otherwise
+ * false
+ */
+export function hasDestroy(entity: any): entity is IOnDestroy {
+  return 'onDestroy' in entity
 }
 
 /**
