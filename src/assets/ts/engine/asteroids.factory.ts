@@ -1,4 +1,10 @@
-import { hasStart, hasLoop, hasAwake, isEntity } from './utils/validations'
+import {
+  hasStart,
+  hasLoop,
+  hasAwake,
+  isEntity,
+  hasDestroy,
+} from './utils/validations'
 
 import { IScreen } from '../interfaces/screen.interface'
 import { AbstractComponent } from './abstract-component'
@@ -241,6 +247,10 @@ class AsteroidsApplication implements IAsteroidsApplication {
   public destroy<T extends AbstractEntity | AbstractComponent>(
     instance: T,
   ): void {
+    if (hasDestroy(instance)) {
+      instance.onDestroy()
+    }
+
     if (isEntity(instance)) {
       this.entities = this.entities.filter((entity) => entity !== instance)
       instance.components.forEach((component) => this.destroy(component))
