@@ -54,7 +54,7 @@ export class ManagerAsteroids extends AbstractEntity implements IOnStart {
 
     const velocity = Vector2.multiply(new Vector2(x, y).normalized, -2)
 
-    this.instantiate({
+    const asteroid = this.instantiate({
       use: {
         id,
         asteroidSize,
@@ -88,7 +88,7 @@ export class ManagerAsteroids extends AbstractEntity implements IOnStart {
         position: new Vector2(x, y),
         rotation,
         asteroidSize,
-        angularVelocity: 0.05 / (asteroidSize + 1),
+        image: asteroid.image.src,
       },
     } as ISocketData)
   }
