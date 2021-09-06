@@ -8,6 +8,7 @@ import { IOnFixedLoop } from '../interfaces/on-fixed-loop.interface'
 import { IOnLateLoop } from '../interfaces/on-late-loop.interface'
 import { IOnLoop } from '../interfaces/on-loop.interface'
 import { IOnStart } from '../interfaces/on-start.interface'
+import { IOnDestroy } from './../interfaces/on-destory.interface'
 
 /**
  * Function that validates if some object is of type {@link Entity}
@@ -53,7 +54,18 @@ export function hasFixedLoop(entity: any): entity is IOnFixedLoop {
 }
 
 /**
- * Function that validates if some object is of type {@link IOnAwake}
+ * Function that validates if some object is of type {@link IOnDestroy}
+ *
+ * @param entity defines an object that will be validated
+ * @returns true if the object implements the {@link IOnDestroy} interface, otherwise
+ * false
+ */
+export function hasDestroy(entity: any): entity is IOnDestroy {
+  return 'onDestroy' in entity
+}
+
+/**
+ * Function that validates if some object is of type {@link IOnDraw}
  *
  * @param entity defines an object that will be validated
  * @returns true if the object implements the {@link IOnAwake} interface, otherwise

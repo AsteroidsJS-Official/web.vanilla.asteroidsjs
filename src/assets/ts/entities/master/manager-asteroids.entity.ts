@@ -1,17 +1,18 @@
-import {
-  AbstractEntity,
-  Entity,
-  generateUUID,
-  IOnStart,
-  ISocketData,
-  Vector2,
-} from '@asteroidsjs'
+import { ISocketData } from '../interfaces/socket-data.interface'
+import { socket } from '../socket'
 
-import { socket } from '../../socket'
+import { Vector2 } from '../engine/math/vector2'
 
+import { AbstractEntity } from '../engine/abstract-entity'
+import { Entity } from '../engine/decorators/entity.decorator'
 import { Asteroid } from './asteroid.entity'
 
-import { AsteroidSizeEnum } from '../../enums/asteroid.enum'
+import { Rigidbody } from '../components/rigidbody.component'
+import { Transform } from '../components/transform.component'
+
+import { IOnStart } from '../engine/interfaces/on-start.interface'
+
+import { uuid } from '../engine/utils/validations'
 
 /**
  * Class that represents the first entity to be loaded into the game
@@ -19,11 +20,16 @@ import { AsteroidSizeEnum } from '../../enums/asteroid.enum'
 @Entity()
 export class ManagerAsteroids extends AbstractEntity implements IOnStart {
   public onStart(): void {
-    this.generateAsteroid()
+    for (let i = 0; i < 3; i++) {
+      this.generateAsteroid()
+    }
+    setInterval(() => {
+      this.generateAsteroid()
+    }, 10000)
   }
 
   private generateAsteroid(): void {
-    const id = generateUUID()
+    const id = uuid()
     const sizes = [0, 1, 2, 3, 4]
     const asteroidSize = sizes[Math.floor(Math.random() * sizes.length)]
 
@@ -47,17 +53,32 @@ export class ManagerAsteroids extends AbstractEntity implements IOnStart {
           : canvasHeight / 2 + offset
     }
 
-    this.instantiate({
+    const rotation = Math.random() * 2 * Math.PI
+
+    const velocity = Vector2.multiply(new Vector2(x, y).normalized, -2)
+
+    const asteroid = this.instantiate({
       use: {
         id,
-        asteroidSize: AsteroidSizeEnum.large,
+        asteroidSize,
       },
       entity: Asteroid,
-      components: [
+      properties: [
         {
-          id: '__asteroid_transform__',
+          for: Transform,
           use: {
-            position: new Vector2(0, 300),
+            rotation,
+            position: new Vector2(x, y),
+          },
+        },
+        {
+          for: Rigidbody,
+          use: {
+            velocity,
+            friction: 0,
+            mass: 15 * (asteroidSize + 1),
+            maxAngularVelocity: 0.09,
+            angularVelocity: 0.05 / (asteroidSize + 1),
           },
         },
       ],
@@ -68,7 +89,9 @@ export class ManagerAsteroids extends AbstractEntity implements IOnStart {
       type: Asteroid.name,
       data: {
         position: new Vector2(x, y),
+        rotation,
         asteroidSize,
+        image: asteroid.image.src,
       },
     } as ISocketData)
   }
