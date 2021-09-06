@@ -1,44 +1,52 @@
-import { socket } from '../socket'
+import {
+  Entity,
+  AbstractEntity,
+  IOnAwake,
+  IOnStart,
+  IDraw,
+  IOnLoop,
+  IOnDestroy,
+  Rect,
+  isOverflowingX,
+  isOverflowingY,
+  Vector2,
+} from '@asteroidsjs'
 
-import { Rect } from '../engine/math/rect'
-import { Vector2 } from '../engine/math/vector2'
+import { socket } from '../../socket'
 
-import { AbstractEntity } from '../engine/abstract-entity'
-import { Entity } from '../engine/decorators/entity.decorator'
+import { Drawer } from '../../components/drawer.component'
+import { RenderOverflow } from '../../components/renderers/render-overflow.component'
+import { Render } from '../../components/renderers/render.component'
+import { Rigidbody } from '../../components/rigidbody.component'
+import { Transform } from '../../components/transform.component'
 
-import { RenderOverflow } from '../components/render-overflow.component'
-import { Render } from '../components/render.component'
-import { Rigidbody } from '../components/rigidbody.component'
-import { Transform } from '../components/transform.component'
-
-import { IDraw } from '../engine/interfaces/draw.interface'
-import { IOnAwake } from '../engine/interfaces/on-awake.interface'
-
-import { IOnDestroy } from '../engine/interfaces/on-destory.interface'
-import { isOverflowingX, isOverflowingY } from '../engine/utils/overflow'
-import { uuid } from '../engine/utils/validations'
-
-import asteroidLg1 from '../../svg/asteroid-lg-1.svg'
-import asteroidLg2 from '../../svg/asteroid-lg-2.svg'
-import asteroidLg3 from '../../svg/asteroid-lg-3.svg'
-import asteroidMd1 from '../../svg/asteroid-md-1.svg'
-import asteroidMd2 from '../../svg/asteroid-md-2.svg'
-import asteroidSm from '../../svg/asteroid-sm.svg'
-import asteroidXs from '../../svg/asteroid-xs.svg'
-
-import { IOnLoop } from '../engine/interfaces/on-loop.interface'
-import { IOnStart } from '../engine/interfaces/on-start.interface'
+import asteroidLg1 from '../../../svg/asteroid-lg-1.svg'
+import asteroidLg2 from '../../../svg/asteroid-lg-2.svg'
+import asteroidLg3 from '../../../svg/asteroid-lg-3.svg'
+import asteroidMd1 from '../../../svg/asteroid-md-1.svg'
+import asteroidMd2 from '../../../svg/asteroid-md-2.svg'
+import asteroidSm from '../../../svg/asteroid-sm.svg'
+import asteroidXs from '../../../svg/asteroid-xs.svg'
 
 @Entity({
-  components: [Transform, Rigidbody, Render],
+  components: [
+    Render,
+    Drawer,
+    {
+      id: '__asteroid_transform__',
+      class: Transform,
+    },
+    {
+      id: '__asteroid_rigidbody__',
+      class: Rigidbody,
+    },
+  ],
 })
 export class Asteroid
   extends AbstractEntity
   implements IOnAwake, IOnStart, IDraw, IOnLoop, IOnDestroy
 {
   private transform: Transform
-
-  private rigidbody: Rigidbody
 
   private _asteroidSize: number
 
@@ -50,7 +58,6 @@ export class Asteroid
 
   public onAwake(): void {
     this.transform = this.getComponent(Transform)
-    this.rigidbody = this.getComponent(Rigidbody)
   }
 
   public onStart(): void {
@@ -129,7 +136,6 @@ export class Asteroid
    */
   private generateAsteroidFragments(amount: number): void {
     for (let i = 0; i < amount; i++) {
-      const id = uuid()
       const rotation = Math.random() * 2 * Math.PI
       const direction = new Vector2(Math.sin(rotation), Math.cos(rotation))
       const position = new Vector2(
@@ -139,20 +145,19 @@ export class Asteroid
 
       const fragment = this.instantiate({
         use: {
-          id,
           asteroidSize: this._asteroidSize - 1,
         },
         entity: Asteroid,
-        properties: [
+        components: [
           {
-            for: Transform,
+            id: '__asteroid_transform__',
             use: {
               rotation,
               position,
             },
           },
           {
-            for: Rigidbody,
+            id: '__asteroid_rigidbody__',
             use: {
               velocity: Vector2.multiply(direction.normalized, 2),
               friction: 0,
@@ -165,7 +170,7 @@ export class Asteroid
       })
 
       socket.emit('instantiate', {
-        id,
+        id: fragment.id,
         type: Asteroid.name,
         data: {
           asteroidSize: fragment._asteroidSize,

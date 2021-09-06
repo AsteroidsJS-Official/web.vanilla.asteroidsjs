@@ -1,5 +1,7 @@
 import { AbstractComponent, Component, Rect, Vector2 } from '@asteroidsjs'
 
+import { Asteroid } from '../entities/master/asteroid.entity'
+
 /**
  * Component that adds soma spacial behaviours such as position and rotation
  */
@@ -90,6 +92,7 @@ export class Transform extends AbstractComponent {
       this._position = value
       return
     }
+
     this.localPosition = Vector2.sum(
       value,
       Vector2.multiply(this.parent.position, -1),

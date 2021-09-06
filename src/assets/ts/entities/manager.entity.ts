@@ -25,7 +25,13 @@ import { RectCollider2 } from '../components/colliders/rect-collider2.component'
 @Entity()
 export class Manager extends AbstractEntity implements IOnStart {
   public onStart(): void {
-    this.master()
+    if (this.game.getScreen().number === 1) {
+      setTimeout(() => {
+        this.master()
+      }, 100)
+    } else {
+      this.virtual()
+    }
   }
 
   private master(): void {
@@ -113,12 +119,14 @@ export class Manager extends AbstractEntity implements IOnStart {
                 use: {
                   rotation: data.rotation,
                   position: data.position,
+                  dimensions: new Rect(2, 14),
                 },
               },
               {
                 id: '__bullet_virtual_rigidbody__',
                 use: {
                   velocity: data.velocity,
+                  mass: 3,
                 },
               },
             ],

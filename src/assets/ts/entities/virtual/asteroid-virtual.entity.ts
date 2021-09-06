@@ -1,24 +1,32 @@
-import { ISocketData } from '../interfaces/socket-data.interface'
-import { socket } from '../socket'
+import {
+  AbstractEntity,
+  Entity,
+  IDraw,
+  IOnAwake,
+  IOnLoop,
+  IOnStart,
+  ISocketData,
+  isOverflowingX,
+  isOverflowingY,
+  Rect,
+} from '@asteroidsjs'
 
-import { Rect } from '../engine/math/rect'
+import { socket } from '../../socket'
 
-import { AbstractEntity } from '../engine/abstract-entity'
-import { Entity } from '../engine/decorators/entity.decorator'
-
-import { RenderOverflow } from '../components/render-overflow.component'
-import { Render } from '../components/render.component'
-import { Transform } from '../components/transform.component'
-
-import { IDraw } from '../engine/interfaces/draw.interface'
-import { IOnAwake } from '../engine/interfaces/on-awake.interface'
-import { IOnLoop } from '../engine/interfaces/on-loop.interface'
-import { IOnStart } from '../engine/interfaces/on-start.interface'
-
-import { isOverflowingX, isOverflowingY } from '../engine/utils/overflow'
+import { Drawer } from '../../components/drawer.component'
+import { RenderOverflow } from '../../components/renderers/render-overflow.component'
+import { Render } from '../../components/renderers/render.component'
+import { Transform } from '../../components/transform.component'
 
 @Entity({
-  components: [Transform, Render],
+  components: [
+    Render,
+    Drawer,
+    {
+      id: '__asteroid_virtual_transform__',
+      class: Transform,
+    },
+  ],
 })
 export class AsteroidVirtual
   extends AbstractEntity

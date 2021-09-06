@@ -4,7 +4,6 @@ import {
   IDraw,
   IOnAwake,
   IOnLoop,
-  Rect,
   Vector2,
 } from '@asteroidsjs'
 
@@ -20,16 +19,12 @@ import { IBullet } from '../../interfaces/bullet.interface'
     Drawer,
     Render,
     {
+      id: '__bullet_virtual_transform__',
       class: Transform,
-      use: {
-        dimensions: new Rect(2, 14),
-      },
     },
     {
+      id: '__bullet_virtual_rigidbody__',
       class: Rigidbody,
-      use: {
-        mass: 3,
-      },
     },
   ],
 })

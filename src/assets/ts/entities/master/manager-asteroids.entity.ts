@@ -1,18 +1,17 @@
-import { ISocketData } from '../interfaces/socket-data.interface'
-import { socket } from '../socket'
+import {
+  Entity,
+  AbstractEntity,
+  IOnStart,
+  Vector2,
+  ISocketData,
+} from '@asteroidsjs'
 
-import { Vector2 } from '../engine/math/vector2'
+import { socket } from '../../socket'
 
-import { AbstractEntity } from '../engine/abstract-entity'
-import { Entity } from '../engine/decorators/entity.decorator'
 import { Asteroid } from './asteroid.entity'
 
-import { Rigidbody } from '../components/rigidbody.component'
-import { Transform } from '../components/transform.component'
-
-import { IOnStart } from '../engine/interfaces/on-start.interface'
-
-import { uuid } from '../engine/utils/validations'
+import { Rigidbody } from '../../components/rigidbody.component'
+import { Transform } from '../../components/transform.component'
 
 /**
  * Class that represents the first entity to be loaded into the game
@@ -29,7 +28,6 @@ export class ManagerAsteroids extends AbstractEntity implements IOnStart {
   }
 
   private generateAsteroid(): void {
-    const id = uuid()
     const sizes = [0, 1, 2, 3, 4]
     const asteroidSize = sizes[Math.floor(Math.random() * sizes.length)]
 
@@ -59,20 +57,19 @@ export class ManagerAsteroids extends AbstractEntity implements IOnStart {
 
     const asteroid = this.instantiate({
       use: {
-        id,
         asteroidSize,
       },
       entity: Asteroid,
-      properties: [
+      components: [
         {
-          for: Transform,
+          id: '__asteroid_transform__',
           use: {
             rotation,
             position: new Vector2(x, y),
           },
         },
         {
-          for: Rigidbody,
+          id: '__asteroid_rigidbody__',
           use: {
             velocity,
             friction: 0,
@@ -85,7 +82,7 @@ export class ManagerAsteroids extends AbstractEntity implements IOnStart {
     })
 
     socket.emit('instantiate', {
-      id,
+      id: asteroid.id,
       type: Asteroid.name,
       data: {
         position: new Vector2(x, y),

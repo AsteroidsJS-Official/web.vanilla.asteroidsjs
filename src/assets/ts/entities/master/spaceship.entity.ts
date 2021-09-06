@@ -1,7 +1,6 @@
 import {
   AbstractEntity,
   Entity,
-  generateUUID,
   IDraw,
   IOnAwake,
   IOnLateLoop,
@@ -152,7 +151,6 @@ export class Spaceship
   }
 
   private createRightBullet(): void {
-    const rightBulletId = generateUUID()
     const rotation = this.transform.rotation
     const position = Vector2.sum(
       this.transform.position,
@@ -169,9 +167,9 @@ export class Spaceship
       Vector2.multiply(this.direction, this.bulletVelocity),
     )
 
-    this.instantiate({
+    const bullet = this.instantiate({
       use: {
-        tag: `${Bullet.name}|${rightBulletId}`,
+        tag: `${Bullet.name}`,
       },
       entity: Bullet,
       components: [
@@ -192,7 +190,7 @@ export class Spaceship
     })
 
     socket.emit('instantiate', {
-      id: rightBulletId,
+      id: bullet.id,
       type: Bullet.name,
       data: {
         position,
@@ -203,7 +201,6 @@ export class Spaceship
   }
 
   private createLeftBullet(): void {
-    const leftBulletId = generateUUID()
     const rotation = this.transform.rotation
     const position = Vector2.sum(
       this.transform.position,
@@ -220,9 +217,9 @@ export class Spaceship
       Vector2.multiply(this.direction, this.bulletVelocity),
     )
 
-    this.instantiate({
+    const bullet = this.instantiate({
       use: {
-        tag: `${Bullet.name}|${leftBulletId}`,
+        tag: `${Bullet.name}`,
       },
       entity: Bullet,
       components: [
@@ -243,7 +240,7 @@ export class Spaceship
     })
 
     socket.emit('instantiate', {
-      id: leftBulletId,
+      id: bullet.id,
       type: Bullet.name,
       data: {
         position,

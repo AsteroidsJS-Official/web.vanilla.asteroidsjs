@@ -18,6 +18,7 @@ import {
   isEntity,
   hasFixedLoop,
   hasLateLoop,
+  hasDestroy,
 } from './utils/validations'
 
 import { COMPONENT_OPTIONS, ENTITY_OPTIONS, SERVICE_OPTIONS } from './constants'

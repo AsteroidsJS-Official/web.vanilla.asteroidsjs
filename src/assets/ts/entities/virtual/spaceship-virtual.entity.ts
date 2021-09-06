@@ -88,7 +88,6 @@ export class SpaceshipVirtual
     const image = new Image()
     image.src = spaceshipImg
 
-    // TODO: apply color to SVG
     this.getContext().drawImage(
       image,
       0 - this.transform.dimensions.width / 2,

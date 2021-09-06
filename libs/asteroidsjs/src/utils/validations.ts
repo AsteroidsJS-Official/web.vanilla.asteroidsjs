@@ -2,13 +2,13 @@
 
 import { AbstractEntity } from '../abstract-entity'
 
+import { IOnDestroy } from '../interfaces'
 import { IDraw } from '../interfaces/draw.interface'
 import { IOnAwake } from '../interfaces/on-awake.interface'
 import { IOnFixedLoop } from '../interfaces/on-fixed-loop.interface'
 import { IOnLateLoop } from '../interfaces/on-late-loop.interface'
 import { IOnLoop } from '../interfaces/on-loop.interface'
 import { IOnStart } from '../interfaces/on-start.interface'
-import { IOnDestroy } from './../interfaces/on-destory.interface'
 
 /**
  * Function that validates if some object is of type {@link Entity}
