@@ -14,11 +14,17 @@ import {
 
 import { socket } from '../../socket'
 
+import { Spaceship } from './spaceship.entity'
+
+import { CircleCollider2 } from '../../components/colliders/circle-collider2.component'
 import { Drawer } from '../../components/drawer.component'
 import { RenderOverflow } from '../../components/renderers/render-overflow.component'
 import { Render } from '../../components/renderers/render.component'
 import { Rigidbody } from '../../components/rigidbody.component'
 import { Transform } from '../../components/transform.component'
+
+import { ICollision2 } from '../../interfaces/collision2.interface'
+import { IOnTriggerEnter } from '../../interfaces/on-trigger-enter.interface'
 
 import asteroidLg1 from '../../../svg/asteroid-lg-1.svg'
 import asteroidLg2 from '../../../svg/asteroid-lg-2.svg'
@@ -32,6 +38,7 @@ import asteroidXs from '../../../svg/asteroid-xs.svg'
   components: [
     Render,
     Drawer,
+    CircleCollider2,
     {
       id: '__asteroid_transform__',
       class: Transform,
@@ -44,13 +51,15 @@ import asteroidXs from '../../../svg/asteroid-xs.svg'
 })
 export class Asteroid
   extends AbstractEntity
-  implements IOnAwake, IOnStart, IDraw, IOnLoop, IOnDestroy
+  implements IOnAwake, IOnStart, IDraw, IOnLoop, IOnDestroy, IOnTriggerEnter
 {
   private transform: Transform
 
   private _asteroidSize: number
 
   public image: HTMLImageElement
+
+  public tag = Asteroid.name
 
   public set asteroidSize(size: number) {
     this._asteroidSize = size
@@ -80,18 +89,27 @@ export class Asteroid
       10 * ((this._asteroidSize + 2) * 2),
       10 * ((this._asteroidSize + 2) * 2),
     )
-
-    setTimeout(() => {
-      if (this._asteroidSize > 0) {
-        this.generateAsteroidFragments(2)
-      }
-
-      this.destroy(this)
-    }, 6000)
   }
 
   public onDestroy(): void {
     socket.emit('destroy', this.id)
+  }
+
+  public onTriggerEnter(collision: ICollision2): void {
+    if (
+      collision.entity2.tag?.includes(Asteroid.name) ||
+      collision.entity2.tag?.includes(Spaceship.name)
+    ) {
+      return
+    }
+
+    this.destroy(collision.entity2)
+
+    if (this._asteroidSize > 0) {
+      this.generateAsteroidFragments(2)
+    }
+
+    this.destroy(this)
   }
 
   public onLoop(): void {

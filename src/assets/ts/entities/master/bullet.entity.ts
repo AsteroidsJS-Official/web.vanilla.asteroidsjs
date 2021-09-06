@@ -3,10 +3,13 @@ import {
   Entity,
   IDraw,
   IOnAwake,
+  IOnDestroy,
   IOnLoop,
   Rect,
   Vector2,
 } from '@asteroidsjs'
+
+import { socket } from '../../socket'
 
 import { Drawer } from '../../components/drawer.component'
 import { Render } from '../../components/renderers/render.component'
@@ -37,7 +40,7 @@ import { IBullet } from '../../interfaces/bullet.interface'
 })
 export class Bullet
   extends AbstractEntity
-  implements IBullet, IDraw, IOnAwake, IOnLoop
+  implements IBullet, IDraw, IOnAwake, IOnLoop, IOnDestroy
 {
   public transform: Transform
   public rigidbody: Rigidbody
@@ -52,6 +55,10 @@ export class Bullet
   onAwake(): void {
     this.transform = this.getComponent(Transform)
     this.rigidbody = this.getComponent(Rigidbody)
+  }
+
+  public onDestroy(): void {
+    socket.emit('destroy', this.id)
   }
 
   draw(): void {
