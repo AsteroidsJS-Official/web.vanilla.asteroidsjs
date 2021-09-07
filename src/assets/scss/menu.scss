@@ -62,28 +62,38 @@
       width: 100%;
       min-height: 200px;
 
-      & img {
-        position: absolute;
-        top: 50%;
-        left: 50%;
+      & .spaceship-skin-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
-        width: 140px;
+        & img {
+          width: 60%;
+          height: 60%;
+          object-fit: contain;
 
-        transform: translate(-50%, -50%);
+          animation-name: rotate-spaceship;
+          animation-duration: 20s;
+          animation-delay: 0.1s;
+          animation-fill-mode: forwards;
+          animation-iteration-count: infinite;
+          animation-timing-function: linear;
+        }
 
-        animation-name: rotate-spaceship;
-        animation-duration: 20s;
-        animation-delay: 0.1s;
-        animation-fill-mode: forwards;
-        animation-iteration-count: infinite;
-        animation-timing-function: linear;
+        &::before {
+          content: '';
+          width: 20px;
+        }
       }
 
       & .spaceship-color-picker {
         display: flex;
         flex-direction: column;
+        justify-content: center;
         align-items: center;
         gap: 10px;
+
+        min-width: 20px;
       }
     }
   }
@@ -91,9 +101,9 @@
 
 @keyframes rotate-spaceship {
   from {
-    transform: translate(-50%, -50%) rotateZ(0deg);
+    transform: rotateZ(0deg);
   }
   to {
-    transform: translate(-50%, -50%) rotateZ(-360deg);
+    transform: rotateZ(-360deg);
   }
 }
