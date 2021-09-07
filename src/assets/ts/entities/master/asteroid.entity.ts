@@ -106,7 +106,7 @@ export class Asteroid
     this.destroy(collision.entity2)
 
     if (this._asteroidSize > 0) {
-      this.generateAsteroidFragments(2)
+      this.generateAsteroidFragments(this._asteroidSize <= 2 ? 1 : 2)
     }
 
     this.destroy(this)
@@ -133,14 +133,6 @@ export class Asteroid
       this.addComponent(RenderOverflow)
       this.destroy(this.getComponent(Render))
     }
-
-    socket.emit('update-slaves', {
-      id: this.id,
-      data: {
-        position: this.transform.position,
-        rotation: this.transform.rotation,
-      },
-    })
   }
 
   public draw(): void {
@@ -156,10 +148,13 @@ export class Asteroid
     for (let i = 0; i < amount; i++) {
       const rotation = Math.random() * 2 * Math.PI
       const direction = new Vector2(Math.sin(rotation), Math.cos(rotation))
+
       const position = new Vector2(
         this.transform.position.x,
         this.transform.position.y,
       )
+
+      const velocity = Vector2.multiply(direction.normalized, 2)
 
       const fragment = this.instantiate({
         use: {
@@ -177,8 +172,7 @@ export class Asteroid
           {
             id: '__asteroid_rigidbody__',
             use: {
-              velocity: Vector2.multiply(direction.normalized, 2),
-              friction: 0,
+              velocity,
               mass: 15 * this._asteroidSize,
               maxAngularVelocity: 0.09,
               angularVelocity: 0.05 / this._asteroidSize,
@@ -195,6 +189,10 @@ export class Asteroid
           image: fragment.image.src,
           rotation,
           position,
+          velocity,
+          mass: 15 * this._asteroidSize,
+          maxAngularVelocity: 0.09,
+          angularVelocity: 0.05 / this._asteroidSize,
         },
       })
     }
@@ -209,9 +207,7 @@ export class Asteroid
       )
     this.game.getContext().rotate(this.transform.rotation)
 
-    this.game.getContext().shadowColor = 'black'
-    this.game.getContext().shadowBlur = 5
-
+    this.game.getContext().beginPath()
     this.game
       .getContext()
       .drawImage(
@@ -221,9 +217,7 @@ export class Asteroid
         this.transform.dimensions.width,
         this.transform.dimensions.height,
       )
-
-    this.game.getContext().shadowColor = 'transparent'
-    this.game.getContext().shadowBlur = 0
+    this.game.getContext().closePath()
 
     this.game.getContext().rotate(-this.transform.rotation)
     this.game

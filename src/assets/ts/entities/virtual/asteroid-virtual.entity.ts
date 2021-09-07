@@ -5,7 +5,6 @@ import {
   IOnAwake,
   IOnLoop,
   IOnStart,
-  ISocketData,
   isOverflowingX,
   isOverflowingY,
   Rect,
@@ -16,6 +15,7 @@ import { socket } from '../../socket'
 import { Drawer } from '../../components/drawer.component'
 import { RenderOverflow } from '../../components/renderers/render-overflow.component'
 import { Render } from '../../components/renderers/render.component'
+import { Rigidbody } from '../../components/rigidbody.component'
 import { Transform } from '../../components/transform.component'
 
 @Entity({
@@ -25,6 +25,10 @@ import { Transform } from '../../components/transform.component'
     {
       id: '__asteroid_virtual_transform__',
       class: Transform,
+    },
+    {
+      id: '__asteroid_virtual_rigidbody__',
+      class: Rigidbody,
     },
   ],
 })
@@ -55,14 +59,6 @@ export class AsteroidVirtual
       10 * ((this._asteroidSize + 2) * 2),
       10 * ((this._asteroidSize + 2) * 2),
     )
-
-    socket.on('update-screen', ({ id, data }: ISocketData) => {
-      if (this.id !== id) {
-        return
-      }
-      this.transform.position = data.position
-      this.transform.rotation = data.rotation
-    })
 
     socket.on('destroy', (id: string) => {
       if (id === this.id) {
@@ -107,9 +103,7 @@ export class AsteroidVirtual
       )
     this.game.getContext().rotate(this.transform.rotation)
 
-    this.game.getContext().shadowColor = 'black'
-    this.game.getContext().shadowBlur = 5
-
+    this.game.getContext().beginPath()
     this.game
       .getContext()
       .drawImage(
@@ -119,9 +113,7 @@ export class AsteroidVirtual
         this.transform.dimensions.width,
         this.transform.dimensions.height,
       )
-
-    this.game.getContext().shadowColor = 'transparent'
-    this.game.getContext().shadowBlur = 0
+    this.game.getContext().closePath()
 
     this.game.getContext().rotate(-this.transform.rotation)
     this.game
