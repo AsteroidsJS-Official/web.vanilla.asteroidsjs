@@ -17,8 +17,6 @@ import { AsteroidVirtual } from './virtual/asteroid-virtual.entity'
 import { BulletVirtual } from './virtual/bullet-virtual.entity'
 import { SpaceshipVirtual } from './virtual/spaceship-virtual.entity'
 
-import { RectCollider2 } from '../components/colliders/rect-collider2.component'
-
 /**
  * Class that represents the first entity to be loaded into the game
  */
@@ -45,18 +43,6 @@ export class Manager extends AbstractEntity implements IOnStart {
       },
       entity: Spaceship,
       components: [
-        {
-          class: RectCollider2,
-          use: {
-            localPosition: new Vector2(-50, -50),
-          },
-        },
-        {
-          class: RectCollider2,
-          use: {
-            localPosition: new Vector2(50, -50),
-          },
-        },
         {
           id: '__spaceship_transform__',
           use: {
@@ -146,6 +132,15 @@ export class Manager extends AbstractEntity implements IOnStart {
                 use: {
                   rotation: data.rotation,
                   position: data.position,
+                },
+              },
+              {
+                id: '__asteroid_virtual_rigidbody__',
+                use: {
+                  velocity: data.velocity,
+                  mass: data.mass,
+                  maxAngularVelocity: data.maxAngularVelocity,
+                  angularVelocity: data.angularVelocity,
                 },
               },
             ],

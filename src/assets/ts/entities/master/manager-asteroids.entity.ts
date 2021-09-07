@@ -10,9 +10,6 @@ import { socket } from '../../socket'
 
 import { Asteroid } from './asteroid.entity'
 
-import { Rigidbody } from '../../components/rigidbody.component'
-import { Transform } from '../../components/transform.component'
-
 /**
  * Class that represents the first entity to be loaded into the game
  */
@@ -72,7 +69,6 @@ export class ManagerAsteroids extends AbstractEntity implements IOnStart {
           id: '__asteroid_rigidbody__',
           use: {
             velocity,
-            friction: 0,
             mass: 15 * (asteroidSize + 1),
             maxAngularVelocity: 0.09,
             angularVelocity: 0.05 / (asteroidSize + 1),
@@ -89,6 +85,10 @@ export class ManagerAsteroids extends AbstractEntity implements IOnStart {
         rotation,
         asteroidSize,
         image: asteroid.image.src,
+        velocity,
+        mass: 15 * (asteroidSize + 1),
+        maxAngularVelocity: 0.09,
+        angularVelocity: 0.05 / (asteroidSize + 1),
       },
     } as ISocketData)
   }
