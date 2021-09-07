@@ -3,6 +3,8 @@ import { IEntityOptions } from './entity-options.interface'
 
 import { Type } from './type.interface'
 
+import { AbstractScene } from '../abstract-scene'
+
 /**
  * Interface that represents all the needed data to instantiate some
  * entity
@@ -19,4 +21,10 @@ export interface IInstantiateOptions<E extends AbstractEntity>
    * this entity
    */
   use?: Partial<E>
+
+  /**
+   * Property that defines the reference to the scene where the entity
+   * is instantiated
+   */
+  scene?: AbstractScene
 }

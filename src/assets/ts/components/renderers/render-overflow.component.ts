@@ -35,12 +35,12 @@ export class RenderOverflow
     this.drawer.draw()
 
     const overflowingX = isOverflowingX(
-      this.game.getContext().canvas.width,
+      this.getContext().canvas.width,
       this.transform.position.x,
       this.transform.totalDimensions.width,
     )
     const overflowingY = isOverflowingY(
-      this.game.getContext().canvas.height,
+      this.getContext().canvas.height,
       this.transform.position.y,
       this.transform.totalDimensions.height,
     )
@@ -60,12 +60,12 @@ export class RenderOverflow
 
       const auxY = this.transform.position.y
       const newY = isTop
-        ? this.transform.position.y - this.game.getContext().canvas.height
-        : this.transform.position.y + this.game.getContext().canvas.height
+        ? this.transform.position.y - this.getContext().canvas.height
+        : this.transform.position.y + this.getContext().canvas.height
 
       const newX = isLeft
-        ? this.transform.position.x + this.game.getContext().canvas.width
-        : this.transform.position.x - this.game.getContext().canvas.width
+        ? this.transform.position.x + this.getContext().canvas.width
+        : this.transform.position.x - this.getContext().canvas.width
 
       this.transform.position = new Vector2(this.transform.position.x, newY)
 
@@ -88,8 +88,8 @@ export class RenderOverflow
       this.transform.position = new Vector2(
         this.transform.position.x,
         isTop
-          ? this.transform.position.y - this.game.getContext().canvas.height
-          : this.transform.position.y + this.game.getContext().canvas.height,
+          ? this.transform.position.y - this.getContext().canvas.height
+          : this.transform.position.y + this.getContext().canvas.height,
       )
 
       this.drawer?.draw()
@@ -102,8 +102,8 @@ export class RenderOverflow
 
       this.transform.position = new Vector2(
         isLeft
-          ? this.transform.position.x + this.game.getContext().canvas.width
-          : this.transform.position.x - this.game.getContext().canvas.width,
+          ? this.transform.position.x + this.getContext().canvas.width
+          : this.transform.position.x - this.getContext().canvas.width,
         this.transform.position.y,
       )
 

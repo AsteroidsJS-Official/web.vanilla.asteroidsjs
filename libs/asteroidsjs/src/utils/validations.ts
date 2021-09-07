@@ -10,6 +10,18 @@ import { IOnLateLoop } from '../interfaces/on-late-loop.interface'
 import { IOnLoop } from '../interfaces/on-loop.interface'
 import { IOnStart } from '../interfaces/on-start.interface'
 
+import { AbstractScene } from '../abstract-scene'
+
+/**
+ * Function that validates if some object is of type {@link Scene}
+ *
+ * @param entity defines an object that will be validated
+ * @returns true if the object is of type, otherwise false
+ */
+export function isScene(scene: any): scene is AbstractScene {
+  return 'entities' in scene
+}
+
 /**
  * Function that validates if some object is of type {@link Entity}
  *

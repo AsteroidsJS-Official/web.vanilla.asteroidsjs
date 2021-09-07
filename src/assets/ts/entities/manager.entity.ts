@@ -23,7 +23,7 @@ import { SpaceshipVirtual } from './virtual/spaceship-virtual.entity'
 @Entity()
 export class Manager extends AbstractEntity implements IOnStart {
   public onStart(): void {
-    if (this.game.getScreen().number === 1) {
+    if (this.scene.game.getScreen().number === 1) {
       setTimeout(() => {
         this.master()
       }, 100)

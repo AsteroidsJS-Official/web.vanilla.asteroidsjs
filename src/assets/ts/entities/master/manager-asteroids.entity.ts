@@ -30,8 +30,8 @@ export class ManagerAsteroids extends AbstractEntity implements IOnStart {
 
     const offset = 150
 
-    const canvasWidth = this.game.getContext().canvas.width
-    const canvasHeight = this.game.getContext().canvas.height
+    const canvasWidth = this.getContext().canvas.width
+    const canvasHeight = this.getContext().canvas.height
 
     let x = Math.floor(Math.random() * (canvasWidth + offset * 2)) - offset
     let y = Math.floor(Math.random() * (canvasHeight + offset * 2)) - offset
