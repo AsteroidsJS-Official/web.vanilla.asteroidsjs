@@ -77,32 +77,33 @@ class AsteroidsApplication implements IAsteroidsApplication {
   public start(): void {
     this.bootstrap.forEach((entity) => this.instantiate({ entity }))
 
-    setInterval(() => {
-      ;[...this.entities, ...this.components].forEach((value) => {
-        if (hasFixedLoop(value)) {
-          value.onFixedLoop()
-        }
-      })
-    }, 100 / 18)
+    this.startLoop()
+  }
 
-    setInterval(() => {
-      this.context.clearRect(
-        0,
-        0,
-        this.context.canvas.width,
-        this.context.canvas.height,
-      )
-      ;[...this.entities, ...this.components].forEach((value) => {
-        if (hasLoop(value)) {
-          value.onLoop()
-        }
-      })
-      ;[...this.entities, ...this.components].forEach((value) => {
-        if (hasLateLoop(value)) {
-          value.onLateLoop()
-        }
-      })
-    }, 100 / 6)
+  private startLoop(): void {
+    requestAnimationFrame(() => this.startLoop())
+    ;[...this.entities, ...this.components].forEach((value) => {
+      if (hasFixedLoop(value)) {
+        value.onFixedLoop()
+      }
+    })
+
+    this.context.clearRect(
+      0,
+      0,
+      this.context.canvas.width,
+      this.context.canvas.height,
+    )
+    ;[...this.entities, ...this.components].forEach((value) => {
+      if (hasLoop(value)) {
+        value.onLoop()
+      }
+    })
+    ;[...this.entities, ...this.components].forEach((value) => {
+      if (hasLateLoop(value)) {
+        value.onLateLoop()
+      }
+    })
   }
 
   /**
