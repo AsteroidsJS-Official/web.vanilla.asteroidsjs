@@ -3,9 +3,33 @@ input {
   box-shadow: none;
   border: none;
   outline: none;
+
+  font-family: 'Neptunus';
+  -webkit-text-security: asterisk;
+
+  &.auth-form {
+    font-family: 'Poppins', sans-serif;
+
+    &[type='password']::-ms-reveal,
+    &[type='password']::-ms-clear {
+      display: none;
+    }
+  }
+
+  &:-webkit-autofill,
+  &:-webkit-autofill:focus,
+  &:-webkit-autofill:hover,
+  &:-webkit-autofill:active {
+    background-clip: text !important;
+    color: #ffffff !important;
+    caret-color: #ffffff !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: #ffffff !important;
+  }
 }
 
-.nickname-input-container {
+.nickname-guest-input-container,
+.auth-input-container {
   position: relative;
 
   width: 100%;
@@ -19,7 +43,8 @@ input {
 
   transition: background-color 0.2s;
 
-  & > .nickname-input {
+  & > .nickname-guest-input,
+  & > .auth-form {
     width: 100%;
     height: 100%;
 
@@ -27,18 +52,17 @@ input {
 
     text-align: center;
     color: #ffffff;
-    font-size: 1.1rem;
-    font-family: 'Neptunus';
+    font-size: 1rem;
   }
 
-  & > .nickname-label {
+  & > .nickname-guest-label,
+  & > .auth-label {
     position: absolute;
     top: 50%;
     left: 50%;
 
     color: #888888;
-    font-size: 1.1rem;
-    font-family: 'Neptunus';
+    font-size: 1rem;
 
     pointer-events: none;
     opacity: 1;
@@ -48,12 +72,38 @@ input {
     transition: all 0.1s;
   }
 
-  & > .nickname-input:focus ~ .nickname-label,
-  & > .nickname-input:valid ~ .nickname-label {
+  & > .nickname-guest-input:focus ~ .nickname-guest-label,
+  & > .nickname-guest-input:valid ~ .nickname-guest-label,
+  & > .auth-form:focus ~ .auth-label,
+  & > .auth-form:valid ~ .auth-label {
     opacity: 0;
   }
 
   &:hover {
     background-color: #aaaaaa34;
+  }
+}
+
+.auth-input-container {
+  width: 80%;
+  height: 40px;
+
+  background-color: #aaaaaa34;
+
+  &.nickname-input-container,
+  &.confirm-password-input-container {
+    display: none;
+
+    &.active {
+      display: block;
+    }
+  }
+
+  &:hover {
+    background-color: #cdcdcd34;
+  }
+
+  &:not(:first-of-type) {
+    margin-top: 20px;
   }
 }
