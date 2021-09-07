@@ -14,6 +14,7 @@ import { Bullet } from './bullet.entity'
 import { SpaceshipVirtual } from './spaceship-virtual.entity'
 import { Spaceship } from './spaceship.entity'
 
+import { Health } from '../components/health.component'
 import { Rigidbody } from '../components/rigidbody.component'
 import { Transform } from '../components/transform.component'
 
@@ -36,9 +37,28 @@ export class Manager extends AbstractEntity implements IOnStart {
 
   private master(): void {
     const id = uuid()
+
+    const color = window.localStorage.getItem('asteroidsjs_spaceship_color')
+    let nickname = window.localStorage.getItem('asteroidsjs_nickname')
+    nickname = nickname ? nickname.toUpperCase() : 'GUEST'
+
+    let imageSrc = ''
+    let spaceshipColor = ''
+
+    if (color) {
+      spaceshipColor = JSON.parse(color).rgb
+      imageSrc = `./assets/svg/spaceship-${JSON.parse(color).name}.svg`
+    } else {
+      spaceshipColor = '#888888'
+      imageSrc = './assets/svg/spaceship-grey.svg'
+    }
+
     this.instantiate({
       use: {
         id,
+        spaceshipColor,
+        nickname,
+        imageSrc,
       },
       entity: Spaceship,
       properties: [
@@ -55,6 +75,14 @@ export class Manager extends AbstractEntity implements IOnStart {
             friction: 0.005,
             mass: 10,
             maxAngularVelocity: 0.09,
+          },
+        },
+        {
+          for: Health,
+          use: {
+            color: spaceshipColor,
+            maxHealth: 30,
+            health: 30,
           },
         },
       ],

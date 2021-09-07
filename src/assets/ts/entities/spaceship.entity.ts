@@ -4,6 +4,7 @@ import {
   IDraw,
   IOnAwake,
   IOnLoop,
+  IOnStart,
   ISocketData,
   Vector2,
 } from '@asteroidsjs'
@@ -13,6 +14,7 @@ import { socket } from '../socket'
 import { Bullet } from './bullet.entity'
 
 import { Drawer } from '../components/drawer.component'
+import { Health } from '../components/health.component'
 import { Input } from '../components/input.component'
 import { RenderOverflow } from '../components/render-overflow.component'
 import { Rigidbody } from '../components/rigidbody.component'
@@ -20,13 +22,11 @@ import { Transform } from '../components/transform.component'
 
 import { uuid } from '../../../../libs/asteroidsjs/src/utils/validations'
 
-import spaceshipImg from '../../svg/spaceship-blue.svg'
-
 /**
  * Class that represents the spaceship entity controlled by the user.
  */
 @Entity({
-  components: [Input, Drawer, Transform, Rigidbody, RenderOverflow],
+  components: [Input, Drawer, Transform, Rigidbody, RenderOverflow, Health],
   properties: [
     {
       for: Input,
@@ -39,7 +39,7 @@ import spaceshipImg from '../../svg/spaceship-blue.svg'
 })
 export class Spaceship
   extends AbstractEntity
-  implements IOnAwake, IDraw, IOnLoop
+  implements IOnAwake, IDraw, IOnLoop, IOnStart
 {
   public isShooting = false
 
@@ -63,7 +63,15 @@ export class Spaceship
    */
   private rigidbody: Rigidbody
 
-  private image: HTMLImageElement
+  private health: Health
+
+  private image = new Image()
+
+  public imageSrc = ''
+
+  public nickname = ''
+
+  public spaceshipColor = ''
 
   public get direction(): Vector2 {
     return new Vector2(
@@ -75,14 +83,16 @@ export class Spaceship
   onAwake(): void {
     this.transform = this.getComponent(Transform)
     this.rigidbody = this.getComponent(Rigidbody)
+    this.health = this.getComponent(Health)
   }
 
   onStart(): void {
-    this.image = new Image()
-    this.image.src = spaceshipImg
+    this.image.src = this.imageSrc
   }
 
   onLoop(): void {
+    this.health.heal(0.01)
+
     socket.emit('update-slaves', {
       id: this.id,
       data: {
@@ -94,7 +104,7 @@ export class Spaceship
   }
 
   public draw(): void {
-    this.drawTriangle()
+    this.drawSpaceship()
   }
 
   public shoot(): void {
@@ -108,13 +118,25 @@ export class Spaceship
     this.createRightBullet()
   }
 
-  private drawTriangle(): void {
+  private drawSpaceship(): void {
     this.getContext().translate(
       this.transform.canvasPosition.x,
       this.transform.canvasPosition.y,
     )
+
+    // this.getContext().fillStyle = this.spaceshipColor
+    // this.getContext().textAlign = 'center'
+    // this.getContext().canvas.style.letterSpacing = '0.75px'
+    // this.getContext().font = '12px Neptunus'
+    // this.getContext().fillText(
+    //   this.nickname,
+    //   0,
+    //   0 - (this.transform.dimensions.height / 2 + 20),
+    // )
+
     this.getContext().rotate(this.transform.rotation)
 
+    this.getContext().beginPath()
     this.getContext().drawImage(
       this.image,
       0 - this.transform.dimensions.width / 2,
@@ -122,6 +144,7 @@ export class Spaceship
       this.transform.dimensions.width,
       this.transform.dimensions.height,
     )
+    this.getContext().closePath()
 
     this.getContext().rotate(-this.transform.rotation)
     this.getContext().translate(
