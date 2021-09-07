@@ -5,6 +5,7 @@ import {
   IOnAwake,
   IOnLateLoop,
   ISocketData,
+  Rect,
   Vector2,
 } from '@asteroidsjs'
 
@@ -34,7 +35,29 @@ import spaceshipImg from '../../../svg/spaceship.svg'
     {
       class: CircleCollider2,
       use: {
-        localPosition: new Vector2(0, 25),
+        localPosition: new Vector2(0, 15),
+        dimensions: new Rect(20, 20),
+      },
+    },
+    {
+      class: CircleCollider2,
+      use: {
+        localPosition: new Vector2(0, -10),
+        dimensions: new Rect(30, 30),
+      },
+    },
+    {
+      class: CircleCollider2,
+      use: {
+        localPosition: new Vector2(20, -17),
+        dimensions: new Rect(12, 12),
+      },
+    },
+    {
+      class: CircleCollider2,
+      use: {
+        localPosition: new Vector2(-20, -17),
+        dimensions: new Rect(12, 12),
       },
     },
     {
@@ -146,70 +169,23 @@ export class Spaceship
 
     this.lastShot = new Date()
 
-    this.createLeftBullet()
-    this.createRightBullet()
+    this.createBullet((2 * Math.PI) / 5, 7.5)
+    this.createBullet(-(2 * Math.PI) / 5, 5.5)
+
+    this.createBullet((2 * Math.PI) / 7, 9.5)
+    this.createBullet(-(2 * Math.PI) / 7, 7.5)
   }
 
-  private createRightBullet(): void {
+  private createBullet(localPosition: number, offset: number): void {
     const rotation = this.transform.rotation
     const position = Vector2.sum(
       this.transform.position,
       Vector2.multiply(
         new Vector2(
-          Math.sin(this.transform.rotation + (2 * Math.PI) / 4),
-          Math.cos(this.transform.rotation + (2 * Math.PI) / 4),
+          Math.sin(this.transform.rotation + localPosition),
+          Math.cos(this.transform.rotation + localPosition),
         ),
-        this.transform.dimensions.width / 2 - 6,
-      ),
-    )
-    const velocity = Vector2.sum(
-      this.rigidbody.velocity,
-      Vector2.multiply(this.direction, this.bulletVelocity),
-    )
-
-    const bullet = this.instantiate({
-      use: {
-        tag: `${Bullet.name}`,
-      },
-      entity: Bullet,
-      components: [
-        {
-          id: '__bullet_transform__',
-          use: {
-            position,
-            rotation,
-          },
-        },
-        {
-          id: '__bullet_rigidbody__',
-          use: {
-            velocity,
-          },
-        },
-      ],
-    })
-
-    socket.emit('instantiate', {
-      id: bullet.id,
-      type: Bullet.name,
-      data: {
-        position,
-        rotation,
-        velocity,
-      },
-    } as ISocketData)
-  }
-
-  private createLeftBullet(): void {
-    const rotation = this.transform.rotation
-    const position = Vector2.sum(
-      this.transform.position,
-      Vector2.multiply(
-        new Vector2(
-          Math.sin(this.transform.rotation - (2 * Math.PI) / 4),
-          Math.cos(this.transform.rotation - (2 * Math.PI) / 4),
-        ),
-        this.transform.dimensions.width / 2 - 4,
+        this.transform.dimensions.width / 2 - offset,
       ),
     )
     const velocity = Vector2.sum(
