@@ -21,7 +21,7 @@ export class CircleCollider2 extends AbstractCollider {
     this.getContext().rotate(this.transform.rotation)
 
     this.getContext().beginPath()
-    this.getContext().fillStyle = '#05FF0020'
+    this.getContext().fillStyle = '#05FF0060'
     this.getContext().arc(0, 0, this.dimensions.width / 2, 0, 360)
     this.getContext().fill()
 
