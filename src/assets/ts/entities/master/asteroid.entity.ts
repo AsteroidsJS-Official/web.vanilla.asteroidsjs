@@ -199,32 +199,26 @@ export class Asteroid
   }
 
   private drawAsteroid(): void {
-    this.game
-      .getContext()
-      .translate(
-        this.transform.canvasPosition.x,
-        this.transform.canvasPosition.y,
-      )
-    this.game.getContext().rotate(this.transform.rotation)
+    this.getContext().translate(
+      this.transform.canvasPosition.x,
+      this.transform.canvasPosition.y,
+    )
+    this.getContext().rotate(this.transform.rotation)
 
-    this.game.getContext().beginPath()
-    this.game
-      .getContext()
-      .drawImage(
-        this.image,
-        0 - this.transform.dimensions.width / 2,
-        0 - this.transform.dimensions.height / 2,
-        this.transform.dimensions.width,
-        this.transform.dimensions.height,
-      )
-    this.game.getContext().closePath()
+    this.getContext().beginPath()
+    this.getContext().drawImage(
+      this.image,
+      0 - this.transform.dimensions.width / 2,
+      0 - this.transform.dimensions.height / 2,
+      this.transform.dimensions.width,
+      this.transform.dimensions.height,
+    )
+    this.getContext().closePath()
 
-    this.game.getContext().rotate(-this.transform.rotation)
-    this.game
-      .getContext()
-      .translate(
-        -this.transform.canvasPosition.x,
-        -this.transform.canvasPosition.y,
-      )
+    this.getContext().rotate(-this.transform.rotation)
+    this.getContext().translate(
+      -this.transform.canvasPosition.x,
+      -this.transform.canvasPosition.y,
+    )
   }
 }
