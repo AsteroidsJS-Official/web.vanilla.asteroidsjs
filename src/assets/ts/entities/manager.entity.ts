@@ -94,6 +94,11 @@ export class Manager extends AbstractEntity implements IOnStart {
       data: {
         position: new Vector2(),
         dimensions: new Rect(50, 50),
+        spaceshipColor,
+        nickname,
+        imageSrc,
+        maxHealth: 30,
+        health: 30,
       },
     } as ISocketData)
   }
@@ -105,6 +110,9 @@ export class Manager extends AbstractEntity implements IOnStart {
           this.instantiate({
             use: {
               id,
+              spaceshipColor: data.spaceshipColor,
+              nickname: data.nickname,
+              imageSrc: data.imageSrc,
             },
             entity: SpaceshipVirtual,
             properties: [
@@ -114,6 +122,14 @@ export class Manager extends AbstractEntity implements IOnStart {
                   rotation: data.rotation,
                   position: data.position,
                   dimensions: data.dimensions,
+                },
+              },
+              {
+                for: Health,
+                use: {
+                  color: data.spaceshipColor,
+                  maxHealth: data.maxHealth,
+                  health: data.health,
                 },
               },
             ],

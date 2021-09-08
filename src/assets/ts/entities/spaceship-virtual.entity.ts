@@ -11,17 +11,16 @@ import {
 import { socket } from '../socket'
 
 import { Drawer } from '../components/drawer.component'
+import { Health } from '../components/health.component'
 import { RenderOverflow } from '../components/render-overflow.component'
 import { Transform } from '../components/transform.component'
-
-import spaceshipImg from '../../svg/spaceship-blue.svg'
 
 /**
  * Class that represents the virtual spaceship entity, used for rendering
  * uncontrollable spaceships.
  */
 @Entity({
-  components: [Drawer, Transform, RenderOverflow],
+  components: [Drawer, Transform, RenderOverflow, Health],
 })
 export class SpaceshipVirtual
   extends AbstractEntity
@@ -33,11 +32,6 @@ export class SpaceshipVirtual
   private transform: Transform
 
   /**
-   * Property that contains the spaceship velocity.
-   */
-  private velocity: Vector2
-
-  /**
    * Property responsible for the spaceship bullet velocity.
    */
   public readonly bulletVelocity = 10
@@ -46,6 +40,16 @@ export class SpaceshipVirtual
    * Property responsible for the spaceship last bullet time.
    */
   public lastShot: Date
+
+  private health: Health
+
+  private image = new Image()
+
+  public imageSrc = ''
+
+  public nickname = ''
+
+  public spaceshipColor = ''
 
   /**
    * Property that indicates the direction that the spaceship is facing.
@@ -61,9 +65,12 @@ export class SpaceshipVirtual
 
   onAwake(): void {
     this.transform = this.getComponent(Transform)
+    this.health = this.getComponent(Health)
   }
 
   onStart(): void {
+    this.image.src = this.imageSrc
+
     socket.on('update-screen', ({ id, data }: ISocketData) => {
       if (this.id !== id) {
         return
@@ -71,6 +78,8 @@ export class SpaceshipVirtual
       this.transform.position = data.position
       this.transform.dimensions = data.dimensions
       this.transform.rotation = data.rotation
+      this.health.health = data.health
+      this.health.maxHealth = data.maxHealth
     })
   }
 
@@ -83,14 +92,21 @@ export class SpaceshipVirtual
       this.transform.canvasPosition.x,
       this.transform.canvasPosition.y,
     )
+
+    // this.getContext().fillStyle = this.spaceshipColor
+    // this.getContext().textAlign = 'center'
+    // this.getContext().canvas.style.letterSpacing = '0.75px'
+    // this.getContext().font = '12px Neptunus'
+    // this.getContext().fillText(
+    //   this.nickname,
+    //   0,
+    //   0 - (this.transform.dimensions.height / 2 + 20),
+    // )
+
     this.getContext().rotate(this.transform.rotation)
 
-    const image = new Image()
-    image.src = spaceshipImg
-
-    // TODO: apply color to SVG
     this.getContext().drawImage(
-      image,
+      this.image,
       0 - this.transform.dimensions.width / 2,
       0 - this.transform.dimensions.height / 2,
       this.transform.dimensions.width,

@@ -99,6 +99,8 @@ export class Spaceship
         position: this.transform.position,
         dimensions: this.transform.dimensions,
         rotation: this.transform.rotation,
+        health: this.health.health,
+        maxHealth: this.health.maxHealth,
       },
     })
   }
@@ -111,6 +113,8 @@ export class Spaceship
     if (this.lastShot && new Date().getTime() - this.lastShot.getTime() < 300) {
       return
     }
+
+    this.health.hurt(3)
 
     this.lastShot = new Date()
 
