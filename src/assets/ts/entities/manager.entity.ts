@@ -12,6 +12,7 @@ import { socket } from '../socket'
 import { Asteroid } from './master/asteroid.entity'
 import { Bullet } from './master/bullet.entity'
 import { ManagerAsteroids } from './master/manager-asteroids.entity'
+import { Score } from './master/score.entity'
 import { Spaceship } from './master/spaceship.entity'
 import { AsteroidVirtual } from './virtual/asteroid-virtual.entity'
 import { BulletVirtual } from './virtual/bullet-virtual.entity'
@@ -52,6 +53,10 @@ export class Manager extends AbstractEntity implements IOnStart {
 
     this.instantiate({
       entity: ManagerAsteroids,
+    })
+
+    this.instantiate({
+      entity: Score,
     })
 
     const spaceship = this.instantiate({
