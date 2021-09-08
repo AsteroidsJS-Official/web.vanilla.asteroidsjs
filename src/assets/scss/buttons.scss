@@ -25,3 +25,156 @@
     opacity: 0.8;
   }
 }
+
+.background {
+  position: relative;
+
+  width: 100vw;
+  height: 100vh;
+}
+
+button {
+  background-color: transparent;
+  outline: none;
+  box-shadow: none;
+  border: none;
+
+  cursor: pointer;
+
+  font-family: 'Neptunus';
+
+  & svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  &.play-singleplayer-button,
+  &.play-local-multiplayer-button,
+  &.play-online-multiplayer-button {
+    font-size: 34px;
+    color: #ffffff;
+    letter-spacing: 0.035em;
+
+    transition: color 0.2s;
+  }
+
+  &.play-singleplayer-button:hover {
+    color: #48bdff;
+  }
+
+  &.play-local-multiplayer-button:hover {
+    color: #ff9c41;
+  }
+
+  &.play-online-multiplayer-button:hover {
+    color: #ff371c;
+  }
+
+  &.login-button {
+    margin-top: 10px;
+
+    color: #c4c4c4;
+    font-size: 0.9rem;
+
+    transition: color 0.2s;
+
+    &:hover {
+      color: #ffffff;
+    }
+  }
+
+  &.auth-button {
+    width: 120px;
+    height: 46px;
+
+    margin-top: 40px;
+    margin-bottom: 30px;
+
+    background-color: transparent;
+    border: 3px solid #fff;
+    border-radius: 5px;
+
+    font-size: 1.2rem;
+    color: #fff;
+
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+
+    &:hover {
+      color: #2d2d2d;
+      background-color: #fff;
+      border-color: transparent;
+    }
+  }
+
+  &.auth-switch-button {
+    color: #c4c4c4;
+    font-size: 0.9rem;
+
+    margin-bottom: 20px;
+
+    transition: color 0.2s;
+
+    &:hover {
+      color: #ffffff;
+    }
+  }
+
+  &.close-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+
+    width: 20px;
+    height: 20px;
+
+    & svg {
+      color: #fff;
+
+      transform: rotateZ(45deg);
+
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    &:hover svg {
+      transform: rotateZ(135deg);
+    }
+  }
+
+  &.settings-button {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+
+    width: 40px;
+    height: 40px;
+
+    & svg {
+      color: #c4c4c4;
+
+      transition: color 0.2s,
+        transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    &:hover svg {
+      color: #fff;
+
+      transform: rotateZ(90deg);
+    }
+  }
+
+  &.color-button {
+    min-width: 20px;
+    width: 20px;
+    height: 20px;
+
+    border-radius: 1px;
+
+    &.active {
+      border: 3px solid #fcff68;
+    }
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+}
