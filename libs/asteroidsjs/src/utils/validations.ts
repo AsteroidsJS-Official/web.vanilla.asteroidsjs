@@ -29,7 +29,7 @@ export function isScene(scene: any): scene is AbstractScene {
  * @returns true if the object is of type, otherwise false
  */
 export function isEntity(entity: any): entity is AbstractEntity {
-  return 'components' in entity && 'game' in entity
+  return 'components' in entity && 'scene' in entity
 }
 
 /**

@@ -1,6 +1,7 @@
-import { AbstractEntity, IContext, Type } from '..'
+import { AbstractEntity, generateUUID, IContext, Type } from '..'
 
 import { IAsteroidsApplication } from './interfaces/asteroids-application.interface'
+import { ICanvasOptions } from './interfaces/canvas-options.interface'
 import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
 
 /**
@@ -12,10 +13,15 @@ import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
  * components.
  */
 export abstract class AbstractScene {
+  /**
+   * Property that defines an object that represents the canvas context
+   */
+  private _context: IContext
+
   constructor(
     readonly id: number | string,
     readonly game: IAsteroidsApplication,
-    public entities: AbstractEntity[],
+    public entities: AbstractEntity[] = [],
   ) {}
 
   /**
@@ -33,8 +39,34 @@ export abstract class AbstractScene {
    *
    * @param scene defines the scene id, type or instance
    */
-  unload<S extends AbstractScene>(scene: string | S | Type<S>): void {
-    this.game.unload(scene)
+  async unload<S extends AbstractScene>(
+    scene: string | S | Type<S>,
+  ): Promise<void> {
+    await this.game.unload(scene)
+    if (document.getElementById(this._context.canvas.id)) {
+      document.querySelector('body').removeChild(this._context.canvas)
+    }
+  }
+
+  /**
+   * Method that creates a new canvas for rendering the game entities
+   *
+   * @param options defines an object that represents the canvas
+   * creation options
+   * @returns the created canvas context
+   */
+  createCanvas(options?: ICanvasOptions): IContext {
+    const canvas = document.createElement('canvas')
+    canvas.id = generateUUID()
+
+    options ??= {} as ICanvasOptions
+    canvas.width = options.width ?? window.innerWidth
+    canvas.height = options.height ?? window.innerHeight
+
+    document.querySelector('body').appendChild(canvas)
+
+    this._context = canvas.getContext('2d')
+    return this._context
   }
 
   /**
@@ -56,7 +88,7 @@ export abstract class AbstractScene {
    * @returns an object that represents the game context
    */
   getContext(): IContext {
-    return this.game.getContext()
+    return this._context
   }
 
   /**

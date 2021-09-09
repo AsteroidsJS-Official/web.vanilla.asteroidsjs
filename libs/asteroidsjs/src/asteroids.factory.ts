@@ -8,7 +8,6 @@ import { IAsteroidsApplication } from './interfaces/asteroids-application.interf
 import { GameFactoryOptions } from './interfaces/game-factory-options.interface'
 import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
 import { IProvider } from './interfaces/provider.interface'
-import { IScreen } from './interfaces/screen.interface'
 import { Type } from './interfaces/type.interface'
 
 import {
@@ -55,36 +54,13 @@ class AsteroidsApplication implements IAsteroidsApplication {
    */
   private services: AbstractService[] = []
 
-  /**
-   * Property that returns the canvas context
-   *
-   * @returns the canvas context
-   */
-  getContext(): CanvasRenderingContext2D {
-    return this.context
-  }
-
-  /**
-   * Property that returns the screen data
-   *
-   * @returns the screen data
-   */
-  getScreen(): IScreen {
-    return this.screen
-  }
-
-  constructor(
-    private readonly screen: IScreen,
-    private readonly context: CanvasRenderingContext2D,
-    private readonly bootstrap: Type<AbstractEntity>[],
-  ) {}
+  constructor(private readonly bootstrap: Type<AbstractScene>[]) {}
 
   /**
    * Method that starts the game lifecycle
    */
   start(): void {
-    this.bootstrap.forEach((entity) => this.instantiate({ entity }))
-
+    this.bootstrap.forEach((scene) => this.load(scene))
     this.startLoop()
   }
 
@@ -109,7 +85,9 @@ class AsteroidsApplication implements IAsteroidsApplication {
    *
    * @param scene defines the scene id, type or instance
    */
-  unload<S extends AbstractScene>(scene: string | S | Type<S>): void {
+  async unload<S extends AbstractScene>(
+    scene: string | S | Type<S>,
+  ): Promise<void> {
     let instance: AbstractScene
     if (typeof scene === 'string') {
       instance = this.scenes.find((s) => s.id === scene)
@@ -119,7 +97,10 @@ class AsteroidsApplication implements IAsteroidsApplication {
       instance = scene
     }
 
-    this.destroy(instance)
+    return new Promise((resolve) => {
+      this.destroy(instance)
+      resolve()
+    })
   }
 
   /**
@@ -136,6 +117,8 @@ class AsteroidsApplication implements IAsteroidsApplication {
       options && options.entity
         ? new options.entity(generateUUID(), options.scene)
         : new DefaultEntity(generateUUID(), options.scene)
+
+    options.scene.entities.push(instance)
 
     if (options.use) {
       for (const key in options.use) {
@@ -179,7 +162,7 @@ class AsteroidsApplication implements IAsteroidsApplication {
       // creates the components
       instance.components = components
         .filter((c) => !!c.class)
-        .map((c) => new c.class(c.id, this, instance))
+        .map((c) => new c.class(c.id, instance))
     }
 
     const instances = [instance, ...instance.components, ...instance.services]
@@ -228,7 +211,7 @@ class AsteroidsApplication implements IAsteroidsApplication {
     entity: E,
     component: Type<C>,
   ): C {
-    const c = new component(generateUUID(), this, entity)
+    const c = new component(generateUUID(), entity)
     entity.components.push(c)
 
     if (hasAwake(c)) {
@@ -293,16 +276,12 @@ class AsteroidsApplication implements IAsteroidsApplication {
       instance.entities.forEach((entity) => {
         this.destroy(entity)
       })
-      instance.entities = []
-      delete instance.entities
-
       return
     }
 
     if (isEntity(instance)) {
       this.entities = this.entities.filter((entity) => entity !== instance)
       instance.components.forEach((component) => this.destroy(component))
-
       return
     }
 
@@ -321,13 +300,6 @@ class AsteroidsApplication implements IAsteroidsApplication {
         value.onFixedLoop()
       }
     })
-
-    this.context.clearRect(
-      0,
-      0,
-      this.context.canvas.width,
-      this.context.canvas.height,
-    )
     ;[...this.entities, ...this.components].forEach((value) => {
       if (hasLoop(value)) {
         value.onLoop()
@@ -441,19 +413,7 @@ export class AsteroidsFactory {
    * @param options defines an object that contains the game options
    */
   static create(options?: GameFactoryOptions): AsteroidsApplication {
-    const canvas = document.getElementById(
-      'asteroidsjs-canvas',
-    ) as HTMLCanvasElement
-
-    canvas.width = options.screen.width || window.innerWidth
-    canvas.height = options.screen.height || window.innerHeight
-    canvas.style.transform = `translateX(${-options.displacement || 0}px)`
-
-    return new AsteroidsApplication(
-      options.screen,
-      canvas.getContext('2d'),
-      options.bootstrap,
-    )
+    return new AsteroidsApplication(options.bootstrap)
   }
 }
 

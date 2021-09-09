@@ -5,7 +5,6 @@ import { AbstractService } from '../abstract-service'
 import { AbstractComponent } from '../abstract-component'
 
 import { IInstantiateOptions } from './instantiate-options.interface'
-import { IScreen } from './screen.interface'
 import { Type } from './type.interface'
 
 import { AbstractScene } from '../abstract-scene'
@@ -13,13 +12,9 @@ import { AbstractScene } from '../abstract-scene'
 export interface IAsteroidsApplication {
   start(): void
 
-  getContext(): CanvasRenderingContext2D
-
-  getScreen(): IScreen
-
   load<S extends AbstractScene>(scene: Type<S>): S
 
-  unload<S extends AbstractScene>(scene: string | S | Type<S>): void
+  unload<S extends AbstractScene>(scene: string | S | Type<S>): Promise<void>
 
   instantiate<E extends AbstractEntity>(
     options?: IInstantiateOptions<E>,
