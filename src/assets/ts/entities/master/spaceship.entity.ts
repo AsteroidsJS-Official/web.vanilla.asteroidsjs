@@ -3,6 +3,7 @@ import {
   Entity,
   IDraw,
   IOnAwake,
+  IOnDestroy,
   IOnLateLoop,
   ISocketData,
   Rect,
@@ -81,7 +82,7 @@ import { IOnTriggerEnter } from '../../interfaces/on-trigger-enter.interface'
 })
 export class Spaceship
   extends AbstractEntity
-  implements IOnAwake, IDraw, IOnLateLoop, IOnTriggerEnter
+  implements IOnAwake, IDraw, IOnLateLoop, IOnTriggerEnter, IOnDestroy
 {
   public isShooting = false
 
@@ -129,6 +130,10 @@ export class Spaceship
   onStart(): void {
     this.image.src = `./assets/svg/spaceship-${this.userService.spaceshipImage}.svg`
     this.health.color = this.userService.spaceshipColor
+  }
+
+  onDestroy(): void {
+    socket.emit('destroy', this.id)
   }
 
   onTriggerEnter(collision: ICollision2): void {
@@ -187,7 +192,7 @@ export class Spaceship
   }
 
   public shoot(): void {
-    if (this.lastShot && new Date().getTime() - this.lastShot.getTime() < 300) {
+    if (this.lastShot && new Date().getTime() - this.lastShot.getTime() < 400) {
       return
     }
 

@@ -99,6 +99,9 @@ export class Manager extends AbstractEntity implements IOnStart {
       data: {
         position: new Vector2(),
         dimensions: new Rect(50, 50),
+        spaceshipColor: this.userService.spaceshipColor,
+        nickname: this.userService.nickname,
+        imageSrc: `./assets/svg/spaceship-${this.userService.spaceshipImage}.svg`,
         maxHealth: 30,
         health: 30,
       },
