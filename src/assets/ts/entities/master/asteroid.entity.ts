@@ -66,6 +66,8 @@ export class Asteroid
 
   public tag = Asteroid.name
 
+  public isFragment = false
+
   public set asteroidSize(size: number) {
     this._asteroidSize = size
   }
@@ -133,10 +135,9 @@ export class Asteroid
     )
 
     if (
-      !overflowingX &&
-      !overflowingY &&
       this.getComponent(Render) &&
-      !this.getComponent(RenderOverflow)
+      !this.getComponent(RenderOverflow) &&
+      (this.isFragment || (!overflowingX && !overflowingY))
     ) {
       this.addComponent(RenderOverflow)
       this.destroy(this.getComponent(Render))
@@ -170,6 +171,7 @@ export class Asteroid
       const fragment = this.instantiate({
         use: {
           asteroidSize: this._asteroidSize - 1,
+          isFragment: true,
         },
         entity: Asteroid,
         components: [
@@ -204,6 +206,7 @@ export class Asteroid
           mass: 15 * this._asteroidSize,
           maxAngularVelocity: 0.09,
           angularVelocity: 0.05 / this._asteroidSize,
+          isFragment: true,
         },
       })
     }
