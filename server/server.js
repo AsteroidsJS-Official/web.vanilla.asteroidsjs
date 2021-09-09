@@ -123,15 +123,6 @@ function setupServer() {
     }
   })
 
-  router.get('/screen/:screenNumber/game', (_, res) => {
-    res.header('Access-Control-Allow-Origin', '*')
-    res.header(
-      'Access-Control-Allow-Headers',
-      'Origin, X-Requested-With, Content-Type, Accept',
-    )
-    res.sendFile(path.resolve(__dirname, '../dist/assets/html/game.html'))
-  })
-
   app.use('/', router)
 
   httpServer.listen(process.env.PORT || 8080)
