@@ -140,7 +140,9 @@ export abstract class AbstractComponent {
    *
    * @param instance defines the instance that will be destroyed
    */
-  destroy<T extends AbstractEntity | AbstractComponent>(instance: T): void {
-    this.entity.destroy(instance)
+  async destroy<T extends AbstractEntity | AbstractComponent>(
+    instance: T,
+  ): Promise<void> {
+    await this.entity.destroy(instance)
   }
 }

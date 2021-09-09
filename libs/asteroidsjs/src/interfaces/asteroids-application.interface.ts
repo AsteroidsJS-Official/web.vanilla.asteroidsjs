@@ -22,7 +22,9 @@ export interface IAsteroidsApplication {
 
   find<C extends AbstractComponent>(component: Type<C>): C[]
 
-  destroy<T extends AbstractEntity | AbstractComponent>(instance: T): void
+  destroy<T extends AbstractEntity | AbstractComponent>(
+    instance: T,
+  ): Promise<void>
 
   addService<E extends AbstractEntity, P extends AbstractService>(
     entity: E,

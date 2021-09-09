@@ -6,5 +6,5 @@ export interface IOnStart {
   /**
    * Method that will be called after the awake method be called
    */
-  onStart(): void
+  onStart(): void | Promise<void>
 }

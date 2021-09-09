@@ -6,5 +6,5 @@ export interface IOnDestroy {
   /**
    * Method that will be called when the entity is destroyed
    */
-  onDestroy(): void
+  onDestroy(): void | Promise<void>
 }

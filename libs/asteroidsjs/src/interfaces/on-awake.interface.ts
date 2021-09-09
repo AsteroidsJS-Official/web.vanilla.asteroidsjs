@@ -6,5 +6,5 @@ export interface IOnAwake {
   /**
    * Method that will be called after all the entity dependencies be resolved
    */
-  onAwake(): void
+  onAwake(): void | Promise<void>
 }
