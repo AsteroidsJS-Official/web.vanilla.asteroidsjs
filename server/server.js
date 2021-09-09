@@ -83,6 +83,8 @@ function setupServer() {
 
   const router = express.Router()
 
+  router.use(express.static(path.resolve(__dirname, '../dist')))
+
   router.use(
     '/screen/:screenNumber',
     express.static(path.resolve(__dirname, '../dist')),

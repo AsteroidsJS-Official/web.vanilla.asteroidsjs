@@ -19,6 +19,10 @@ import { CircleCollider2 } from './circle-collider2.component'
 })
 export class RectCollider2 extends AbstractCollider {
   draw(): void {
+    if (!this.devMode) {
+      return
+    }
+
     this.getContext().translate(this.canvasPosition.x, this.canvasPosition.y)
 
     this.getContext().beginPath()

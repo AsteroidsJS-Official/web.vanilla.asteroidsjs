@@ -53,6 +53,11 @@ export abstract class AbstractCollider
   protected collisions: ICollision2[] = []
 
   /**
+   * Property that allows some methods to be called.
+   */
+  protected devMode = false
+
+  /**
    * Property that represents the collider dimensions
    */
   private _dimensions: Rect

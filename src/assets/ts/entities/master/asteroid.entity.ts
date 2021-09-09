@@ -16,6 +16,8 @@ import { socket } from '../../socket'
 
 import { Spaceship } from './spaceship.entity'
 
+import { UserService } from '../../services/user.service'
+
 import { CircleCollider2 } from '../../components/colliders/circle-collider2.component'
 import { Drawer } from '../../components/drawer.component'
 import { RenderOverflow } from '../../components/renderers/render-overflow.component'
@@ -35,6 +37,7 @@ import asteroidSm from '../../../svg/asteroid-sm.svg'
 import asteroidXs from '../../../svg/asteroid-xs.svg'
 
 @Entity({
+  services: [UserService],
   components: [
     Render,
     Drawer,
@@ -53,6 +56,8 @@ export class Asteroid
   extends AbstractEntity
   implements IOnAwake, IOnStart, IDraw, IOnLoop, IOnDestroy, IOnTriggerEnter
 {
+  private userService: UserService
+
   private transform: Transform
 
   private _asteroidSize: number
@@ -66,6 +71,7 @@ export class Asteroid
   }
 
   public onAwake(): void {
+    this.userService = this.getService(UserService)
     this.transform = this.getComponent(Transform)
   }
 
@@ -102,6 +108,8 @@ export class Asteroid
     ) {
       return
     }
+
+    this.userService.increaseScore(this._asteroidSize + 1)
 
     this.destroy(collision.entity2)
 
@@ -154,7 +162,10 @@ export class Asteroid
         this.transform.position.y,
       )
 
-      const velocity = Vector2.multiply(direction.normalized, 2)
+      const velocity = Vector2.multiply(
+        direction.normalized,
+        Math.floor(Math.random() * (5 - this._asteroidSize - 2) + 2) * -1,
+      )
 
       const fragment = this.instantiate({
         use: {

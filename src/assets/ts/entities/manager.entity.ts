@@ -12,48 +12,59 @@ import { socket } from '../socket'
 import { Asteroid } from './master/asteroid.entity'
 import { Bullet } from './master/bullet.entity'
 import { ManagerAsteroids } from './master/manager-asteroids.entity'
+import { Score } from './master/score.entity'
 import { Spaceship } from './master/spaceship.entity'
 import { AsteroidVirtual } from './virtual/asteroid-virtual.entity'
 import { BulletVirtual } from './virtual/bullet-virtual.entity'
 import { SpaceshipVirtual } from './virtual/spaceship-virtual.entity'
+
+import { UserService } from '../services/user.service'
 
 import { Health } from '../components/health.component'
 
 /**
  * Class that represents the first entity to be loaded into the game
  */
-@Entity()
+@Entity({
+  services: [UserService],
+})
 export class Manager extends AbstractEntity implements IOnStart {
+  private userService: UserService
+
   public onStart(): void {
+    this.userService = this.getService(UserService)
+
     this.master()
+    // if (this.getScreen().number === 1) {
+    //   setTimeout(() => {
+    //   }, 100)
+    // } else {
+    //   this.virtual()
+    // }
   }
 
   private master(): void {
     const color = window.localStorage.getItem('asteroidsjs_spaceship_color')
-    let nickname = window.localStorage.getItem('asteroidsjs_nickname')
-    nickname = nickname ? nickname.toUpperCase() : 'GUEST'
+    const nickname = window.localStorage.getItem('asteroidsjs_nickname')
 
-    let imageSrc = ''
-    let spaceshipColor = ''
+    if (nickname) {
+      this.userService.nickname = nickname.toUpperCase()
+    }
 
     if (color) {
-      spaceshipColor = JSON.parse(color).rgb
-      imageSrc = `./assets/svg/spaceship-${JSON.parse(color).name}.svg`
-    } else {
-      spaceshipColor = '#888888'
-      imageSrc = './assets/svg/spaceship-grey.svg'
+      this.userService.spaceshipColor = JSON.parse(color).rgb as string
+      this.userService.spaceshipImage = JSON.parse(color).name as string
     }
 
     this.instantiate({
       entity: ManagerAsteroids,
     })
 
+    this.instantiate({
+      entity: Score,
+    })
+
     const spaceship = this.instantiate({
-      use: {
-        spaceshipColor,
-        nickname,
-        imageSrc,
-      },
       entity: Spaceship,
       components: [
         {
@@ -75,7 +86,6 @@ export class Manager extends AbstractEntity implements IOnStart {
         {
           class: Health,
           use: {
-            color: spaceshipColor,
             maxHealth: 30,
             health: 30,
           },
@@ -89,9 +99,9 @@ export class Manager extends AbstractEntity implements IOnStart {
       data: {
         position: new Vector2(),
         dimensions: new Rect(50, 50),
-        spaceshipColor,
-        nickname,
-        imageSrc,
+        spaceshipColor: this.userService.spaceshipColor,
+        nickname: this.userService.nickname,
+        imageSrc: `./assets/svg/spaceship-${this.userService.spaceshipImage}.svg`,
         maxHealth: 30,
         health: 30,
       },
