@@ -3,6 +3,7 @@ import {
   Entity,
   IDraw,
   IOnAwake,
+  IOnDestroy,
   IOnLateLoop,
   ISocketData,
   Rect,
@@ -12,6 +13,8 @@ import {
 import { socket } from '../../socket'
 
 import { Bullet } from './bullet.entity'
+
+import { UserService } from '../../services/user.service'
 
 import { CircleCollider2 } from '../../components/colliders/circle-collider2.component'
 import { Drawer } from '../../components/drawer.component'
@@ -30,6 +33,7 @@ import { Single } from '../../scenes/single.scene'
  * Class that represents the spaceship entity controlled by the user.
  */
 @Entity({
+  services: [UserService],
   components: [
     Drawer,
     RenderOverflow,
@@ -80,11 +84,13 @@ import { Single } from '../../scenes/single.scene'
 })
 export class Spaceship
   extends AbstractEntity
-  implements IOnAwake, IDraw, IOnLateLoop, IOnTriggerEnter
+  implements IOnAwake, IDraw, IOnLateLoop, IOnTriggerEnter, IOnDestroy
 {
   tag = Spaceship.name
 
   public isShooting = false
+
+  private userService: UserService
 
   /**
    * Property responsible for the spaceship bullet velocity.
@@ -110,12 +116,6 @@ export class Spaceship
 
   private image = new Image()
 
-  public imageSrc = ''
-
-  public nickname = ''
-
-  public spaceshipColor = ''
-
   public get direction(): Vector2 {
     return new Vector2(
       Math.sin(this.transform.rotation),
@@ -124,13 +124,20 @@ export class Spaceship
   }
 
   onAwake(): void {
+    this.userService = this.getService(UserService)
+
     this.transform = this.getComponent(Transform)
     this.rigidbody = this.getComponent(Rigidbody)
     this.health = this.getComponent(Health)
   }
 
   onStart(): void {
-    this.image.src = this.imageSrc
+    this.image.src = `./assets/svg/spaceship-${this.userService.spaceshipImage}.svg`
+    this.health.color = this.userService.spaceshipColor
+  }
+
+  onDestroy(): void {
+    socket.emit('destroy', this.id)
   }
 
   onTriggerEnter(collision: ICollision2): void {
@@ -192,7 +199,7 @@ export class Spaceship
   }
 
   public shoot(): void {
-    if (this.lastShot && new Date().getTime() - this.lastShot.getTime() < 300) {
+    if (this.lastShot && new Date().getTime() - this.lastShot.getTime() < 400) {
       return
     }
 

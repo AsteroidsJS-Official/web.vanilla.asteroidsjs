@@ -81,6 +81,12 @@ export class SpaceshipVirtual
       this.health.health = data.health
       this.health.maxHealth = data.maxHealth
     })
+
+    socket.on('destroy', (id: string) => {
+      if (id === this.id) {
+        this.destroy(this)
+      }
+    })
   }
 
   public draw(): void {

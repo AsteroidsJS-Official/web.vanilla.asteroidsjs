@@ -1,0 +1,14 @@
+.score-container {
+  position: fixed;
+  top: 40px;
+  right: 50px;
+
+  pointer-events: none;
+
+  font-family: 'Neptunus';
+
+  & > .score {
+    color: #fff;
+    letter-spacing: 2px;
+  }
+}

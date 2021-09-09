@@ -27,6 +27,7 @@ export class ManagerAsteroids
     }
     this.interval = setInterval(() => {
       this.generateAsteroid()
+      this.generateAsteroid()
     }, 10000)
   }
 
@@ -60,7 +61,10 @@ export class ManagerAsteroids
 
     const rotation = Math.random() * 2 * Math.PI
 
-    const velocity = Vector2.multiply(new Vector2(x, y).normalized, -2)
+    const velocity = Vector2.multiply(
+      new Vector2(x, y).normalized,
+      Math.floor(Math.random() * (5 - asteroidSize + 1 - 2) + 2) * -1,
+    )
 
     const asteroid = this.instantiate({
       use: {
