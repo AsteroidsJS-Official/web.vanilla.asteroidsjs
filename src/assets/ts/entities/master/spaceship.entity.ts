@@ -13,6 +13,8 @@ import { socket } from '../../socket'
 
 import { Bullet } from './bullet.entity'
 
+import { UserService } from '../../services/user.service'
+
 import { CircleCollider2 } from '../../components/colliders/circle-collider2.component'
 import { Drawer } from '../../components/drawer.component'
 import { Health } from '../../components/health.component'
@@ -28,6 +30,7 @@ import { IOnTriggerEnter } from '../../interfaces/on-trigger-enter.interface'
  * Class that represents the spaceship entity controlled by the user.
  */
 @Entity({
+  services: [UserService],
   components: [
     Drawer,
     RenderOverflow,
@@ -82,6 +85,8 @@ export class Spaceship
 {
   public isShooting = false
 
+  private userService: UserService
+
   /**
    * Property responsible for the spaceship bullet velocity.
    */
@@ -106,12 +111,6 @@ export class Spaceship
 
   private image = new Image()
 
-  public imageSrc = ''
-
-  public nickname = ''
-
-  public spaceshipColor = ''
-
   public get direction(): Vector2 {
     return new Vector2(
       Math.sin(this.transform.rotation),
@@ -120,13 +119,16 @@ export class Spaceship
   }
 
   onAwake(): void {
+    this.userService = this.getService(UserService)
+
     this.transform = this.getComponent(Transform)
     this.rigidbody = this.getComponent(Rigidbody)
     this.health = this.getComponent(Health)
   }
 
   onStart(): void {
-    this.image.src = this.imageSrc
+    this.image.src = `./assets/svg/spaceship-${this.userService.spaceshipImage}.svg`
+    this.health.color = this.userService.spaceshipColor
   }
 
   onTriggerEnter(collision: ICollision2): void {
