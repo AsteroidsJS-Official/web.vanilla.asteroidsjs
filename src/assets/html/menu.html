@@ -1,0 +1,168 @@
+<div class="menu-container">
+  <section class="play-buttons">
+    <span class="play-game-selector">
+      <button
+        id="play-singleplayer-button"
+        aria-label="SINGLEPLAYER"
+        class="play-singleplayer-button"
+      >
+        SINGLEPLAYER
+      </button>
+      <img
+        src="./assets/svg/spaceship-sp.svg"
+        alt="play-singleplayer-spaceship"
+      />
+    </span>
+
+    <span class="play-game-selector">
+      <button
+        id="play-local-multiplayer-button"
+        aria-label="LOCAL MULTIPLAYER"
+        class="play-local-multiplayer-button"
+      >
+        LOCAL MULTIPLAYER
+      </button>
+      <img
+        src="./assets/svg/spaceship-lmp.svg"
+        alt="play-local-multiplayer-spaceship"
+      />
+    </span>
+
+    <span class="play-game-selector">
+      <button
+        id="play-online-multiplayer-button"
+        aria-label="ONLINE MULTIPLAYER"
+        class="play-online-multiplayer-button"
+      >
+        ONLINE MULTIPLAYER
+      </button>
+      <img
+        src="./assets/svg/spaceship-omp.svg"
+        alt="play-online-multiplayer-spaceship"
+      />
+    </span>
+  </section>
+
+  <section class="player-customization">
+    <div class="spaceship-customization">
+      <div class="spaceship-skin-container">
+        <img
+          id="spaceship-skin"
+          src="./assets/svg/spaceship-grey.svg"
+          alt="Spaceship Skin"
+        />
+      </div>
+
+      <div class="spaceship-color-picker"></div>
+    </div>
+
+    <div class="nickname-guest-input-container">
+      <input
+        id="nickname-guest-input"
+        name="nickname-guest"
+        type="text"
+        class="nickname-guest-input"
+        maxlength="20"
+        required
+      />
+      <label for="nickname-guest" class="nickname-guest-label">Nickname</label>
+    </div>
+
+    <button class="login-button">Login with my account</button>
+  </section>
+
+  <button class="settings-button">
+    <svg
+      width="155"
+      height="158"
+      viewBox="0 0 155 158"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M1.05947 104.841L16.8915 132.175C17.9425 133.988 19.6721 135.31 21.6999 135.851C23.7276 136.392 25.8875 136.107 27.7047 135.058L38.7554 128.691C43.3467 132.301 48.4209 135.264 53.7562 137.476V150.1C53.7562 152.195 54.5902 154.205 56.0748 155.686C57.5593 157.168 59.5728 158 61.6722 158H93.3362C95.4357 158 97.4491 157.168 98.9337 155.686C100.418 154.205 101.252 152.195 101.252 150.1V137.476C106.629 135.242 111.676 132.286 116.253 128.691L127.304 135.058C131.08 137.231 135.94 135.927 138.117 132.175L153.949 104.841C154.991 103.025 155.272 100.873 154.731 98.8515C154.189 96.8303 152.87 95.1044 151.06 94.0495L140.199 87.7848C141.048 81.9585 141.042 76.04 140.183 70.2152L151.044 63.9505C154.812 61.778 156.118 56.9195 153.933 53.1591L138.101 25.8251C137.05 24.012 135.321 22.6898 133.293 22.149C131.265 21.6083 129.105 21.8934 127.288 22.9416L116.237 29.309C111.666 25.7096 106.621 22.7537 101.244 20.5242V7.9C101.244 5.80479 100.41 3.79539 98.9258 2.31386C97.4412 0.832319 95.4278 0 93.3283 0H61.6643C59.5649 0 57.5514 0.832319 56.0669 2.31386C54.5823 3.79539 53.7483 5.80479 53.7483 7.9V20.5242C48.3712 22.7584 43.3244 25.7139 38.7475 29.309L27.7047 22.9416C26.8052 22.4215 25.8118 22.0836 24.7812 21.947C23.7507 21.8105 22.7033 21.878 21.699 22.1459C20.6947 22.4137 19.7531 22.8765 18.9282 23.5078C18.1033 24.1391 17.4111 24.9266 16.8915 25.8251L1.05947 53.1591C0.0176251 54.9746 -0.263302 57.1273 0.277863 59.1485C0.819027 61.1697 2.13845 62.8956 3.9488 63.9505L14.8095 70.2152C13.9557 76.0407 13.9557 81.9593 14.8095 87.7848L3.9488 94.0495C0.180791 96.222 -1.12535 101.08 1.05947 104.841ZM77.4963 47.4C94.959 47.4 109.16 61.5726 109.16 79C109.16 96.4274 94.959 110.6 77.4963 110.6C60.0336 110.6 45.8323 96.4274 45.8323 79C45.8323 61.5726 60.0336 47.4 77.4963 47.4Z"
+        fill="currentColor"
+        fill-opacity="0.8"
+      />
+    </svg>
+  </button>
+
+  <div class="modal-container">
+    <div class="overlay"></div>
+
+    <div class="auth-modal">
+      <button class="close-button auth">
+        <svg
+          width="307"
+          height="307"
+          viewBox="0 0 307 307"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M137 16.5C137 7.3873 144.387 0 153.5 0C162.613 0 170 7.3873 170 16.5V290.5C170 299.613 162.613 307 153.5 307C144.387 307 137 299.613 137 290.5V16.5Z"
+            fill="currentColor"
+          />
+          <path
+            d="M16.5 170C7.3873 170 0 162.613 0 153.5C0 144.387 7.3873 137 16.5 137H290.5C299.613 137 307 144.387 307 153.5C307 162.613 299.613 170 290.5 170H16.5Z"
+            fill="currentColor"
+          />
+        </svg>
+      </button>
+
+      <h1 id="auth-modal-title">LOGIN</h1>
+
+      <div class="nickname-input-container auth-input-container">
+        <input
+          id="nickname-input"
+          name="nickname"
+          type="text"
+          class="nickname-input auth-form"
+          required
+        />
+        <label for="nickname" class="nickname-label auth-label">Nickname</label>
+      </div>
+
+      <div class="email-input-container auth-input-container">
+        <input
+          id="email-input"
+          name="email"
+          type="text"
+          class="email-input auth-form"
+          required
+        />
+        <label for="email" class="email-label auth-label">E-mail</label>
+      </div>
+
+      <div class="password-input-container auth-input-container">
+        <input
+          id="password-input"
+          name="password"
+          type="password"
+          class="password-input auth-form"
+          required
+        />
+        <label for="password" class="password-label auth-label">Password</label>
+      </div>
+
+      <div class="confirm-password-input-container auth-input-container">
+        <input
+          id="confirm-password-input"
+          name="confirm-password"
+          type="password"
+          class="confirm-password-input auth-form"
+          required
+        />
+        <label for="confirm-password" class="confirm-password-label auth-label"
+          >Confirm password</label
+        >
+      </div>
+
+      <button class="auth-button">LOGIN</button>
+
+      <button class="auth-switch-button">Already have an account?</button>
+    </div>
+
+    <div class="settings-modal"></div>
+  </div>
+</div>

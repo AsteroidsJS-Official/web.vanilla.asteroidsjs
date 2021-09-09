@@ -4,14 +4,14 @@ import './assets/ts/menu.ts'
 
 import { AsteroidsFactory } from '@asteroidsjs'
 
-import { Single } from './assets/ts/scenes/single.scene'
+import { Menu } from './assets/ts/scenes/menu.scene'
 
 /**
  * Creates and starts the game.
  */
 function bootstrap(): void {
   const game = AsteroidsFactory.create({
-    bootstrap: [Single],
+    bootstrap: [Menu],
   })
   game.start()
 }

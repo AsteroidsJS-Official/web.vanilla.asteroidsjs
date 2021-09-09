@@ -42,6 +42,8 @@ export class AsteroidVirtual
 
   private _image = new Image()
 
+  public isFragment = false
+
   public set image(src: string) {
     this._image.src = src
   }
@@ -80,10 +82,9 @@ export class AsteroidVirtual
     )
 
     if (
-      !overflowingX &&
-      !overflowingY &&
       this.getComponent(Render) &&
-      !this.getComponent(RenderOverflow)
+      !this.getComponent(RenderOverflow) &&
+      (this.isFragment || (!overflowingX && !overflowingY))
     ) {
       this.addComponent(RenderOverflow)
       this.destroy(this.getComponent(Render))
