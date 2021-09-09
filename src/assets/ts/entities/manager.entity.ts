@@ -17,6 +17,8 @@ import { AsteroidVirtual } from './virtual/asteroid-virtual.entity'
 import { BulletVirtual } from './virtual/bullet-virtual.entity'
 import { SpaceshipVirtual } from './virtual/spaceship-virtual.entity'
 
+import { Health } from '../components/health.component'
+
 /**
  * Class that represents the first entity to be loaded into the game
  */
@@ -27,13 +29,30 @@ export class Manager extends AbstractEntity implements IOnStart {
   }
 
   private master(): void {
+    const color = window.localStorage.getItem('asteroidsjs_spaceship_color')
+    let nickname = window.localStorage.getItem('asteroidsjs_nickname')
+    nickname = nickname ? nickname.toUpperCase() : 'GUEST'
+
+    let imageSrc = ''
+    let spaceshipColor = ''
+
+    if (color) {
+      spaceshipColor = JSON.parse(color).rgb
+      imageSrc = `./assets/svg/spaceship-${JSON.parse(color).name}.svg`
+    } else {
+      spaceshipColor = '#888888'
+      imageSrc = './assets/svg/spaceship-grey.svg'
+    }
+
     this.instantiate({
       entity: ManagerAsteroids,
     })
 
     const spaceship = this.instantiate({
       use: {
-        tag: `${Spaceship.name}`,
+        spaceshipColor,
+        nickname,
+        imageSrc,
       },
       entity: Spaceship,
       components: [
@@ -53,6 +72,14 @@ export class Manager extends AbstractEntity implements IOnStart {
             maxAngularVelocity: 0.09,
           },
         },
+        {
+          class: Health,
+          use: {
+            color: spaceshipColor,
+            maxHealth: 30,
+            health: 30,
+          },
+        },
       ],
     })
 
@@ -62,6 +89,11 @@ export class Manager extends AbstractEntity implements IOnStart {
       data: {
         position: new Vector2(),
         dimensions: new Rect(50, 50),
+        spaceshipColor,
+        nickname,
+        imageSrc,
+        maxHealth: 30,
+        health: 30,
       },
     } as ISocketData)
   }
@@ -73,6 +105,9 @@ export class Manager extends AbstractEntity implements IOnStart {
           this.instantiate({
             use: {
               id,
+              spaceshipColor: data.spaceshipColor,
+              nickname: data.nickname,
+              imageSrc: data.imageSrc,
             },
             entity: SpaceshipVirtual,
             components: [
@@ -82,6 +117,14 @@ export class Manager extends AbstractEntity implements IOnStart {
                   rotation: data.rotation,
                   position: data.position,
                   dimensions: data.dimensions,
+                },
+              },
+              {
+                class: Health,
+                use: {
+                  color: data.spaceshipColor,
+                  maxHealth: data.maxHealth,
+                  health: data.health,
                 },
               },
             ],

@@ -1,5 +1,6 @@
 import './global.scss'
 import 'reflect-metadata'
+import './assets/ts/menu.ts'
 
 import { AsteroidsFactory } from '@asteroidsjs'
 

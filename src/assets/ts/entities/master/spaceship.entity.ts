@@ -15,6 +15,7 @@ import { Bullet } from './bullet.entity'
 
 import { CircleCollider2 } from '../../components/colliders/circle-collider2.component'
 import { Drawer } from '../../components/drawer.component'
+import { Health } from '../../components/health.component'
 import { Input } from '../../components/input.component'
 import { RenderOverflow } from '../../components/renderers/render-overflow.component'
 import { Rigidbody } from '../../components/rigidbody.component'
@@ -23,7 +24,6 @@ import { Transform } from '../../components/transform.component'
 import { ICollision2 } from '../../interfaces/collision2.interface'
 import { IOnTriggerEnter } from '../../interfaces/on-trigger-enter.interface'
 
-import spaceshipImg from '../../../svg/spaceship.svg'
 import { Single } from '../../scenes/single.scene'
 
 /**
@@ -106,7 +106,15 @@ export class Spaceship
    */
   private rigidbody: Rigidbody
 
-  private image: HTMLImageElement
+  private health: Health
+
+  private image = new Image()
+
+  public imageSrc = ''
+
+  public nickname = ''
+
+  public spaceshipColor = ''
 
   public get direction(): Vector2 {
     return new Vector2(
@@ -118,11 +126,11 @@ export class Spaceship
   onAwake(): void {
     this.transform = this.getComponent(Transform)
     this.rigidbody = this.getComponent(Rigidbody)
+    this.health = this.getComponent(Health)
   }
 
   onStart(): void {
-    this.image = new Image()
-    this.image.src = spaceshipImg
+    this.image.src = this.imageSrc
   }
 
   onTriggerEnter(collision: ICollision2): void {
@@ -142,6 +150,8 @@ export class Spaceship
         position: this.transform.position,
         dimensions: this.transform.dimensions,
         rotation: this.transform.rotation,
+        health: this.health.health,
+        maxHealth: this.health.maxHealth,
       },
     })
   }
@@ -151,8 +161,20 @@ export class Spaceship
       this.transform.canvasPosition.x,
       this.transform.canvasPosition.y,
     )
+
+    // this.getContext().fillStyle = this.spaceshipColor
+    // this.getContext().textAlign = 'center'
+    // this.getContext().canvas.style.letterSpacing = '0.75px'
+    // this.getContext().font = '12px Neptunus'
+    // this.getContext().fillText(
+    //   this.nickname,
+    //   0,
+    //   0 - (this.transform.dimensions.height / 2 + 20),
+    // )
+
     this.getContext().rotate(this.transform.rotation)
 
+    this.getContext().beginPath()
     this.getContext().drawImage(
       this.image,
       0 - this.transform.dimensions.width / 2,
@@ -160,6 +182,7 @@ export class Spaceship
       this.transform.dimensions.width,
       this.transform.dimensions.height,
     )
+    this.getContext().closePath()
 
     this.getContext().rotate(-this.transform.rotation)
     this.getContext().translate(
