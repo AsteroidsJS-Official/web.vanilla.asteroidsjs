@@ -27,6 +27,7 @@ export class Score extends AbstractEntity implements IOnAwake, IOnDestroy {
       const scoreEl = html.getElementsByClassName('score')[0]
       if (scoreEl) {
         this.score = +scoreEl.innerHTML
+        this.userService.setScore(this.score)
       }
 
       document.body.appendChild(html)
@@ -34,10 +35,10 @@ export class Score extends AbstractEntity implements IOnAwake, IOnDestroy {
   }
 
   onDestroy(): void {
-    const scoreEl = document.querySelector('.score-container > .score')
+    const scoreEl = document.querySelector('ast-score')
 
     if (scoreEl) {
-      document.body.removeChild(scoreEl)
+      scoreEl.remove()
     }
   }
 

@@ -34,13 +34,13 @@ export class Manager extends AbstractEntity implements IOnStart {
   public onStart(): void {
     this.userService = this.getService(UserService)
 
-    if (this.game.getScreen().number === 1) {
-      setTimeout(() => {
-        this.master()
-      }, 100)
-    } else {
-      this.virtual()
-    }
+    this.master()
+    // if (this.getScreen().number === 1) {
+    //   setTimeout(() => {
+    //   }, 100)
+    // } else {
+    //   this.virtual()
+    // }
   }
 
   private master(): void {
