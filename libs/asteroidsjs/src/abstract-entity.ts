@@ -149,8 +149,10 @@ export abstract class AbstractEntity {
    *
    * @param instance defines the instance that will be destroyed
    */
-  destroy<T extends AbstractEntity | AbstractComponent>(instance: T): void {
-    this.scene.game.destroy(instance)
+  async destroy<T extends AbstractEntity | AbstractComponent>(
+    instance: T,
+  ): Promise<void> {
+    await this.scene.game.destroy(instance)
   }
 
   /**

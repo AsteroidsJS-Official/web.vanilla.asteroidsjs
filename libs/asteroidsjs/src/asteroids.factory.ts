@@ -97,10 +97,7 @@ class AsteroidsApplication implements IAsteroidsApplication {
       instance = scene
     }
 
-    return new Promise((resolve) => {
-      this.destroy(instance)
-      resolve()
-    })
+    await this.destroy(instance)
   }
 
   /**
@@ -264,30 +261,33 @@ class AsteroidsApplication implements IAsteroidsApplication {
    *
    * @param instance defines the instance that will be destroyed
    */
-  destroy<T extends AbstractEntity | AbstractComponent | AbstractScene>(
+  async destroy<T extends AbstractEntity | AbstractComponent | AbstractScene>(
     instance: T,
-  ): void {
-    if (hasDestroy(instance)) {
-      instance.onDestroy()
-    }
+  ): Promise<void> {
+    return new Promise((resolve) => {
+      if (hasDestroy(instance)) {
+        instance.onDestroy()
+      }
 
-    if (isScene(instance)) {
-      this.scenes = this.scenes.filter((scene) => scene !== instance)
-      instance.entities.forEach((entity) => {
-        this.destroy(entity)
-      })
-      return
-    }
+      if (isScene(instance)) {
+        this.scenes = this.scenes.filter((scene) => scene !== instance)
+        instance.entities.forEach((entity) => {
+          this.destroy(entity)
+        })
+        resolve()
+      }
 
-    if (isEntity(instance)) {
-      this.entities = this.entities.filter((entity) => entity !== instance)
-      instance.components.forEach((component) => this.destroy(component))
-      return
-    }
+      if (isEntity(instance)) {
+        this.entities = this.entities.filter((entity) => entity !== instance)
+        instance.components.forEach((component) => this.destroy(component))
+        resolve()
+      }
 
-    this.components = this.components.filter(
-      (component) => component !== instance,
-    )
+      this.components = this.components.filter(
+        (component) => component !== instance,
+      )
+      resolve()
+    })
   }
 
   /**
