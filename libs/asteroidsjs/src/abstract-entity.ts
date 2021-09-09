@@ -2,10 +2,11 @@ import { AbstractService } from './abstract-service'
 
 import { AbstractComponent } from './abstract-component'
 
-import { IAsteroidsApplication } from './interfaces/asteroids-application.interface'
 import { IContext } from './interfaces/context.interface'
 import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
 import { Type } from './interfaces/type.interface'
+
+import { AbstractScene } from './abstract-scene'
 
 /**
  * Class that represents some object in the game
@@ -19,7 +20,7 @@ export abstract class AbstractEntity {
 
   constructor(
     readonly id: string | number,
-    readonly game: IAsteroidsApplication,
+    public scene: AbstractScene,
     public components: AbstractComponent[] = [],
     public services: AbstractService[] = [],
   ) {}
@@ -36,22 +37,22 @@ export abstract class AbstractEntity {
   /**
    * Method that can create new entities
    *
-   * @param entity defines the new entity type
-   * @param components defines the new entity component dependencies
+   * @param options defines the entity options when intantiating it
    * @returns the created entity
    */
   instantiate<E extends AbstractEntity>(
     options?: IInstantiateOptions<E>,
   ): E extends AbstractEntity ? E : AbstractEntity {
-    return this.game.instantiate(options)
+    return this.scene.instantiate(options)
   }
 
   /**
    * Method that returns the game context
+   *
    * @returns an object that represents the game context
    */
   getContext(): IContext {
-    return this.game.getContext()
+    return this.scene.getContext()
   }
 
   /**
@@ -130,7 +131,7 @@ export abstract class AbstractEntity {
    * @returns an object that represents the component instance
    */
   addComponent<C extends AbstractComponent>(component: Type<C>): C {
-    return this.game.addComponent(this, component)
+    return this.scene.game.addComponent(this, component)
   }
 
   /**
@@ -140,7 +141,7 @@ export abstract class AbstractEntity {
    * @returns an object that represents the service instance
    */
   addService<P extends AbstractService>(service: Type<P>): P {
-    return this.game.addService(this, service)
+    return this.scene.game.addService(this, service)
   }
 
   /**
@@ -149,7 +150,7 @@ export abstract class AbstractEntity {
    * @param instance defines the instance that will be destroyed
    */
   destroy<T extends AbstractEntity | AbstractComponent>(instance: T): void {
-    this.game.destroy(instance)
+    this.scene.game.destroy(instance)
   }
 
   /**
@@ -159,6 +160,6 @@ export abstract class AbstractEntity {
    * @returns an array of objects with the passed type
    */
   find<C extends AbstractComponent>(component: Type<C>): C[] {
-    return this.game.find(component)
+    return this.scene.game.find(component)
   }
 }

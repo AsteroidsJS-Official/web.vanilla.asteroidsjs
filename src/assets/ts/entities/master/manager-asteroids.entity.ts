@@ -4,6 +4,7 @@ import {
   IOnStart,
   Vector2,
   ISocketData,
+  IOnDestroy,
 } from '@asteroidsjs'
 
 import { socket } from '../../socket'
@@ -14,14 +15,23 @@ import { Asteroid } from './asteroid.entity'
  * Class that represents the first entity to be loaded into the game
  */
 @Entity()
-export class ManagerAsteroids extends AbstractEntity implements IOnStart {
+export class ManagerAsteroids
+  extends AbstractEntity
+  implements IOnStart, IOnDestroy
+{
+  private interval: ReturnType<typeof setInterval>
+
   public onStart(): void {
     for (let i = 0; i < 3; i++) {
       this.generateAsteroid()
     }
-    setInterval(() => {
+    this.interval = setInterval(() => {
       this.generateAsteroid()
     }, 10000)
+  }
+
+  onDestroy(): void {
+    clearInterval(this.interval)
   }
 
   private generateAsteroid(): void {
@@ -30,8 +40,8 @@ export class ManagerAsteroids extends AbstractEntity implements IOnStart {
 
     const offset = 150
 
-    const canvasWidth = this.game.getContext().canvas.width
-    const canvasHeight = this.game.getContext().canvas.height
+    const canvasWidth = this.getContext().canvas.width
+    const canvasHeight = this.getContext().canvas.height
 
     let x = Math.floor(Math.random() * (canvasWidth + offset * 2)) - offset
     let y = Math.floor(Math.random() * (canvasHeight + offset * 2)) - offset

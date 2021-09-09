@@ -2,7 +2,6 @@ import { AbstractEntity } from './abstract-entity'
 
 import { AbstractService } from './abstract-service'
 
-import { IAsteroidsApplication } from './interfaces/asteroids-application.interface'
 import { IContext } from './interfaces/context.interface'
 import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
 import { Type } from './interfaces/type.interface'
@@ -20,11 +19,7 @@ export abstract class AbstractComponent {
     return this.entity.tag
   }
 
-  constructor(
-    readonly id: string | number,
-    readonly game: IAsteroidsApplication,
-    readonly entity: AbstractEntity,
-  ) {}
+  constructor(readonly id: string | number, readonly entity: AbstractEntity) {}
 
   /**
    * Method that returns the entity with some class or interface type
@@ -53,7 +48,7 @@ export abstract class AbstractComponent {
    * @returns an object that represents the game context
    */
   getContext(): IContext {
-    return this.game.getContext()
+    return this.entity.getContext()
   }
 
   /**
@@ -127,7 +122,7 @@ export abstract class AbstractComponent {
    * @returns an object that represents the service instance
    */
   addService<P extends AbstractService>(service: Type<P>): P {
-    return this.game.addService(this.entity, service)
+    return this.entity.addService(service)
   }
 
   /**
@@ -137,7 +132,7 @@ export abstract class AbstractComponent {
    * @returns an array of objects with the passed type
    */
   find<C extends AbstractComponent>(component: Type<C>): C[] {
-    return this.game.find(component)
+    return this.entity.find(component)
   }
 
   /**
@@ -146,6 +141,6 @@ export abstract class AbstractComponent {
    * @param instance defines the instance that will be destroyed
    */
   destroy<T extends AbstractEntity | AbstractComponent>(instance: T): void {
-    this.game.destroy(instance)
+    this.entity.destroy(instance)
   }
 }

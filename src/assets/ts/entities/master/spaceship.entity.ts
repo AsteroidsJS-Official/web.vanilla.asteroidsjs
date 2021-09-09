@@ -24,6 +24,7 @@ import { ICollision2 } from '../../interfaces/collision2.interface'
 import { IOnTriggerEnter } from '../../interfaces/on-trigger-enter.interface'
 
 import spaceshipImg from '../../../svg/spaceship.svg'
+import { Single } from '../../scenes/single.scene'
 
 /**
  * Class that represents the spaceship entity controlled by the user.
@@ -81,6 +82,8 @@ export class Spaceship
   extends AbstractEntity
   implements IOnAwake, IDraw, IOnLateLoop, IOnTriggerEnter
 {
+  tag = Spaceship.name
+
   public isShooting = false
 
   /**
@@ -126,7 +129,10 @@ export class Spaceship
     if (collision.entity2.tag?.includes(Bullet.name)) {
       return
     }
-    console.log('destroy')
+
+    this.scene.unload(this.scene).then(() => {
+      this.scene.load(Single)
+    })
   }
 
   onLateLoop(): void {

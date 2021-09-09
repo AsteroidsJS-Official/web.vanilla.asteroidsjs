@@ -8,7 +8,6 @@ import { IAsteroidsApplication } from './interfaces/asteroids-application.interf
 import { GameFactoryOptions } from './interfaces/game-factory-options.interface'
 import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
 import { IProvider } from './interfaces/provider.interface'
-import { IScreen } from './interfaces/screen.interface'
 import { Type } from './interfaces/type.interface'
 
 import {
@@ -19,8 +18,10 @@ import {
   hasFixedLoop,
   hasLateLoop,
   hasDestroy,
+  isScene,
 } from './utils/validations'
 
+import { AbstractScene } from './abstract-scene'
 import { COMPONENT_OPTIONS, ENTITY_OPTIONS, SERVICE_OPTIONS } from './constants'
 
 import { Entity, generateUUID } from '..'
@@ -29,6 +30,12 @@ import { Entity, generateUUID } from '..'
  * Class that represents the main application behaviour
  */
 class AsteroidsApplication implements IAsteroidsApplication {
+  /**
+   * Property that defines an array of scenes, that represents all the
+   * loaded entities in the game
+   */
+  private scenes: AbstractScene[] = []
+
   /**
    * Property that defines an array of entities, that represents all the
    * instantiated entities in the game
@@ -47,79 +54,71 @@ class AsteroidsApplication implements IAsteroidsApplication {
    */
   private services: AbstractService[] = []
 
-  /**
-   * Property that returns the canvas context
-   *
-   * @returns the canvas context
-   */
-  public getContext(): CanvasRenderingContext2D {
-    return this.context
-  }
-
-  /**
-   * Property that returns the screen data
-   *
-   * @returns the screen data
-   */
-  public getScreen(): IScreen {
-    return this.screen
-  }
-
-  public constructor(
-    private readonly screen: IScreen,
-    private readonly context: CanvasRenderingContext2D,
-    private readonly bootstrap: Type<AbstractEntity>[],
-  ) {}
+  constructor(private readonly bootstrap: Type<AbstractScene>[]) {}
 
   /**
    * Method that starts the game lifecycle
    */
-  public start(): void {
-    this.bootstrap.forEach((entity) => this.instantiate({ entity }))
-
+  start(): void {
+    this.bootstrap.forEach((scene) => this.load(scene))
     this.startLoop()
   }
 
-  private startLoop(): void {
-    requestAnimationFrame(() => this.startLoop())
-    ;[...this.entities, ...this.components].forEach((value) => {
-      if (hasFixedLoop(value)) {
-        value.onFixedLoop()
-      }
-    })
+  /**
+   * Method that can create a new project scene
+   *
+   * @param scene defines the scene type
+   * @returns the created scene
+   */
+  load<S extends AbstractScene>(scene: Type<S>): S {
+    const instance = new scene(generateUUID(), this)
 
-    this.context.clearRect(
-      0,
-      0,
-      this.context.canvas.width,
-      this.context.canvas.height,
-    )
-    ;[...this.entities, ...this.components].forEach((value) => {
-      if (hasLoop(value)) {
-        value.onLoop()
-      }
-    })
-    ;[...this.entities, ...this.components].forEach((value) => {
-      if (hasLateLoop(value)) {
-        value.onLateLoop()
-      }
+    if (hasStart(instance)) {
+      instance.onStart()
+    }
+
+    return instance
+  }
+
+  /**
+   * Method that unloads some specified scene.
+   *
+   * @param scene defines the scene id, type or instance
+   */
+  async unload<S extends AbstractScene>(
+    scene: string | S | Type<S>,
+  ): Promise<void> {
+    let instance: AbstractScene
+    if (typeof scene === 'string') {
+      instance = this.scenes.find((s) => s.id === scene)
+    } else if (typeof scene === 'function') {
+      instance = this.scenes.find((s) => s.constructor.name === scene.name)
+    } else {
+      instance = scene
+    }
+
+    return new Promise((resolve) => {
+      this.destroy(instance)
+      resolve()
     })
   }
 
   /**
    * Method that can create new entities
    *
-   * @param options defines an object that contains all the options needed
-   * to create a new entity
+   * @param options defines an object that contains all the options
+   * needed to create a new entity
    * @returns the created entity
    */
-  public instantiate<E extends AbstractEntity>(
+  instantiate<E extends AbstractEntity>(
     options?: IInstantiateOptions<E>,
   ): E extends AbstractEntity ? E : AbstractEntity {
     const instance =
       options && options.entity
-        ? new options.entity(generateUUID(), this)
-        : new DefaultEntity(generateUUID(), this)
+        ? new options.entity(generateUUID(), options.scene)
+        : new DefaultEntity(generateUUID(), options.scene)
+
+    options.scene.entities.push(instance)
 
     if (options.use) {
       for (const key in options.use) {
@@ -163,7 +162,7 @@ class AsteroidsApplication implements IAsteroidsApplication {
       // creates the components
       instance.components = components
         .filter((c) => !!c.class)
-        .map((c) => new c.class(c.id, this, instance))
+        .map((c) => new c.class(c.id, instance))
     }
 
     const instances = [instance, ...instance.components, ...instance.services]
@@ -208,11 +207,11 @@ class AsteroidsApplication implements IAsteroidsApplication {
    * @param component defines the component type
    * @returns an object that represents the component instance
    */
-  public addComponent<E extends AbstractEntity, C extends AbstractComponent>(
+  addComponent<E extends AbstractEntity, C extends AbstractComponent>(
     entity: E,
     component: Type<C>,
   ): C {
-    const c = new component(generateUUID(), this, entity)
+    const c = new component(generateUUID(), entity)
     entity.components.push(c)
 
     if (hasAwake(c)) {
@@ -233,7 +232,7 @@ class AsteroidsApplication implements IAsteroidsApplication {
    * @param service defines the service type
    * @returns an object that represents the service instance
    */
-  public addService<E extends AbstractEntity, P extends AbstractService>(
+  addService<E extends AbstractEntity, P extends AbstractService>(
     entity: E,
     service: Type<P>,
   ): P {
@@ -254,7 +253,7 @@ class AsteroidsApplication implements IAsteroidsApplication {
    * @param component defines the component type
    * @returns an array with all the found components
    */
-  public find<C extends AbstractComponent>(component: Type<C>): C[] {
+  find<C extends AbstractComponent>(component: Type<C>): C[] {
     return this.components.filter(
       (c) => c.constructor.name === component.name,
     ) as C[]
@@ -265,11 +264,19 @@ class AsteroidsApplication implements IAsteroidsApplication {
    *
    * @param instance defines the instance that will be destroyed
    */
-  public destroy<T extends AbstractEntity | AbstractComponent>(
+  destroy<T extends AbstractEntity | AbstractComponent | AbstractScene>(
     instance: T,
   ): void {
     if (hasDestroy(instance)) {
       instance.onDestroy()
+    }
+
+    if (isScene(instance)) {
+      this.scenes = this.scenes.filter((scene) => scene !== instance)
+      instance.entities.forEach((entity) => {
+        this.destroy(entity)
+      })
+      return
     }
 
     if (isEntity(instance)) {
@@ -277,9 +284,32 @@ class AsteroidsApplication implements IAsteroidsApplication {
       instance.components.forEach((component) => this.destroy(component))
       return
     }
+
     this.components = this.components.filter(
       (component) => component !== instance,
     )
+  }
+
+  /**
+   * Method that stars the game loop
+   */
+  private startLoop(): void {
+    requestAnimationFrame(() => this.startLoop())
+    ;[...this.entities, ...this.components].forEach((value) => {
+      if (hasFixedLoop(value)) {
+        value.onFixedLoop()
+      }
+    })
+    ;[...this.entities, ...this.components].forEach((value) => {
+      if (hasLoop(value)) {
+        value.onLoop()
+      }
+    })
+    ;[...this.entities, ...this.components].forEach((value) => {
+      if (hasLateLoop(value)) {
+        value.onLateLoop()
+      }
+    })
   }
 
   /**
@@ -382,20 +412,8 @@ export class AsteroidsFactory {
    *
    * @param options defines an object that contains the game options
    */
-  public static create(options?: GameFactoryOptions): AsteroidsApplication {
-    const canvas = document.getElementById(
-      'asteroidsjs-canvas',
-    ) as HTMLCanvasElement
-
-    canvas.width = options.screen.width || window.innerWidth
-    canvas.height = options.screen.height || window.innerHeight
-    canvas.style.transform = `translateX(${-options.displacement || 0}px)`
-
-    return new AsteroidsApplication(
-      options.screen,
-      canvas.getContext('2d'),
-      options.bootstrap,
-    )
+  static create(options?: GameFactoryOptions): AsteroidsApplication {
+    return new AsteroidsApplication(options.bootstrap)
   }
 }
 
