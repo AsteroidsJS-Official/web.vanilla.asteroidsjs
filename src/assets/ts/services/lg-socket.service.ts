@@ -5,6 +5,7 @@ import io from 'socket.io-client/dist/socket.io.js'
 import { BehaviorSubject, Observable } from 'rxjs'
 
 type SocketEmitEvents =
+  | 'change-scene'
   | 'connect-screen'
   | 'set-screen-amount'
   | 'get-screens'
@@ -12,24 +13,23 @@ type SocketEmitEvents =
   | 'destroy'
   | 'update-slaves'
   | 'start-game'
-  | 'screens-connected'
   | 'disconnect'
   | 'check-connection-waiting'
   | 'cancel-connection'
   | 'wait-for-slaves'
 
 type SocketOnEvents =
+  | 'change-scene'
   | 'instantiate'
   | 'destroy'
   | 'update-screen'
   | 'start-game'
-  | 'screens-connected'
   | 'slave-connected'
   | 'slave-disconnected'
   | 'waiting-connection'
   | 'cancel-connection'
 
-type LoadScreensData = {
+export type LoadScreensData = {
   screens: IScreen[]
   screenAmount: number
 }
@@ -84,6 +84,12 @@ export class LGSocketService extends AbstractService {
    * Property that defines the canvas total height (all screens connected).
    */
   public canvasTotalHeight = 0
+
+  /**
+   * Property that defines how much the canvas will displace to fit screen
+   * position.
+   */
+  public displacement = 0
 
   public get screen$(): Observable<IScreen> {
     return this._screen.asObservable()
@@ -184,9 +190,14 @@ export class LGSocketService extends AbstractService {
    */
   connectScreen(screenNumber?: number): Observable<IScreen> {
     return new Observable((subscriber) => {
-      this.emit<{ number: number }, IScreen>('connect-screen', {
-        number: screenNumber,
-      }).subscribe((screen: IScreen) => {
+      this.emit<{ number: number; width: number; height: number }, IScreen>(
+        'connect-screen',
+        {
+          number: screenNumber,
+          width: window.innerWidth,
+          height: window.innerHeight,
+        },
+      ).subscribe((screen: IScreen) => {
         if (!screen) {
           return
         }
@@ -203,6 +214,32 @@ export class LGSocketService extends AbstractService {
         subscriber.next(screen)
       })
     })
+  }
+
+  /**
+   * Computes the canvas total width and height and its displacement.
+   */
+  setCanvasSize(): void {
+    if (!this.screen) {
+      return
+    }
+
+    this.screen.position = this.getScreenLayout(this.screenAmount).findIndex(
+      (s) => s === this.screen.number,
+    )
+
+    const screens = this.screens
+
+    this.canvasTotalWidth = screens
+      .map((s) => s.width)
+      .reduce((previous, current) => previous + current, 0)
+
+    this.canvasTotalHeight = this.getScreenByNumber(1)?.height || 0
+
+    this.displacement = screens
+      .filter((s) => s.position < this.screen.position)
+      .map((s) => s.width)
+      .reduce((previous, current) => previous + current, 0)
   }
 
   /**
