@@ -19,12 +19,23 @@ export abstract class AbstractComponent {
     return this.entity.tag
   }
 
+  /**
+   * Property that defines a number used to synchronize the application
+   * physics.
+   */
   get deltaTime(): number {
     return this.entity.deltaTime
   }
 
   constructor(readonly id: string | number, readonly entity: AbstractEntity) {}
 
+  /**
+   * Method that recalculates the component delta time.
+   *
+   * It must be invoked in the begining of the "onFixedLoop" method, before
+   * any other instruction, in order to keep the component physics
+   * synchronized.
+   */
   refreshDeltaTime(): void {
     this.entity.refreshDeltaTime()
   }

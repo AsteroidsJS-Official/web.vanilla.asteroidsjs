@@ -18,8 +18,16 @@ export abstract class AbstractEntity {
    */
   tag: string
 
+  /**
+   * Property that defines a number used to synchronize the application
+   * physics.
+   */
   deltaTime: number
 
+  /**
+   * Property that defines a number that represents the last time saved for
+   * this entity.
+   */
   private lastTime: number
 
   constructor(
@@ -29,6 +37,13 @@ export abstract class AbstractEntity {
     public services: AbstractService[] = [],
   ) {}
 
+  /**
+   * Method that recalculates the entity delta time.
+   *
+   * It must be invoked in the begining of the "onFixedLoop" method, before
+   * any other instruction, in order to keep the entity physics
+   * synchronized.
+   */
   refreshDeltaTime(): void {
     const aux = this.lastTime || Date.now()
     this.lastTime = Date.now()
