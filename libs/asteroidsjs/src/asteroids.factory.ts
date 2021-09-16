@@ -11,14 +11,15 @@ import { IProvider } from './interfaces/provider.interface'
 import { Type } from './interfaces/type.interface'
 
 import {
-  hasStart,
-  hasLoop,
-  hasAwake,
+  hasOnStart,
+  hasOnLoop,
+  hasOnAwake,
   isEntity,
-  hasFixedLoop,
-  hasLateLoop,
-  hasDestroy,
+  hasOnFixedLoop,
+  hasOnLateLoop,
+  hasOnDestroy,
   isScene,
+  hasOnRender,
 } from './utils/validations'
 
 import { AbstractScene } from './abstract-scene'
@@ -61,7 +62,25 @@ class AsteroidsApplication implements IAsteroidsApplication {
    */
   start(): void {
     this.bootstrap.forEach((scene) => this.load(scene))
-    this.startLoop()
+
+    this.startRenderLoop()
+    setInterval(() => {
+      ;[...this.entities, ...this.components].forEach((value) => {
+        if (hasOnFixedLoop(value)) {
+          value.onFixedLoop()
+        }
+      })
+      ;[...this.entities, ...this.components].forEach((value) => {
+        if (hasOnLoop(value)) {
+          value.onLoop()
+        }
+      })
+      ;[...this.entities, ...this.components].forEach((value) => {
+        if (hasOnLateLoop(value)) {
+          value.onLateLoop()
+        }
+      })
+    }, 100 / 16)
   }
 
   /**
@@ -73,7 +92,7 @@ class AsteroidsApplication implements IAsteroidsApplication {
   load<S extends AbstractScene>(scene: Type<S>): S {
     const instance = new scene(generateUUID(), this)
 
-    if (hasStart(instance)) {
+    if (hasOnStart(instance)) {
       instance.onStart()
     }
 
@@ -166,7 +185,7 @@ class AsteroidsApplication implements IAsteroidsApplication {
 
     // invoke the `onAwake` method for the entity and it components and services
     instances.forEach((value) => {
-      if (hasAwake(value)) {
+      if (hasOnAwake(value)) {
         value.onAwake()
       }
     })
@@ -187,7 +206,7 @@ class AsteroidsApplication implements IAsteroidsApplication {
 
     // invoke the `onStart` method for the entity and it components and services
     instances.forEach((value) => {
-      if (hasStart(value)) {
+      if (hasOnStart(value)) {
         value.onStart()
       }
     })
@@ -211,11 +230,11 @@ class AsteroidsApplication implements IAsteroidsApplication {
     const c = new component(generateUUID(), entity)
     entity.components.push(c)
 
-    if (hasAwake(c)) {
+    if (hasOnAwake(c)) {
       c.onAwake()
     }
 
-    if (hasStart(c)) {
+    if (hasOnStart(c)) {
       c.onStart()
     }
 
@@ -235,7 +254,7 @@ class AsteroidsApplication implements IAsteroidsApplication {
   ): P {
     const p = this.findOrCreateService(service)
 
-    if (hasAwake(p)) {
+    if (hasOnAwake(p)) {
       p.onAwake()
     }
 
@@ -265,7 +284,7 @@ class AsteroidsApplication implements IAsteroidsApplication {
     instance: T,
   ): Promise<void> {
     return new Promise((resolve) => {
-      if (hasDestroy(instance)) {
+      if (hasOnDestroy(instance)) {
         instance.onDestroy()
       }
 
@@ -293,21 +312,11 @@ class AsteroidsApplication implements IAsteroidsApplication {
   /**
    * Method that stars the game loop
    */
-  private startLoop(): void {
-    requestAnimationFrame(() => this.startLoop())
+  private startRenderLoop(): void {
+    requestAnimationFrame(() => this.startRenderLoop())
     ;[...this.entities, ...this.components].forEach((value) => {
-      if (hasFixedLoop(value)) {
-        value.onFixedLoop()
-      }
-    })
-    ;[...this.entities, ...this.components].forEach((value) => {
-      if (hasLoop(value)) {
-        value.onLoop()
-      }
-    })
-    ;[...this.entities, ...this.components].forEach((value) => {
-      if (hasLateLoop(value)) {
-        value.onLateLoop()
+      if (hasOnRender(value)) {
+        value.onRender()
       }
     })
   }
