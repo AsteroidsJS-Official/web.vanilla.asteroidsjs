@@ -14,12 +14,14 @@ import {
 
 import { LGSocketService } from '../../services/lg-socket.service'
 
+import { Bullet } from './bullet.entity'
 import { Spaceship } from './spaceship.entity'
 
 import { UserService } from '../../services/user.service'
 
 import { CircleCollider2 } from '../../components/colliders/circle-collider2.component'
 import { Drawer } from '../../components/drawer.component'
+import { Health } from '../../components/health.component'
 import { RenderOverflow } from '../../components/renderers/render-overflow.component'
 import { Render } from '../../components/renderers/render.component'
 import { Rigidbody } from '../../components/rigidbody.component'
@@ -35,12 +37,14 @@ import asteroidMd1 from '../../../svg/asteroid-md-1.svg'
 import asteroidMd2 from '../../../svg/asteroid-md-2.svg'
 import asteroidSm from '../../../svg/asteroid-sm.svg'
 import asteroidXs from '../../../svg/asteroid-xs.svg'
+import { Single } from '../../scenes/single.scene'
 
 @Entity({
   services: [UserService, LGSocketService],
   components: [
     Render,
     Drawer,
+    Health,
     CircleCollider2,
     {
       id: '__asteroid_transform__',
@@ -62,13 +66,23 @@ export class Asteroid
 
   private transform: Transform
 
+  private health: Health
+
   private _asteroidSize: number
+
+  private timesCollided = 0
+
+  private wasDestroyed = false
 
   public image: HTMLImageElement
 
   public tag = Asteroid.name
 
   public isFragment = false
+
+  public get asteroidSize(): number {
+    return this._asteroidSize
+  }
 
   public set asteroidSize(size: number) {
     this._asteroidSize = size
@@ -78,6 +92,7 @@ export class Asteroid
     this.userService = this.getService(UserService)
     this.lgSocketService = this.getService(LGSocketService)
     this.transform = this.getComponent(Transform)
+    this.health = this.getComponent(Health)
   }
 
   public onStart(): void {
@@ -100,6 +115,10 @@ export class Asteroid
       10 * ((this._asteroidSize + 2) * 2),
       10 * ((this._asteroidSize + 2) * 2),
     )
+
+    this.health.color = '#8d8d8d'
+    this.health.maxHealth = (this._asteroidSize + 1) * 20
+    this.health.health = this.health.maxHealth
   }
 
   public onDestroy(): void {
@@ -107,20 +126,39 @@ export class Asteroid
   }
 
   public onTriggerEnter(collision: ICollision2): void {
-    if (
-      collision.entity2.tag?.includes(Asteroid.name) ||
-      collision.entity2.tag?.includes(Spaceship.name)
-    ) {
+    if (this.wasDestroyed || collision.entity2.tag?.includes(Asteroid.name)) {
+      return
+    }
+
+    if (collision.entity2.tag?.includes(Bullet.name)) {
+      this.destroy(collision.entity2)
+      this.health.hurt(20)
+    } else {
+      ;(collision.entity2 as unknown as Spaceship).health.hurt(
+        this.asteroidSize + 1 * 8,
+      )
+      if ((collision.entity2 as unknown as Spaceship).health.health <= 0) {
+        ;(collision.entity2 as unknown as Spaceship).scene
+          .unload((collision.entity2 as unknown as Spaceship).scene)
+          .then(() => {
+            ;(collision.entity2 as unknown as Spaceship).scene.load(Single)
+          })
+      }
+
+      this.health.hurt(this.health.maxHealth)
+    }
+
+    if (this.health.health > 0) {
       return
     }
 
     this.userService.increaseScore(this._asteroidSize + 1)
 
-    this.destroy(collision.entity2)
-
     if (this._asteroidSize > 0) {
       this.generateAsteroidFragments(this._asteroidSize <= 2 ? 1 : 2)
     }
+
+    this.wasDestroyed = true
 
     this.destroy(this)
   }
