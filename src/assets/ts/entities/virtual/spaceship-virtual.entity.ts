@@ -8,7 +8,7 @@ import {
   Vector2,
 } from '@asteroidsjs'
 
-import { socket } from '../../socket'
+import { LGSocketService } from '../../services/lg-socket.service'
 
 import { Drawer } from '../../components/drawer.component'
 import { Health } from '../../components/health.component'
@@ -20,12 +20,15 @@ import { Transform } from '../../components/transform.component'
  * uncontrollable spaceships.
  */
 @Entity({
+  services: [LGSocketService],
   components: [Drawer, Transform, RenderOverflow, Health],
 })
 export class SpaceshipVirtual
   extends AbstractEntity
   implements IOnAwake, IOnStart, IDraw
 {
+  private lgSocketService: LGSocketService
+
   /**
    * Property that contains the spaceship position, dimensions and rotation.
    */
@@ -64,6 +67,7 @@ export class SpaceshipVirtual
   public isShooting = false
 
   onAwake(): void {
+    this.lgSocketService = this.getService(LGSocketService)
     this.transform = this.getComponent(Transform)
     this.health = this.getComponent(Health)
   }
@@ -71,18 +75,20 @@ export class SpaceshipVirtual
   onStart(): void {
     this.image.src = this.imageSrc
 
-    socket.on('update-screen', ({ id, data }: ISocketData) => {
-      if (this.id !== id) {
-        return
-      }
-      this.transform.position = data.position
-      this.transform.dimensions = data.dimensions
-      this.transform.rotation = data.rotation
-      this.health.health = data.health
-      this.health.maxHealth = data.maxHealth
-    })
+    this.lgSocketService
+      .on<ISocketData>('update-screen')
+      .subscribe(({ id, data }) => {
+        if (this.id !== id) {
+          return
+        }
+        this.transform.position = data.position
+        this.transform.dimensions = data.dimensions
+        this.transform.rotation = data.rotation
+        this.health.health = data.health
+        this.health.maxHealth = data.maxHealth
+      })
 
-    socket.on('destroy', (id: string) => {
+    this.lgSocketService.on<string>('destroy').subscribe((id: string) => {
       if (id === this.id) {
         this.destroy(this)
       }

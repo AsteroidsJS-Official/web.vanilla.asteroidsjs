@@ -5,25 +5,35 @@ import {
   Vector2,
   ISocketData,
   IOnDestroy,
+  IOnAwake,
 } from '@asteroidsjs'
 
-import { socket } from '../../socket'
+import { LGSocketService } from '../../services/lg-socket.service'
 
+import { AsteroidVirtual } from '../virtual/asteroid-virtual.entity'
 import { Asteroid } from './asteroid.entity'
 
 /**
  * Class that represents the first entity to be loaded into the game
  */
-@Entity()
+@Entity({
+  services: [LGSocketService],
+})
 export class ManagerAsteroids
   extends AbstractEntity
-  implements IOnStart, IOnDestroy
+  implements IOnAwake, IOnStart, IOnDestroy
 {
   private interval: ReturnType<typeof setInterval>
 
+  private lgSocketService: LGSocketService
+
   public isMenu = false
 
-  public onStart(): void {
+  onAwake(): void {
+    this.lgSocketService = this.getService(LGSocketService)
+  }
+
+  onStart(): void {
     if (!this.isMenu) {
       for (let i = 0; i < 3; i++) {
         this.generateAsteroid()
@@ -34,8 +44,20 @@ export class ManagerAsteroids
         this.generateAsteroid()
       }, 10000)
     } else {
-      for (let i = 0; i < 6; i++) {
-        this.generateAsteroid()
+      const screen = this.lgSocketService.screen
+
+      if (!screen) {
+        return
+      }
+
+      if (screen.number === 1) {
+        setTimeout(() => {
+          for (let i = 0; i < 4; i++) {
+            this.generateAsteroid()
+          }
+        }, 100)
+      } else {
+        this.listenForAsteroids()
       }
     }
   }
@@ -100,7 +122,7 @@ export class ManagerAsteroids
       ],
     })
 
-    socket.emit('instantiate', {
+    this.lgSocketService.emit('instantiate', {
       id: asteroid.id,
       type: Asteroid.name,
       data: {
@@ -114,5 +136,43 @@ export class ManagerAsteroids
         angularVelocity: 0.05 / (asteroidSize + 1),
       },
     } as ISocketData)
+  }
+
+  private listenForAsteroids(): void {
+    this.lgSocketService
+      .on<ISocketData>('instantiate')
+      .subscribe(({ id, type, data }) => {
+        switch (type) {
+          case Asteroid.name:
+            this.instantiate({
+              use: {
+                id,
+                asteroidSize: data.asteroidSize,
+                image: data.image,
+                isFragment: !!data.isFragment,
+              },
+              entity: AsteroidVirtual,
+              components: [
+                {
+                  id: '__asteroid_virtual_transform__',
+                  use: {
+                    rotation: data.rotation,
+                    position: data.position,
+                  },
+                },
+                {
+                  id: '__asteroid_virtual_rigidbody__',
+                  use: {
+                    velocity: data.velocity,
+                    mass: data.mass,
+                    maxAngularVelocity: data.maxAngularVelocity,
+                    angularVelocity: data.angularVelocity,
+                  },
+                },
+              ],
+            })
+            break
+        }
+      })
   }
 }

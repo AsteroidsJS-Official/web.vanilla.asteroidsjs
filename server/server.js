@@ -130,8 +130,8 @@ function setupSocketScreen() {
      * @param {number} height - The screen height.
      * @param {(screen: Screen) => void} callback - A function to be called once the screen has been set.
      */
-    function connectScreen({ number }, callback) {
-      const screen = setScreen(socket.id, number)
+    function connectScreen({ number, width, height }, callback) {
+      const screen = setScreen(socket.id, number, width, height)
       if (!screen) {
         callback(null)
         return
@@ -239,12 +239,14 @@ function setupSocketScreen() {
     socket.on('update-slaves', updateSlaves)
 
     /**
-     * Emits to all slaves screens that the game has started.
+     * Emits to all slaves screens that the scene has changed.
+     *
+     * @param scene The scene name.
      */
-    function startGame() {
-      ioScreen.emit('start-game')
+    function changeScene(scene) {
+      ioScreen.emit('change-scene', scene)
     }
-    socket.on('start-game', startGame)
+    socket.on('change-scene', changeScene)
 
     /**
      * Called when a screen is disconnected.
@@ -306,7 +308,7 @@ setupSocketClient()
  * @param {number} height - The screen height.
  * @returns The connected screen data.
  */
-function setScreen(id, screenN) {
+function setScreen(id, screenN, width, height) {
   if (screenN) {
     screenN = screenN.toString()
 
@@ -322,7 +324,13 @@ function setScreen(id, screenN) {
   /**
    * @type {Screen}
    */
-  const screen = { id, width: 0, height: 0, position: 0, isConnected: true }
+  const screen = {
+    id,
+    width: width || 0,
+    height: height || 0,
+    position: 0,
+    isConnected: true,
+  }
 
   const numbers = Object.keys(screens).map((n) => parseInt(n))
   const newScreenN = numbers.length === 0 ? 1 : numbers[numbers.length - 1] + 1

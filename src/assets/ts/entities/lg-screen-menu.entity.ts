@@ -7,7 +7,7 @@ import {
   IScreen,
 } from '@asteroidsjs'
 
-import { LGSocketService } from '../services/lg-socket.service'
+import { LGSocketService, LoadScreensData } from '../services/lg-socket.service'
 
 import { Menu } from '../scenes/menu.scene'
 
@@ -76,6 +76,12 @@ export class LGScreenMenu extends AbstractEntity implements IOnAwake, IOnStart {
         this.insertSlaveHtml().then(() => {
           document.querySelector('.waiting-info.title')?.classList.add('hide')
           document.querySelector('h3.waiting-info')?.classList.remove('hide')
+        })
+
+        this.lgSocketService.on<string>('change-scene').subscribe((scene) => {
+          if (scene === 'menu') {
+            this.loadMenu()
+          }
         })
       }
     })
@@ -380,12 +386,41 @@ export class LGScreenMenu extends AbstractEntity implements IOnAwake, IOnStart {
         this.lgSocketService.getScreensConnected() ===
         this.lgSocketService.screenAmount
       ) {
-        await this.scene.unload(this.scene)
-        document.querySelector('ast-lg-screen')?.remove()
-        this.lgSocketService.emit('screens-connected')
+        this.lgSocketService
+          .emit('get-screens')
+          .subscribe(async (data: LoadScreensData) => {
+            if (!data) {
+              return
+            }
 
-        this.scene.load(Menu)
+            this.lgSocketService.screens = data.screens
+
+            this.lgSocketService.emit('change-scene', 'menu')
+
+            await this.scene.unload(this.scene)
+            document.querySelector('ast-lg-screen')?.remove()
+
+            this.scene.load(Menu)
+          })
       }
     }, 1500)
+  }
+
+  private loadMenu() {
+    this.lgSocketService
+      .emit('get-screens')
+      .subscribe(async (data: LoadScreensData) => {
+        if (!data) {
+          return
+        }
+
+        this.lgSocketService.screens = data.screens
+        this.lgSocketService.screenAmount = data.screenAmount
+
+        await this.scene.unload(this.scene)
+        document.querySelector('ast-lg-screen-slave')?.remove()
+
+        this.scene.load(Menu)
+      })
   }
 }

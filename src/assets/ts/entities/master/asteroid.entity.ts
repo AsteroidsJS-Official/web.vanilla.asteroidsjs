@@ -12,7 +12,7 @@ import {
   Vector2,
 } from '@asteroidsjs'
 
-import { socket } from '../../socket'
+import { LGSocketService } from '../../services/lg-socket.service'
 
 import { Spaceship } from './spaceship.entity'
 
@@ -37,7 +37,7 @@ import asteroidSm from '../../../svg/asteroid-sm.svg'
 import asteroidXs from '../../../svg/asteroid-xs.svg'
 
 @Entity({
-  services: [UserService],
+  services: [UserService, LGSocketService],
   components: [
     Render,
     Drawer,
@@ -58,6 +58,8 @@ export class Asteroid
 {
   private userService: UserService
 
+  private lgSocketService: LGSocketService
+
   private transform: Transform
 
   private _asteroidSize: number
@@ -74,6 +76,7 @@ export class Asteroid
 
   public onAwake(): void {
     this.userService = this.getService(UserService)
+    this.lgSocketService = this.getService(LGSocketService)
     this.transform = this.getComponent(Transform)
   }
 
@@ -100,7 +103,7 @@ export class Asteroid
   }
 
   public onDestroy(): void {
-    socket.emit('destroy', this.id)
+    this.lgSocketService.emit('destroy', this.id)
   }
 
   public onTriggerEnter(collision: ICollision2): void {
@@ -194,7 +197,7 @@ export class Asteroid
         ],
       })
 
-      socket.emit('instantiate', {
+      this.lgSocketService.emit('instantiate', {
         id: fragment.id,
         type: Asteroid.name,
         data: {
