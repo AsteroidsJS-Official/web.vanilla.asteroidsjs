@@ -10,7 +10,7 @@ import {
   Vector2,
 } from '@asteroidsjs'
 
-import { socket } from '../../socket'
+import { LGSocketService } from '../../services/lg-socket.service'
 
 import { Bullet } from './bullet.entity'
 
@@ -33,7 +33,7 @@ import { Single } from '../../scenes/single.scene'
  * Class that represents the spaceship entity controlled by the user.
  */
 @Entity({
-  services: [UserService],
+  services: [UserService, LGSocketService],
   components: [
     Drawer,
     RenderOverflow,
@@ -92,6 +92,8 @@ export class Spaceship
 
   private userService: UserService
 
+  private lgSocketService: LGSocketService
+
   /**
    * Property responsible for the spaceship bullet velocity.
    */
@@ -124,6 +126,7 @@ export class Spaceship
   }
 
   onAwake(): void {
+    this.lgSocketService = this.getService(LGSocketService)
     this.userService = this.getService(UserService)
 
     this.transform = this.getComponent(Transform)
@@ -137,7 +140,7 @@ export class Spaceship
   }
 
   onDestroy(): void {
-    socket.emit('destroy', this.id)
+    this.lgSocketService.emit('destroy', this.id)
   }
 
   onTriggerEnter(collision: ICollision2): void {
@@ -150,7 +153,7 @@ export class Spaceship
   }
 
   onLateLoop(): void {
-    socket.emit('update-slaves', {
+    this.lgSocketService.emit('update-slaves', {
       id: this.id,
       data: {
         position: this.transform.position,
@@ -250,7 +253,7 @@ export class Spaceship
       ],
     })
 
-    socket.emit('instantiate', {
+    this.lgSocketService.emit('instantiate', {
       id: bullet.id,
       type: Bullet.name,
       data: {
