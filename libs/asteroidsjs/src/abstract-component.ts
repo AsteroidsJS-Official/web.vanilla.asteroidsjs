@@ -3,28 +3,64 @@ import { AbstractEntity } from './abstract-entity'
 import { AbstractService } from './abstract-service'
 
 import { IContext } from './interfaces/context.interface'
+import { IEnabled } from './interfaces/enabled.interface'
 import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
 import { Type } from './interfaces/type.interface'
 
 /**
  * Class that can be passed as dependency for objects of type `Entity`. It
- * can be used to add new behaviours to these entities
+ * can be used to add new behaviours to these entities.
  */
-export abstract class AbstractComponent {
-  /**
-   * Property that defines some tag allowing to differ thngs in collider
-   * behaviours
-   */
-  get tag(): string {
-    return this.entity.tag
-  }
-
+export abstract class AbstractComponent implements IEnabled {
   /**
    * Property that defines a number used to synchronize the application
    * physics.
    */
-  get deltaTime(): number {
-    return this.entity.deltaTime
+  deltaTime = 0
+
+  /**
+   * Property that enables the component.
+   *
+   * All "loop" methods such as "onLoop" or "onLateLoop" are only executed
+   * when the structure is activated, as well as its children's "loop"
+   * methods.
+   */
+  private _enabled = true
+
+  /**
+   * Property that defines a number that represents the last time saved for
+   * this entity.
+   */
+  private _lastTime: number
+
+  /**
+   * Property that enables the component.
+   *
+   * All "loop" methods such as "onLoop" or "onLateLoop" are only executed
+   * when the structure is activated, as well as its children's "loop"
+   * methods.
+   */
+  get enabled(): boolean {
+    return this._enabled && this.entity?.enabled
+  }
+
+  /**
+   * Property that enables the component.
+   *
+   * All "loop" methods such as "onLoop" or "onLateLoop" are only executed
+   * when the structure is activated, as well as its children's "loop"
+   * methods.
+   */
+  set enabled(value: boolean) {
+    this._enabled = value
+  }
+
+  /**
+   * Property that defines some tag allowing to differ thngs in collider
+   * behaviours.
+   */
+  get tag(): string {
+    return this.entity.tag
   }
 
   constructor(readonly id: string | number, readonly entity: AbstractEntity) {}
@@ -37,24 +73,26 @@ export abstract class AbstractComponent {
    * synchronized.
    */
   refreshDeltaTime(): void {
-    this.entity.refreshDeltaTime()
+    const aux = this._lastTime || Date.now()
+    this._lastTime = Date.now()
+    this.deltaTime = Date.now() - aux
   }
 
   /**
-   * Method that returns the entity with some class or interface type
+   * Method that returns the entity with some class or interface type.
    *
-   * @returns the entity as some specified type
+   * @returns the entity as some specified type.
    */
   getEntityAs<T>(): T {
     return this.entity.getEntityAs<T>()
   }
 
   /**
-   * Method that can create new entities
+   * Method that can create new entities.
    *
-   * @param entity defines the new entity type
-   * @param components defines the new entity component dependencies
-   * @returns the created entity
+   * @param entity defines the new entity type.
+   * @param components defines the new entity component dependencies.
+   * @returns the created entity.
    */
   instantiate<E extends AbstractEntity>(
     options?: IInstantiateOptions<E>,
@@ -63,8 +101,9 @@ export abstract class AbstractComponent {
   }
 
   /**
-   * Method that returns the game context
-   * @returns an object that represents the game context
+   * Method that returns the game context.
+   *
+   * @returns an object that represents the game context.
    */
   getContext(): IContext {
     return this.entity.getContext()
@@ -72,11 +111,11 @@ export abstract class AbstractComponent {
 
   /**
    * Method that returns some sibling component, attached to the same parent
-   * entity
+   * entity.
    *
-   * @param component defines the component type
+   * @param component defines the component type.
    * @returns an object that represents the component instance, attached to
-   * the same parent entity
+   * the same parent entity.
    */
   getService<T extends AbstractService>(component: Type<T>): T {
     return this.entity.getService(component)
@@ -84,84 +123,82 @@ export abstract class AbstractComponent {
 
   /**
    * Method that returns some sibling component, attached to the same parent
-   * entity
+   * entity.
    *
-   * @param component defines the component type
+   * @param component defines the component type.
    * @returns an object that represents the component instance, attached to
-   * the same parent entity
+   * the same parent entity.
    */
   getComponent<T extends AbstractComponent>(component: Type<T>): T {
     return this.entity.getComponent(component)
   }
 
   /**
-   * Method that returns several child components, attached to this entity
+   * Method that returns several child components, attached to this entity.
    *
    * @param component defines the component type
-   * @returns an array with objects that represents the component instance, attached to
-   * this entity
+   * @returns an array with objects that represents the component instance,
+   * attached to this entity.
    */
   getComponents<C extends AbstractComponent>(component: Type<C>): C[] {
     return this.entity.getComponents(component)
   }
 
   /**
-   * Method that returns several child services, attached to this entity
+   * Method that returns several child services, attached to this entity.
    *
    * @param component defines the component type
-   * @returns an array with objects that represents the component instance, attached to
-   * this entity
+   * @returns an array with objects that represents the component instance,
+   * attached to this entity.
    */
   getServices<P extends AbstractService>(service: Type<P>): P[] {
     return this.entity.getServices(service)
   }
 
   /**
-   * Method that returns all the components attached to this entity
+   * Method that returns all the components attached to this entity.
    *
-   * @returns an array with objects that represents all the components
+   * @returns an array with objects that represents all the components.
    */
   getAllComponents(): AbstractComponent[] {
     return this.entity.getAllComponents()
   }
 
   /**
-   * Method that returns all the services attached to this entity
+   * Method that returns all the services attached to this entity.
    *
-   * @returns an array with objects that represents all the services
+   * @returns an array with objects that represents all the services.
    */
   getAllServices(): AbstractService[] {
     return this.entity.getAllServices()
   }
 
   /**
-   * Method that adds a new service to a specific entity instance
+   * Method that adds a new service to a specific entity instance.
    *
-   * @param service defines the service type
-   * @returns an object that represents the service instance
+   * @param service defines the service type.
+   * @returns an object that represents the service instance.
    */
   addService<P extends AbstractService>(service: Type<P>): P {
     return this.entity.addService(service)
   }
 
   /**
-   * Method that returns some child component, attached to some entity
+   * Method that returns some child component, attached to some entity.
    *
-   * @param component defines the component type
-   * @returns an array of objects with the passed type
+   * @param component defines the component type.
+   * @returns an array of objects with the passed type.
    */
   find<C extends AbstractComponent>(component: Type<C>): C[] {
     return this.entity.find(component)
   }
 
   /**
-   * Method that detroyes some entity
+   * Method that detroyes some entity.
    *
-   * @param instance defines the instance that will be destroyed
+   * @param instance defines the instance that will be destroyed.
    */
-  async destroy<T extends AbstractEntity | AbstractComponent>(
-    instance: T,
-  ): Promise<void> {
-    await this.entity.destroy(instance)
+  destroy<T extends AbstractEntity | AbstractComponent>(instance: T): void {
+    this.entity.destroy(instance)
   }
 }
