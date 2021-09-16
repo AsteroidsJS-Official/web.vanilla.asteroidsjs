@@ -18,12 +18,22 @@ export abstract class AbstractEntity {
    */
   tag: string
 
+  deltaTime: number
+
+  private lastTime: number
+
   constructor(
     readonly id: string | number,
     public scene: AbstractScene,
     public components: AbstractComponent[] = [],
     public services: AbstractService[] = [],
   ) {}
+
+  refreshDeltaTime(): void {
+    const aux = this.lastTime || Date.now()
+    this.lastTime = Date.now()
+    this.deltaTime = Date.now() - aux
+  }
 
   /**
    * Method that returns the entity with some class or interface type

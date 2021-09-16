@@ -19,7 +19,15 @@ export abstract class AbstractComponent {
     return this.entity.tag
   }
 
+  get deltaTime(): number {
+    return this.entity.deltaTime
+  }
+
   constructor(readonly id: string | number, readonly entity: AbstractEntity) {}
+
+  refreshDeltaTime(): void {
+    this.entity.refreshDeltaTime()
+  }
 
   /**
    * Method that returns the entity with some class or interface type

@@ -76,8 +76,8 @@ import { Single } from '../../scenes/single.scene'
     {
       class: Input,
       use: {
-        force: 3,
-        angularForce: 0.03,
+        force: 0.03,
+        angularForce: 0.00003,
       },
     },
   ],

@@ -24,20 +24,19 @@ export class ManagerAsteroids
   public isMenu = false
 
   public onStart(): void {
-    if (!this.isMenu) {
-      for (let i = 0; i < 3; i++) {
-        this.generateAsteroid()
-      }
-
-      this.interval = setInterval(() => {
-        this.generateAsteroid()
-        this.generateAsteroid()
-      }, 10000)
-    } else {
-      for (let i = 0; i < 6; i++) {
-        this.generateAsteroid()
-      }
-    }
+    // if (!this.isMenu) {
+    //   for (let i = 0; i < 3; i++) {
+    //     this.generateAsteroid()
+    //   }
+    //   this.interval = setInterval(() => {
+    //     this.generateAsteroid()
+    //     this.generateAsteroid()
+    //   }, 10000)
+    // } else {
+    //   for (let i = 0; i < 6; i++) {
+    //     this.generateAsteroid()
+    //   }
+    // }
   }
 
   onDestroy(): void {

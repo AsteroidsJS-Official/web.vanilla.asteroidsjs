@@ -3,6 +3,7 @@ import {
   AbstractComponent,
   Component,
   IOnAwake,
+  IOnFixedLoop,
   IOnLoop,
   Vector2,
 } from '@asteroidsjs'
@@ -15,7 +16,10 @@ import { Transform } from './transform.component'
 @Component({
   required: [Transform],
 })
-export class Rigidbody extends AbstractComponent implements IOnAwake, IOnLoop {
+export class Rigidbody
+  extends AbstractComponent
+  implements IOnAwake, IOnLoop, IOnFixedLoop
+{
   /**
    * Property that defines the entity mass, that directly interfers with
    * the inertia of the entity
@@ -105,6 +109,10 @@ export class Rigidbody extends AbstractComponent implements IOnAwake, IOnLoop {
     this.transform = this.getComponent(Transform)
   }
 
+  onFixedLoop(): void {
+    this.refreshDeltaTime()
+  }
+
   public onLoop(): void {
     this.updateRotation()
     this.updatePosition()
@@ -116,7 +124,8 @@ export class Rigidbody extends AbstractComponent implements IOnAwake, IOnLoop {
    * related to it such as `angularResultant` and `angularVelocity`
    */
   private updateRotation(): void {
-    const angularAceleration = this.angularResultant / this.mass
+    const angularAceleration =
+      this.angularResultant * this.mass * this.deltaTime
     this.angularVelocity += angularAceleration
     this.transform.rotation += this.angularVelocity
   }
@@ -127,12 +136,15 @@ export class Rigidbody extends AbstractComponent implements IOnAwake, IOnLoop {
    */
   private updatePosition(): void {
     const aceleration = Vector2.multiply(this.resultant, 1 / this.mass)
+
     this.transform.position = Vector2.sum(
       this.transform.position,
-      this.velocity,
+      Vector2.multiply(this.velocity, this.deltaTime),
     )
-
-    this.velocity = Vector2.sum(this.velocity, aceleration)
+    this.velocity = Vector2.sum(
+      this.velocity,
+      Vector2.multiply(aceleration, this.deltaTime),
+    )
   }
 
   /**
@@ -142,7 +154,7 @@ export class Rigidbody extends AbstractComponent implements IOnAwake, IOnLoop {
   private applyFriction(): void {
     let force = Vector2.multiply(this.velocity.normalized, -1)
     const normal = this.mass
-    force = Vector2.multiply(force, this.friction * normal)
+    force = Vector2.multiply(force, this.friction * normal * this.deltaTime)
     this.resultant = force
   }
 }
