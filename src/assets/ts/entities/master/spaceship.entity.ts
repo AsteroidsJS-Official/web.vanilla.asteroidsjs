@@ -114,9 +114,9 @@ export class Spaceship
    */
   private rigidbody: Rigidbody
 
-  private health: Health
-
   private image = new Image()
+
+  public health: Health
 
   public get direction(): Vector2 {
     return new Vector2(
@@ -147,10 +147,6 @@ export class Spaceship
     if (collision.entity2.tag?.includes(Bullet.name)) {
       return
     }
-
-    this.scene.unload(this.scene).then(() => {
-      this.scene.load(Single)
-    })
   }
 
   onLateLoop(): void {
