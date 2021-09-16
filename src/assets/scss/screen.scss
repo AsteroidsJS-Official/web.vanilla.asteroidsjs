@@ -3,3 +3,146 @@
 body {
   background-color: $backgroundColor;
 }
+
+.lg-screen-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+
+  padding: 20px;
+
+  width: 100vw;
+  height: 100vh;
+
+  font-family: 'Neptunus';
+
+  & > .info-title,
+  & > .waiting-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #fff;
+    font-size: 2.5rem;
+    text-align: center;
+
+    flex: 1;
+
+    pointer-events: none;
+
+    height: 45px;
+    max-height: 45px;
+
+    transition: opacity 0.2s linear 0.6s, flex 0.6s ease-in-out;
+
+    &.alt {
+      display: none;
+
+      font-size: 2.2rem;
+    }
+
+    &.hide {
+      opacity: 0;
+      flex: 0;
+      pointer-events: none;
+
+      transition: opacity 0.2s, flex 0.6s ease-in-out;
+    }
+  }
+
+  & > .waiting-info {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    height: 90px;
+    max-height: 90px;
+
+    transform: translate(-50%, -50%);
+  }
+
+  & > .amount-picker {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+
+    flex: 1;
+
+    height: 184px;
+
+    transition: opacity 0.2s linear 0.6s, flex 0.6s ease-in-out;
+
+    &.hide {
+      opacity: 0;
+      flex: 0;
+      pointer-events: none;
+
+      transition: opacity 0.2s, flex 0.6s ease-in-out;
+    }
+
+    & > .screen-amount {
+      color: #fff;
+      font-size: 10rem;
+
+      pointer-events: none;
+    }
+  }
+
+  & > .screens {
+    position: relative;
+    width: 100%;
+
+    flex: 1;
+
+    overflow: visible;
+
+    transition: all 0.6s ease-in-out;
+
+    & > .screen {
+      position: absolute;
+
+      height: 70%;
+      max-height: 250px;
+
+      border-radius: 5px;
+
+      transform-style: preserve-3d;
+
+      transition: all 0.6s ease-out;
+    }
+
+    &.waiting > .screen {
+      &.waiting {
+        animation-name: blink-screen;
+        animation-delay: 0.5s;
+        animation-iteration-count: infinite;
+        animation-duration: 0.7s;
+      }
+
+      &.disconnected {
+        background-color: #888 !important;
+      }
+    }
+  }
+}
+
+@keyframes blink-screen {
+  50% {
+    background-color: #fff;
+  }
+}
+
+@media (max-width: 650px) {
+  .lg-screen-container {
+    & > .info-title.normal {
+      display: none;
+    }
+
+    & > .info-title.alt {
+      display: block;
+    }
+  }
+}
