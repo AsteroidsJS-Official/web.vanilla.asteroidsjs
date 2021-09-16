@@ -21,14 +21,23 @@ export class ManagerAsteroids
 {
   private interval: ReturnType<typeof setInterval>
 
+  public isMenu = false
+
   public onStart(): void {
-    for (let i = 0; i < 3; i++) {
-      this.generateAsteroid()
+    if (!this.isMenu) {
+      for (let i = 0; i < 3; i++) {
+        this.generateAsteroid()
+      }
+
+      this.interval = setInterval(() => {
+        this.generateAsteroid()
+        this.generateAsteroid()
+      }, 10000)
+    } else {
+      for (let i = 0; i < 6; i++) {
+        this.generateAsteroid()
+      }
     }
-    this.interval = setInterval(() => {
-      this.generateAsteroid()
-      this.generateAsteroid()
-    }, 10000)
   }
 
   onDestroy(): void {
