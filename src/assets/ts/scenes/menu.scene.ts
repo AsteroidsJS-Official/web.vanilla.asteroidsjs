@@ -1,6 +1,7 @@
 import { Scene, AbstractScene, IOnStart, getHtml } from '@asteroidsjs'
 
 import { Background } from '../entities/background.entity'
+import { ManagerAsteroids } from '../entities/master/manager-asteroids.entity'
 
 import { loadMenu } from '../menu'
 import { Single } from './single.scene'
@@ -10,6 +11,7 @@ export class Menu extends AbstractScene implements IOnStart {
   onStart(): void {
     this.createCanvas()
     this.instantiate({ entity: Background })
+    this.instantiate({ entity: ManagerAsteroids, use: { isMenu: true } })
     this.insertMenuHtml()
   }
 
