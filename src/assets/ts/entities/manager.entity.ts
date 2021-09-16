@@ -8,7 +8,6 @@ import {
 } from '@asteroidsjs'
 
 import { LGSocketService } from '../services/lg-socket.service'
-import { socket } from '../socket'
 
 import { Asteroid } from './master/asteroid.entity'
 import { Bullet } from './master/bullet.entity'
@@ -38,25 +37,18 @@ export class Manager extends AbstractEntity implements IOnStart {
     this.userService = this.getService(UserService)
     this.lgSocketService = this.getService(LGSocketService)
 
-    this.master()
-    // this.lgSocketService.on('start-game').subscribe(() => {
-    //   const canvasWidth = Object.values([...this.lgSocketService.screens])
-    //     .map((s) => s.width)
-    //     .reduce((previous, current) => previous + current, 0)
-    //   const canvasHeight =
-    //     this.lgSocketService.getScreenByNumber(1)?.height || window.innerHeight
+    this.scene.getContext().canvas.width = this.lgSocketService.canvasTotalWidth
+    this.scene.getContext().canvas.height =
+      this.lgSocketService.canvasTotalHeight
+    this.scene.getContext().canvas.style.transform = `translateX(-${this.lgSocketService.displacement}px)`
 
-    //   this.getContext().canvas.width = canvasWidth
-    //   this.getContext().canvas.height = canvasHeight
-
-    //   if (this.lgSocketService.screen.number === 1) {
-    //     setTimeout(() => {
-    //       this.master()
-    //     }, 100)
-    //   } else {
-    //     this.virtual()
-    //   }
-    // })
+    if (this.lgSocketService.screen?.number === 1) {
+      setTimeout(() => {
+        this.master()
+      }, 100)
+    } else {
+      this.virtual()
+    }
   }
 
   private master(): void {
@@ -109,7 +101,7 @@ export class Manager extends AbstractEntity implements IOnStart {
       ],
     })
 
-    socket.emit('instantiate', {
+    this.lgSocketService.emit('instantiate', {
       id: spaceship.id,
       type: Spaceship.name,
       data: {
@@ -125,92 +117,94 @@ export class Manager extends AbstractEntity implements IOnStart {
   }
 
   private virtual(): void {
-    socket.on('instantiate', ({ id, type, data }: ISocketData) => {
-      switch (type) {
-        case Spaceship.name:
-          this.instantiate({
-            use: {
-              id,
-              spaceshipColor: data.spaceshipColor,
-              nickname: data.nickname,
-              imageSrc: data.imageSrc,
-            },
-            entity: SpaceshipVirtual,
-            components: [
-              {
-                id: '__spaceship_virtual_transform__',
-                use: {
-                  rotation: data.rotation,
-                  position: data.position,
-                  dimensions: data.dimensions,
-                },
+    this.lgSocketService
+      .on<ISocketData>('instantiate')
+      .subscribe(({ id, type, data }) => {
+        switch (type) {
+          case Spaceship.name:
+            this.instantiate({
+              use: {
+                id,
+                spaceshipColor: data.spaceshipColor,
+                nickname: data.nickname,
+                imageSrc: data.imageSrc,
               },
-              {
-                class: Health,
-                use: {
-                  color: data.spaceshipColor,
-                  maxHealth: data.maxHealth,
-                  health: data.health,
+              entity: SpaceshipVirtual,
+              components: [
+                {
+                  id: '__spaceship_virtual_transform__',
+                  use: {
+                    rotation: data.rotation,
+                    position: data.position,
+                    dimensions: data.dimensions,
+                  },
                 },
-              },
-            ],
-          })
-          break
-        case Bullet.name:
-          this.instantiate({
-            use: {
-              id,
-            },
-            entity: BulletVirtual,
-            components: [
-              {
-                id: '__bullet_virtual_transform__',
-                use: {
-                  rotation: data.rotation,
-                  position: data.position,
-                  dimensions: new Rect(2, 14),
+                {
+                  class: Health,
+                  use: {
+                    color: data.spaceshipColor,
+                    maxHealth: data.maxHealth,
+                    health: data.health,
+                  },
                 },
+              ],
+            })
+            break
+          case Bullet.name:
+            this.instantiate({
+              use: {
+                id,
               },
-              {
-                id: '__bullet_virtual_rigidbody__',
-                use: {
-                  velocity: data.velocity,
-                  mass: 3,
+              entity: BulletVirtual,
+              components: [
+                {
+                  id: '__bullet_virtual_transform__',
+                  use: {
+                    rotation: data.rotation,
+                    position: data.position,
+                    dimensions: new Rect(2, 14),
+                  },
                 },
-              },
-            ],
-          })
-          break
-        case Asteroid.name:
-          this.instantiate({
-            use: {
-              id,
-              asteroidSize: data.asteroidSize,
-              image: data.image,
-              isFragment: !!data.isFragment,
-            },
-            entity: AsteroidVirtual,
-            components: [
-              {
-                id: '__asteroid_virtual_transform__',
-                use: {
-                  rotation: data.rotation,
-                  position: data.position,
+                {
+                  id: '__bullet_virtual_rigidbody__',
+                  use: {
+                    velocity: data.velocity,
+                    mass: 3,
+                  },
                 },
+              ],
+            })
+            break
+          case Asteroid.name:
+            this.instantiate({
+              use: {
+                id,
+                asteroidSize: data.asteroidSize,
+                image: data.image,
+                isFragment: !!data.isFragment,
               },
-              {
-                id: '__asteroid_virtual_rigidbody__',
-                use: {
-                  velocity: data.velocity,
-                  mass: data.mass,
-                  maxAngularVelocity: data.maxAngularVelocity,
-                  angularVelocity: data.angularVelocity,
+              entity: AsteroidVirtual,
+              components: [
+                {
+                  id: '__asteroid_virtual_transform__',
+                  use: {
+                    rotation: data.rotation,
+                    position: data.position,
+                  },
                 },
-              },
-            ],
-          })
-          break
-      }
-    })
+                {
+                  id: '__asteroid_virtual_rigidbody__',
+                  use: {
+                    velocity: data.velocity,
+                    mass: data.mass,
+                    maxAngularVelocity: data.maxAngularVelocity,
+                    angularVelocity: data.angularVelocity,
+                  },
+                },
+              ],
+            })
+            break
+        }
+      })
   }
 }
