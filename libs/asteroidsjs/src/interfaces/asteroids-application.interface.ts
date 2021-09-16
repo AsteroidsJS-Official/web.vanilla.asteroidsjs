@@ -14,7 +14,7 @@ export interface IAsteroidsApplication {
 
   load<S extends AbstractScene>(scene: Type<S>): S
 
-  unload<S extends AbstractScene>(scene: string | S | Type<S>): Promise<void>
+  unload<S extends AbstractScene>(scene: string | S | Type<S>): void
 
   instantiate<E extends AbstractEntity>(
     options?: IInstantiateOptions<E>,
@@ -22,9 +22,7 @@ export interface IAsteroidsApplication {
 
   find<C extends AbstractComponent>(component: Type<C>): C[]
 
-  destroy<T extends AbstractEntity | AbstractComponent>(
-    instance: T,
-  ): Promise<void>
+  destroy<T extends AbstractEntity | AbstractComponent>(instance: T): void
 
   addService<E extends AbstractEntity, P extends AbstractService>(
     entity: E,
