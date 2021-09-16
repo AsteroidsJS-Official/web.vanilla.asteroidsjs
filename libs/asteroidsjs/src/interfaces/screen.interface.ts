@@ -31,4 +31,9 @@ export interface IScreen {
    * 3
    */
   position: number
+
+  /**
+   * Property that represents the screen connection status.
+   */
+  isConnected: boolean
 }
