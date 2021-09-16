@@ -7,6 +7,7 @@ import {
   Vector2,
 } from '@asteroidsjs'
 
+import { LGSocketService } from '../services/lg-socket.service'
 import { socket } from '../socket'
 
 import { Asteroid } from './master/asteroid.entity'
@@ -26,21 +27,36 @@ import { Health } from '../components/health.component'
  * Class that represents the first entity to be loaded into the game
  */
 @Entity({
-  services: [UserService],
+  services: [UserService, LGSocketService],
 })
 export class Manager extends AbstractEntity implements IOnStart {
   private userService: UserService
 
+  private lgSocketService: LGSocketService
+
   public onStart(): void {
     this.userService = this.getService(UserService)
+    this.lgSocketService = this.getService(LGSocketService)
 
     this.master()
-    // if (this.getScreen().number === 1) {
-    //   setTimeout(() => {
-    //   }, 100)
-    // } else {
-    //   this.virtual()
-    // }
+    // this.lgSocketService.on('start-game').subscribe(() => {
+    //   const canvasWidth = Object.values([...this.lgSocketService.screens])
+    //     .map((s) => s.width)
+    //     .reduce((previous, current) => previous + current, 0)
+    //   const canvasHeight =
+    //     this.lgSocketService.getScreenByNumber(1)?.height || window.innerHeight
+
+    //   this.getContext().canvas.width = canvasWidth
+    //   this.getContext().canvas.height = canvasHeight
+
+    //   if (this.lgSocketService.screen.number === 1) {
+    //     setTimeout(() => {
+    //       this.master()
+    //     }, 100)
+    //   } else {
+    //     this.virtual()
+    //   }
+    // })
   }
 
   private master(): void {
