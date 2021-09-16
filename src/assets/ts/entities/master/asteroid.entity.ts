@@ -165,7 +165,7 @@ export class Asteroid
 
       const velocity = Vector2.multiply(
         direction.normalized,
-        Math.floor(Math.random() * (5 - this._asteroidSize - 2) + 2) * -1,
+        0.1 * Math.floor(Math.random() * (5 - this._asteroidSize - 2) + 2) * -1,
       )
 
       const fragment = this.instantiate({
@@ -187,7 +187,7 @@ export class Asteroid
             use: {
               velocity,
               mass: 15 * this._asteroidSize,
-              maxAngularVelocity: 0.09,
+              maxAngularVelocity: 0.009,
               angularVelocity: 0.05 / this._asteroidSize,
             },
           },

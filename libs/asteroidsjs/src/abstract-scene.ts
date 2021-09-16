@@ -2,6 +2,7 @@ import { AbstractEntity, generateUUID, IContext, Type } from '..'
 
 import { IAsteroidsApplication } from './interfaces/asteroids-application.interface'
 import { ICanvasOptions } from './interfaces/canvas-options.interface'
+import { IEnabled } from './interfaces/enabled.interface'
 import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
 
 /**
@@ -12,7 +13,19 @@ import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
  * `unload` method, all it child entities are destroyed like it
  * components.
  */
-export abstract class AbstractScene {
+export abstract class AbstractScene implements IEnabled {
+  /**
+   * Property that enables the scene.
+   *
+   * All "loop" methods such as "onLoop" or "onLateLoop" are only executed
+   * when the structure is activated, as well as its children's "loop"
+   * methods.
+   *
+   * In this case, when the scene is disabled, child entities and
+   * their components are also.
+   */
+  enabled = true
+
   /**
    * Property that defines an object that represents the canvas context
    */
@@ -39,10 +52,8 @@ export abstract class AbstractScene {
    *
    * @param scene defines the scene id, type or instance
    */
-  async unload<S extends AbstractScene>(
-    scene: string | S | Type<S>,
-  ): Promise<void> {
-    await this.game.unload(scene)
+  unload<S extends AbstractScene>(scene: string | S | Type<S>): void {
+    this.game.unload(scene)
     if (document.getElementById(this._context.canvas.id)) {
       document.querySelector('body').removeChild(this._context.canvas)
     }

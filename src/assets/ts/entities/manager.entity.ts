@@ -93,9 +93,9 @@ export class Manager extends AbstractEntity implements IOnStart {
         {
           id: '__spaceship_rigidbody__',
           use: {
-            friction: 0.03,
+            friction: 0.00003,
             mass: 10,
-            maxVelocity: 8,
+            maxVelocity: 0.8,
             maxAngularVelocity: 0.09,
           },
         },
