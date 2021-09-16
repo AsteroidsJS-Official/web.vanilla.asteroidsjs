@@ -95,7 +95,7 @@ export class Spaceship
   /**
    * Property responsible for the spaceship bullet velocity.
    */
-  private readonly bulletVelocity = 10
+  private readonly bulletVelocity = 1
 
   /**
    * Property responsible for the spaceship last bullet time.
@@ -145,9 +145,8 @@ export class Spaceship
       return
     }
 
-    this.scene.unload(this.scene).then(() => {
-      this.scene.load(Single)
-    })
+    this.scene.unload(this.scene)
+    this.scene.load(Single)
   }
 
   onLateLoop(): void {

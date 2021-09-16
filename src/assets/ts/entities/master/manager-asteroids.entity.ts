@@ -24,19 +24,19 @@ export class ManagerAsteroids
   public isMenu = false
 
   public onStart(): void {
-    // if (!this.isMenu) {
-    //   for (let i = 0; i < 3; i++) {
-    //     this.generateAsteroid()
-    //   }
-    //   this.interval = setInterval(() => {
-    //     this.generateAsteroid()
-    //     this.generateAsteroid()
-    //   }, 10000)
-    // } else {
-    //   for (let i = 0; i < 6; i++) {
-    //     this.generateAsteroid()
-    //   }
-    // }
+    if (!this.isMenu) {
+      for (let i = 0; i < 3; i++) {
+        this.generateAsteroid()
+      }
+      this.interval = setInterval(() => {
+        this.generateAsteroid()
+        this.generateAsteroid()
+      }, 10000)
+    } else {
+      for (let i = 0; i < 6; i++) {
+        this.generateAsteroid()
+      }
+    }
   }
 
   onDestroy(): void {
@@ -71,7 +71,7 @@ export class ManagerAsteroids
 
     const velocity = Vector2.multiply(
       new Vector2(x, y).normalized,
-      Math.floor(Math.random() * (5 - asteroidSize + 1 - 2) + 2) * -1,
+      0.1 * Math.floor(Math.random() * (5 - asteroidSize + 1 - 2) + 2) * -1,
     )
 
     const asteroid = this.instantiate({
@@ -92,7 +92,7 @@ export class ManagerAsteroids
           use: {
             velocity,
             mass: 15 * (asteroidSize + 1),
-            maxAngularVelocity: 0.09,
+            maxAngularVelocity: 0.009,
             angularVelocity: 0.05 / (asteroidSize + 1),
           },
         },
@@ -109,7 +109,7 @@ export class ManagerAsteroids
         image: asteroid.image.src,
         velocity,
         mass: 15 * (asteroidSize + 1),
-        maxAngularVelocity: 0.09,
+        maxAngularVelocity: 0.009,
         angularVelocity: 0.05 / (asteroidSize + 1),
       },
     } as ISocketData)
