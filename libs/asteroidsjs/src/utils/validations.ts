@@ -8,6 +8,7 @@ import { IOnAwake } from '../interfaces/on-awake.interface'
 import { IOnFixedLoop } from '../interfaces/on-fixed-loop.interface'
 import { IOnLateLoop } from '../interfaces/on-late-loop.interface'
 import { IOnLoop } from '../interfaces/on-loop.interface'
+import { IOnRender } from '../interfaces/on-render.interface'
 import { IOnStart } from '../interfaces/on-start.interface'
 
 import { AbstractScene } from '../abstract-scene'
@@ -39,7 +40,7 @@ export function isEntity(entity: any): entity is AbstractEntity {
  * @returns true if the object implements the {@link IOnLoop} interface, otherwise
  * false
  */
-export function hasLoop(entity: any): entity is IOnLoop {
+export function hasOnLoop(entity: any): entity is IOnLoop {
   return 'onLoop' in entity
 }
 
@@ -50,7 +51,7 @@ export function hasLoop(entity: any): entity is IOnLoop {
  * @returns true if the object implements the {@link IOnLateLoop} interface, otherwise
  * false
  */
-export function hasLateLoop(entity: any): entity is IOnLateLoop {
+export function hasOnLateLoop(entity: any): entity is IOnLateLoop {
   return 'onLateLoop' in entity
 }
 
@@ -61,7 +62,7 @@ export function hasLateLoop(entity: any): entity is IOnLateLoop {
  * @returns true if the object implements the {@link IOnFixedLoop} interface, otherwise
  * false
  */
-export function hasFixedLoop(entity: any): entity is IOnFixedLoop {
+export function hasOnFixedLoop(entity: any): entity is IOnFixedLoop {
   return 'onFixedLoop' in entity
 }
 
@@ -72,7 +73,7 @@ export function hasFixedLoop(entity: any): entity is IOnFixedLoop {
  * @returns true if the object implements the {@link IOnDestroy} interface, otherwise
  * false
  */
-export function hasDestroy(entity: any): entity is IOnDestroy {
+export function hasOnDestroy(entity: any): entity is IOnDestroy {
   return 'onDestroy' in entity
 }
 
@@ -83,7 +84,7 @@ export function hasDestroy(entity: any): entity is IOnDestroy {
  * @returns true if the object implements the {@link IOnAwake} interface, otherwise
  * false
  */
-export function hasAwake(entity: any): entity is IOnAwake {
+export function hasOnAwake(entity: any): entity is IOnAwake {
   return 'onAwake' in entity
 }
 
@@ -94,16 +95,27 @@ export function hasAwake(entity: any): entity is IOnAwake {
  * @returns true if the object implements the {@link IOnStart} interface, otherwise
  * false
  */
-export function hasStart(entity: any): entity is IOnStart {
+export function hasOnStart(entity: any): entity is IOnStart {
   return 'onStart' in entity
 }
 
 /**
- * Function that validates if some object is of type {@link IOnDraw}
+ * Function that validates if some object is of type {@link IOnRender}
  *
  * @param entity defines an object that will be validated
- * @returns true if the object implements the {@link IOnDraw} interface, otherwise
+ * @returns true if the object implements the {@link IOnRender} interface, otherwise
  * false
+ */
+export function hasOnRender(entity: any): entity is IOnRender {
+  return 'onRender' in entity
+}
+
+/**
+ * Function that validates if some object is of type {@link IDraw}
+ *
+ * @param entity defines an object that will be validated
+ * @returns true if the object implements the {@link IDraw} interface,
+ * otherwise false
  */
 export function hasDraw(entity: any): entity is IDraw {
   return 'draw' in entity

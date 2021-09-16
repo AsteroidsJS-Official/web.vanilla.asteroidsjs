@@ -2,7 +2,6 @@ import {
   AbstractComponent,
   Component,
   IOnAwake,
-  IOnLateLoop,
   Vector2,
   isOverflowingX,
   isOverflowingY,
@@ -10,6 +9,8 @@ import {
 
 import { Drawer } from '../drawer.component'
 import { Transform } from '../transform.component'
+
+import { IOnRender } from '../../../../../libs/asteroidsjs/src/interfaces/on-render.interface'
 
 /**
  * Class that represents the component responsible for rendering the
@@ -21,7 +22,7 @@ import { Transform } from '../transform.component'
 })
 export class RenderOverflow
   extends AbstractComponent
-  implements IOnAwake, IOnLateLoop
+  implements IOnAwake, IOnRender
 {
   public drawer: Drawer
   public transform: Transform
@@ -31,7 +32,7 @@ export class RenderOverflow
     this.transform = this.getComponent(Transform)
   }
 
-  public onLateLoop(): void {
+  public onRender(): void {
     this.drawer.draw()
 
     const overflowingX = isOverflowingX(
