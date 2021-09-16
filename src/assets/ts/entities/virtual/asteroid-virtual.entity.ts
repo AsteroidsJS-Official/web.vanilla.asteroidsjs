@@ -10,7 +10,7 @@ import {
   Rect,
 } from '@asteroidsjs'
 
-import { socket } from '../../socket'
+import { LGSocketService } from '../../services/lg-socket.service'
 
 import { Drawer } from '../../components/drawer.component'
 import { RenderOverflow } from '../../components/renderers/render-overflow.component'
@@ -19,6 +19,7 @@ import { Rigidbody } from '../../components/rigidbody.component'
 import { Transform } from '../../components/transform.component'
 
 @Entity({
+  services: [LGSocketService],
   components: [
     Render,
     Drawer,
@@ -36,6 +37,8 @@ export class AsteroidVirtual
   extends AbstractEntity
   implements IOnAwake, IOnStart, IDraw, IOnLoop
 {
+  private lgSocketService: LGSocketService
+
   private transform: Transform
 
   private _asteroidSize: number
@@ -53,6 +56,7 @@ export class AsteroidVirtual
   }
 
   public onAwake(): void {
+    this.lgSocketService = this.getService(LGSocketService)
     this.transform = this.getComponent(Transform)
   }
 
@@ -62,7 +66,7 @@ export class AsteroidVirtual
       10 * ((this._asteroidSize + 2) * 2),
     )
 
-    socket.on('destroy', (id: string) => {
+    this.lgSocketService.on<string>('destroy').subscribe((id) => {
       if (id === this.id) {
         this.destroy(this)
       }
