@@ -124,10 +124,9 @@ export class Rigidbody
    * related to it such as `angularResultant` and `angularVelocity`
    */
   private updateRotation(): void {
-    const angularAceleration =
-      this.angularResultant * this.mass * this.deltaTime
-    this.angularVelocity += angularAceleration
-    this.transform.rotation += this.angularVelocity
+    const angularAceleration = this.angularResultant * this.mass
+    this.angularVelocity += angularAceleration * this.deltaTime
+    this.transform.rotation += this.angularVelocity * this.deltaTime
   }
 
   /**
@@ -154,7 +153,7 @@ export class Rigidbody
   private applyFriction(): void {
     let force = Vector2.multiply(this.velocity.normalized, -1)
     const normal = this.mass
-    force = Vector2.multiply(force, this.friction * normal * this.deltaTime)
-    this.resultant = force
+    force = Vector2.multiply(force, this.friction * normal)
+    this.resultant = Vector2.multiply(force, this.deltaTime)
   }
 }
