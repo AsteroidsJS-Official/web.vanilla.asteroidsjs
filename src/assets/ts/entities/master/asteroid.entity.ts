@@ -15,7 +15,6 @@ import {
 import { LGSocketService } from '../../services/lg-socket.service'
 
 import { Bullet } from './bullet.entity'
-import { Spaceship } from './spaceship.entity'
 
 import { UserService } from '../../services/user.service'
 
@@ -37,7 +36,6 @@ import asteroidMd1 from '../../../svg/asteroid-md-1.svg'
 import asteroidMd2 from '../../../svg/asteroid-md-2.svg'
 import asteroidSm from '../../../svg/asteroid-sm.svg'
 import asteroidXs from '../../../svg/asteroid-xs.svg'
-import { Single } from '../../scenes/single.scene'
 
 @Entity({
   services: [UserService, LGSocketService],
@@ -134,17 +132,6 @@ export class Asteroid
       this.destroy(collision.entity2)
       this.health.hurt(20)
     } else {
-      ;(collision.entity2 as unknown as Spaceship).health.hurt(
-        this.asteroidSize + 1 * 8,
-      )
-      if ((collision.entity2 as unknown as Spaceship).health.health <= 0) {
-        ;(collision.entity2 as unknown as Spaceship).scene
-          .unload((collision.entity2 as unknown as Spaceship).scene)
-          .then(() => {
-            ;(collision.entity2 as unknown as Spaceship).scene.load(Single)
-          })
-      }
-
       this.health.hurt(this.health.maxHealth)
     }
 
