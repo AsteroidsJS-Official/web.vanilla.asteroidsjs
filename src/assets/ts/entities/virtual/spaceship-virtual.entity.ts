@@ -13,6 +13,7 @@ import { LGSocketService } from '../../services/lg-socket.service'
 import { Drawer } from '../../components/drawer.component'
 import { Health } from '../../components/health.component'
 import { RenderOverflow } from '../../components/renderers/render-overflow.component'
+import { Render } from '../../components/renderers/render.component'
 import { Transform } from '../../components/transform.component'
 
 /**
@@ -41,7 +42,7 @@ export class SpaceshipVirtual
 
   private health: Health
 
-  private image = new Image()
+  private image: HTMLImageElement
 
   public imageSrc = ''
 
@@ -66,7 +67,12 @@ export class SpaceshipVirtual
   }
 
   onStart(): void {
-    this.image.src = this.imageSrc
+    if (this.getComponent(Render) || this.getComponent(RenderOverflow)) {
+      this.image = new Image()
+      this.image.src = this.imageSrc
+    }
+
+    this.health.color = this.spaceshipColor
 
     this.lgSocketService
       .on<ISocketData>('update-screen')

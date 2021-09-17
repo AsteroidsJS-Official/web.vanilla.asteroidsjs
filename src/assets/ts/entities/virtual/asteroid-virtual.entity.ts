@@ -43,12 +43,15 @@ export class AsteroidVirtual
 
   private _asteroidSize: number
 
-  private _image = new Image()
+  private _image: HTMLImageElement
 
   public isFragment = false
 
   public set image(src: string) {
-    this._image.src = src
+    if (this.getComponent(Render) || this.getComponent(RenderOverflow)) {
+      this._image = new Image()
+      this._image.src = src
+    }
   }
 
   public set asteroidSize(size: number) {

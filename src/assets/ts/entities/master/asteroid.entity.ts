@@ -28,14 +28,6 @@ import { Transform } from '../../components/transform.component'
 import { ICollision2 } from '../../interfaces/collision2.interface'
 import { IOnTriggerEnter } from '../../interfaces/on-trigger-enter.interface'
 
-import asteroidLg1 from '../../../svg/asteroid-lg-1.svg'
-import asteroidLg2 from '../../../svg/asteroid-lg-2.svg'
-import asteroidLg3 from '../../../svg/asteroid-lg-3.svg'
-import asteroidMd1 from '../../../svg/asteroid-md-1.svg'
-import asteroidMd2 from '../../../svg/asteroid-md-2.svg'
-import asteroidSm from '../../../svg/asteroid-sm.svg'
-import asteroidXs from '../../../svg/asteroid-xs.svg'
-
 @Entity({
   services: [UserService, LGSocketService],
   components: [
@@ -81,19 +73,26 @@ export class Asteroid
   }
 
   public onStart(): void {
-    this.image = new Image()
-    if (this._asteroidSize === 0) {
-      this.image.src = asteroidXs
-    } else if (this._asteroidSize === 1) {
-      this.image.src = asteroidSm
-    } else if (this._asteroidSize === 2) {
-      const mediumAsteroids = [asteroidMd1, asteroidMd2]
-      this.image.src =
-        mediumAsteroids[Math.floor(Math.random() * mediumAsteroids.length)]
-    } else {
-      const largeAsteroids = [asteroidLg1, asteroidLg2, asteroidLg3]
-      this.image.src =
-        largeAsteroids[Math.floor(Math.random() * largeAsteroids.length)]
+    if (this.getComponent(Render) || this.getComponent(RenderOverflow)) {
+      this.image = new Image()
+      if (this._asteroidSize === 0) {
+        this.image.src = './assets/svg/asteroid-xs.svg'
+      } else if (this._asteroidSize === 1) {
+        const smallAsteroids = [1, 2]
+        this.image.src = `./assets/svg/asteroid-sm-${
+          smallAsteroids[Math.floor(Math.random() * smallAsteroids.length)]
+        }.svg`
+      } else if (this._asteroidSize === 2) {
+        const mediumAsteroids = [1, 2]
+        this.image.src = `./assets/svg/asteroid-md-${
+          mediumAsteroids[Math.floor(Math.random() * mediumAsteroids.length)]
+        }.svg`
+      } else {
+        const largeAsteroids = [1, 2, 3]
+        this.image.src = `./assets/svg/asteroid-lg-${
+          largeAsteroids[Math.floor(Math.random() * largeAsteroids.length)]
+        }.svg`
+      }
     }
 
     this.transform.dimensions = new Rect(

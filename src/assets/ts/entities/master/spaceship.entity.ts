@@ -21,6 +21,7 @@ import { Drawer } from '../../components/drawer.component'
 import { Health } from '../../components/health.component'
 import { Input } from '../../components/input.component'
 import { RenderOverflow } from '../../components/renderers/render-overflow.component'
+import { Render } from '../../components/renderers/render.component'
 import { Rigidbody } from '../../components/rigidbody.component'
 import { Transform } from '../../components/transform.component'
 
@@ -116,7 +117,7 @@ export class Spaceship
 
   private health: Health
 
-  private image = new Image()
+  private image: HTMLImageElement
 
   public get direction(): Vector2 {
     return new Vector2(
@@ -135,7 +136,11 @@ export class Spaceship
   }
 
   onStart(): void {
-    this.image.src = `./assets/svg/spaceship-${this.userService.spaceshipImage}.svg`
+    if (this.getComponent(Render) || this.getComponent(RenderOverflow)) {
+      this.image = new Image()
+      this.image.src = `./assets/svg/spaceship-${this.userService.spaceshipImage}.svg`
+    }
+
     this.health.color = this.userService.spaceshipColor
   }
 
