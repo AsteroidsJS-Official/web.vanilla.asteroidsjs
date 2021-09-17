@@ -13,6 +13,7 @@ import {
 import { LGSocketService } from '../../services/lg-socket.service'
 
 import { Drawer } from '../../components/drawer.component'
+import { Health } from '../../components/health.component'
 import { RenderOverflow } from '../../components/renderers/render-overflow.component'
 import { Render } from '../../components/renderers/render.component'
 import { Rigidbody } from '../../components/rigidbody.component'
@@ -31,6 +32,10 @@ import { Transform } from '../../components/transform.component'
       id: '__asteroid_virtual_rigidbody__',
       class: Rigidbody,
     },
+    {
+      id: '__asteroid_virtual_health__',
+      class: Health,
+    },
   ],
 })
 export class AsteroidVirtual
@@ -45,6 +50,8 @@ export class AsteroidVirtual
 
   private _image = new Image()
 
+  public health: Health
+
   public isFragment = false
 
   public set image(src: string) {
@@ -58,6 +65,7 @@ export class AsteroidVirtual
   public onAwake(): void {
     this.lgSocketService = this.getService(LGSocketService)
     this.transform = this.getComponent(Transform)
+    this.health = this.getComponent(Health)
   }
 
   public onStart(): void {
@@ -65,6 +73,14 @@ export class AsteroidVirtual
       10 * ((this._asteroidSize + 2) * 2),
       10 * ((this._asteroidSize + 2) * 2),
     )
+
+    this.lgSocketService
+      .on<{ id: string; amount: number }>('change-health')
+      .subscribe(({ id, amount }) => {
+        if (id === this.id) {
+          this.health.health = amount
+        }
+      })
 
     this.lgSocketService.on<string>('destroy').subscribe((id) => {
       if (id === this.id) {
