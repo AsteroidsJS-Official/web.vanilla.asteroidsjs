@@ -7,7 +7,9 @@ import { LGScreenMenu } from '../entities/lg-screen-menu.entity'
 @Scene()
 export class LGScreen extends AbstractScene implements IOnStart {
   onStart(): void {
-    this.createCanvas()
+    this.createCanvas({
+      name: 'lg-screen',
+    })
     this.instantiate({ entity: Background })
     this.instantiate({ entity: LGManager })
     this.instantiate({ entity: LGScreenMenu })

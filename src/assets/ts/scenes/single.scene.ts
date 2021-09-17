@@ -6,7 +6,9 @@ import { Manager } from '../entities/manager.entity'
 @Scene()
 export class Single extends AbstractScene implements IOnStart {
   onStart(): void {
-    this.createCanvas()
+    this.createCanvas({
+      name: 'single',
+    })
     this.instantiate({ entity: Background })
     this.instantiate({ entity: Manager })
   }

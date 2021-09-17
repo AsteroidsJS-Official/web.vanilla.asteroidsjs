@@ -68,7 +68,7 @@ export abstract class AbstractScene implements IEnabled {
    */
   createCanvas(options?: ICanvasOptions): IContext {
     const canvas = document.createElement('canvas')
-    canvas.id = generateUUID()
+    canvas.id = options.name ?? '' + generateUUID()
 
     options ??= {} as ICanvasOptions
     canvas.width = options.width ?? window.innerWidth

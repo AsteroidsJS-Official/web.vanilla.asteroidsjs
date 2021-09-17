@@ -1,4 +1,5 @@
 export interface ICanvasOptions {
-  width: number
-  height: number
+  width?: number
+  height?: number
+  name?: string
 }

@@ -88,7 +88,7 @@ export class Manager extends AbstractEntity implements IOnStart {
             friction: 0.00003,
             mass: 10,
             maxVelocity: 0.5,
-            maxAngularVelocity: 0.039,
+            maxAngularVelocity: 0.007,
           },
         },
         {
