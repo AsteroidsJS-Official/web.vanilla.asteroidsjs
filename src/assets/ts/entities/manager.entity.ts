@@ -140,7 +140,7 @@ export class Manager extends AbstractEntity implements IOnStart {
                   },
                 },
                 {
-                  class: Health,
+                  id: '__spaceship_virtual_health__',
                   use: {
                     color: data.spaceshipColor,
                     maxHealth: data.maxHealth,
@@ -154,6 +154,7 @@ export class Manager extends AbstractEntity implements IOnStart {
             this.instantiate({
               use: {
                 id,
+                userId: data.userId,
               },
               entity: BulletVirtual,
               components: [
@@ -199,6 +200,14 @@ export class Manager extends AbstractEntity implements IOnStart {
                     mass: data.mass,
                     maxAngularVelocity: data.maxAngularVelocity,
                     angularVelocity: data.angularVelocity,
+                  },
+                },
+                {
+                  id: '__asteroid_virtual_health__',
+                  use: {
+                    color: data.color,
+                    maxHealth: data.maxHealth,
+                    health: data.health,
                   },
                 },
               ],
