@@ -80,6 +80,7 @@ class AsteroidsApplication implements IAsteroidsApplication {
       instance.onStart()
     }
 
+    this.scenes.push(instance)
     return instance
   }
 
