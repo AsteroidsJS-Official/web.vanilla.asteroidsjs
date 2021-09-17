@@ -181,7 +181,7 @@ export class Manager extends AbstractEntity implements IOnStart {
               use: {
                 id,
                 asteroidSize: data.asteroidSize,
-                image: data.image,
+                imageSrc: data.image,
                 isFragment: !!data.isFragment,
               },
               entity: AsteroidVirtual,

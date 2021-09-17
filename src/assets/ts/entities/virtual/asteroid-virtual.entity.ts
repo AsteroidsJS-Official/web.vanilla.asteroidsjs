@@ -48,18 +48,13 @@ export class AsteroidVirtual
 
   private _asteroidSize: number
 
-  private _image: HTMLImageElement
+  private image: HTMLImageElement
 
   public health: Health
 
-  public isFragment = false
+  public imageSrc = ''
 
-  public set image(src: string) {
-    if (this.getComponent(Render) || this.getComponent(RenderOverflow)) {
-      this._image = new Image()
-      this._image.src = src
-    }
-  }
+  public isFragment = false
 
   public set asteroidSize(size: number) {
     this._asteroidSize = size
@@ -72,6 +67,11 @@ export class AsteroidVirtual
   }
 
   public onStart(): void {
+    if (this.getComponent(Render) || this.getComponent(RenderOverflow)) {
+      this.image = new Image()
+      this.image.src = this.imageSrc
+    }
+
     this.transform.dimensions = new Rect(
       10 * ((this._asteroidSize + 2) * 2),
       10 * ((this._asteroidSize + 2) * 2),
@@ -127,7 +127,7 @@ export class AsteroidVirtual
 
     this.getContext().beginPath()
     this.getContext().drawImage(
-      this._image,
+      this.image,
       0 - this.transform.dimensions.width / 2,
       0 - this.transform.dimensions.height / 2,
       this.transform.dimensions.width,

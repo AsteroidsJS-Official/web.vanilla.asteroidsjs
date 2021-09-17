@@ -158,7 +158,7 @@ export class ManagerAsteroids
               use: {
                 id,
                 asteroidSize: data.asteroidSize,
-                image: data.image,
+                imageSrc: data.image,
                 isFragment: !!data.isFragment,
               },
               entity: AsteroidVirtual,
