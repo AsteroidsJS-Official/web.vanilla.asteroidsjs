@@ -48,6 +48,8 @@ export class Menu extends AbstractEntity implements IOnAwake, IOnStart {
    * Inserts the menu HTML into the body.
    */
   async insertMenuHtml(): Promise<void> {
+    document.getElementsByTagName('ast-menu')[0]?.remove()
+
     const html = await getHtml('menu', 'ast-menu')
     html.style.position = 'absolute'
     html.style.top = '0'
@@ -61,15 +63,15 @@ export class Menu extends AbstractEntity implements IOnAwake, IOnStart {
     // const playOMP = document.getElementById('play-online-multiplayer-button')
 
     if (playSPButton) {
-      playSPButton.addEventListener('click', async () => {
+      playSPButton.addEventListener('click', () => {
         this.lgSocketService.emit('change-scene', 'single')
         this.loadSinglePlayer()
       })
     }
   }
 
-  private async loadSinglePlayer(): Promise<void> {
-    await this.scene.unload(this.scene)
+  private loadSinglePlayer(): void {
+    this.scene.unload(this.scene)
     document.getElementsByTagName('ast-menu')[0]?.remove()
 
     this.scene.load(Single)

@@ -3,6 +3,7 @@ import {
   Entity,
   getHtml,
   IOnAwake,
+  IOnDestroy,
   IOnStart,
   IScreen,
 } from '@asteroidsjs'
@@ -18,7 +19,10 @@ import { Menu } from '../scenes/menu.scene'
 @Entity({
   services: [LGSocketService],
 })
-export class LGScreenMenu extends AbstractEntity implements IOnAwake, IOnStart {
+export class LGScreenMenu
+  extends AbstractEntity
+  implements IOnAwake, IOnStart, IOnDestroy
+{
   private lgSocketService: LGSocketService
 
   /**
@@ -45,6 +49,11 @@ export class LGScreenMenu extends AbstractEntity implements IOnAwake, IOnStart {
     '--ast-lg-yellow',
     '--ast-lg-green',
   ]
+
+  /**
+   * Property that defines the connection timeout.
+   */
+  private connectionTimeout: NodeJS.Timeout
 
   onAwake(): void {
     this.lgSocketService = this.getService(LGSocketService)
@@ -108,6 +117,10 @@ export class LGScreenMenu extends AbstractEntity implements IOnAwake, IOnStart {
         })
       }
     })
+  }
+
+  onDestroy(): void {
+    clearTimeout(this.connectionTimeout)
   }
 
   /**
@@ -381,14 +394,15 @@ export class LGScreenMenu extends AbstractEntity implements IOnAwake, IOnStart {
       }
     }
 
-    setTimeout(async () => {
+    this.connectionTimeout = setTimeout(() => {
       if (
         this.lgSocketService.getScreensConnected() ===
-        this.lgSocketService.screenAmount
+          this.lgSocketService.screenAmount &&
+        this.lgSocketService.screen.number === 1
       ) {
         this.lgSocketService
           .emit('get-screens')
-          .subscribe(async (data: LoadScreensData) => {
+          .subscribe((data: LoadScreensData) => {
             if (!data) {
               return
             }
@@ -397,7 +411,7 @@ export class LGScreenMenu extends AbstractEntity implements IOnAwake, IOnStart {
 
             this.lgSocketService.emit('change-scene', 'menu')
 
-            await this.scene.unload(this.scene)
+            this.scene.unload(this.scene)
             document.querySelector('ast-lg-screen')?.remove()
 
             this.scene.load(Menu)
@@ -406,10 +420,13 @@ export class LGScreenMenu extends AbstractEntity implements IOnAwake, IOnStart {
     }, 1500)
   }
 
+  /**
+   * Loads the main menu on slave screens.
+   */
   private loadMenu() {
     this.lgSocketService
       .emit('get-screens')
-      .subscribe(async (data: LoadScreensData) => {
+      .subscribe((data: LoadScreensData) => {
         if (!data) {
           return
         }
@@ -417,7 +434,7 @@ export class LGScreenMenu extends AbstractEntity implements IOnAwake, IOnStart {
         this.lgSocketService.screens = data.screens
         this.lgSocketService.screenAmount = data.screenAmount
 
-        await this.scene.unload(this.scene)
+        this.scene.unload(this.scene)
         document.querySelector('ast-lg-screen-slave')?.remove()
 
         this.scene.load(Menu)

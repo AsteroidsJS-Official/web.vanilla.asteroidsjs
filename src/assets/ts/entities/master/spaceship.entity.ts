@@ -76,8 +76,8 @@ import { Single } from '../../scenes/single.scene'
     {
       class: Input,
       use: {
-        force: 0.03,
-        angularForce: 0.00003,
+        force: 0.01,
+        angularForce: 0.000003,
       },
     },
   ],
@@ -97,7 +97,7 @@ export class Spaceship
   /**
    * Property responsible for the spaceship bullet velocity.
    */
-  private readonly bulletVelocity = 1
+  private readonly bulletVelocity = 0.6
 
   /**
    * Property responsible for the spaceship last bullet time.

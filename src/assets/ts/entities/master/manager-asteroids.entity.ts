@@ -93,7 +93,7 @@ export class ManagerAsteroids
 
     const velocity = Vector2.multiply(
       new Vector2(x, y).normalized,
-      0.1 * Math.floor(Math.random() * (5 - asteroidSize + 1 - 2) + 2) * -1,
+      0.1 * Math.floor(Math.random() * (5 - asteroidSize + 1 - 2) + 2) * -0.5,
     )
 
     const asteroid = this.instantiate({
@@ -114,7 +114,7 @@ export class ManagerAsteroids
           use: {
             velocity,
             mass: 15 * (asteroidSize + 1),
-            maxAngularVelocity: 0.009,
+            maxAngularVelocity: 0.006,
             angularVelocity: 0.05 / (asteroidSize + 1),
           },
         },
@@ -131,7 +131,7 @@ export class ManagerAsteroids
         image: asteroid.image.src,
         velocity,
         mass: 15 * (asteroidSize + 1),
-        maxAngularVelocity: 0.009,
+        maxAngularVelocity: 0.006,
         angularVelocity: 0.05 / (asteroidSize + 1),
       },
     } as ISocketData)

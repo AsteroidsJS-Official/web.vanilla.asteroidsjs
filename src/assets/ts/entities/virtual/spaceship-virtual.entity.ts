@@ -35,11 +35,6 @@ export class SpaceshipVirtual
   private transform: Transform
 
   /**
-   * Property responsible for the spaceship bullet velocity.
-   */
-  public readonly bulletVelocity = 10
-
-  /**
    * Property responsible for the spaceship last bullet time.
    */
   public lastShot: Date
@@ -63,8 +58,6 @@ export class SpaceshipVirtual
       Math.cos(this.transform.rotation),
     )
   }
-
-  public isShooting = false
 
   onAwake(): void {
     this.lgSocketService = this.getService(LGSocketService)
