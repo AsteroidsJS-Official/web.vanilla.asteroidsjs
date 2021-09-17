@@ -12,6 +12,7 @@ import {
 
 import { LGSocketService } from '../../services/lg-socket.service'
 
+import { Asteroid } from './asteroid.entity'
 import { Bullet } from './bullet.entity'
 
 import { UserService } from '../../services/user.service'
@@ -146,6 +147,16 @@ export class Spaceship
   onTriggerEnter(collision: ICollision2): void {
     if (collision.entity2.tag?.includes(Bullet.name)) {
       return
+    } else if (collision.entity2.tag?.includes(Asteroid.name)) {
+      console.log('entered')
+
+      const asteroid = collision.entity2 as unknown as Asteroid
+      this.health.hurt(asteroid.asteroidSize + 1 * 8)
+      if (this.health.health <= 0) {
+        this.scene.unload(this.scene).then(() => {
+          this.scene.load(Single)
+        })
+      }
     }
 
     this.scene.unload(this.scene)
