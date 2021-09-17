@@ -65,10 +65,6 @@ export class Manager extends AbstractEntity implements IOnStart {
     }
 
     this.instantiate({
-      entity: ManagerAsteroids,
-    })
-
-    this.instantiate({
       entity: Score,
     })
 
@@ -99,6 +95,10 @@ export class Manager extends AbstractEntity implements IOnStart {
           },
         },
       ],
+    })
+
+    this.instantiate({
+      entity: ManagerAsteroids,
     })
 
     this.lgSocketService.emit('instantiate', {

@@ -148,19 +148,13 @@ export class Spaceship
     if (collision.entity2.tag?.includes(Bullet.name)) {
       return
     } else if (collision.entity2.tag?.includes(Asteroid.name)) {
-      console.log('entered')
-
       const asteroid = collision.entity2 as unknown as Asteroid
       this.health.hurt(asteroid.asteroidSize + 1 * 8)
       if (this.health.health <= 0) {
-        this.scene.unload(this.scene).then(() => {
-          this.scene.load(Single)
-        })
+        this.scene.unload(this.scene)
+        this.scene.load(Single)
       }
     }
-
-    this.scene.unload(this.scene)
-    this.scene.load(Single)
   }
 
   onLateLoop(): void {
