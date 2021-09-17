@@ -39,7 +39,10 @@ export class BulletVirtual
   private lgSocketService: LGSocketService
 
   public transform: Transform
+
   public rigidbody: Rigidbody
+
+  public userId: string
 
   public get direction(): Vector2 {
     return new Vector2(

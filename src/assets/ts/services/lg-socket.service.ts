@@ -6,6 +6,7 @@ import { BehaviorSubject, Observable } from 'rxjs'
 
 type SocketEmitEvents =
   | 'change-scene'
+  | 'change-health'
   | 'connect-screen'
   | 'set-screen-amount'
   | 'get-screens'
@@ -20,6 +21,7 @@ type SocketEmitEvents =
 
 type SocketOnEvents =
   | 'change-scene'
+  | 'change-health'
   | 'instantiate'
   | 'destroy'
   | 'update-screen'

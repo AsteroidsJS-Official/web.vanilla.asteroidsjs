@@ -13,6 +13,11 @@ export class UserService extends AbstractService {
   private readonly score = new BehaviorSubject<number>(0)
 
   /**
+   * Property that defines the user id.
+   */
+  public userId = 'fbA8293AA89'
+
+  /**
    * Property that defines the user nickname.
    */
   public nickname = 'GUEST'
