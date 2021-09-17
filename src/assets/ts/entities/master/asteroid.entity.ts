@@ -42,7 +42,6 @@ import asteroidXs from '../../../svg/asteroid-xs.svg'
   components: [
     Render,
     Drawer,
-    Health,
     CircleCollider2,
     {
       id: '__asteroid_transform__',
@@ -51,6 +50,10 @@ import asteroidXs from '../../../svg/asteroid-xs.svg'
     {
       id: '__asteroid_rigidbody__',
       class: Rigidbody,
+    },
+    {
+      id: '__asteroid_health__',
+      class: Health,
     },
   ],
 })
@@ -114,9 +117,9 @@ export class Asteroid
       10 * ((this._asteroidSize + 2) * 2),
     )
 
-    this.health.color = '#8d8d8d'
-    this.health.maxHealth = (this._asteroidSize + 1) * 20
-    this.health.health = this.health.maxHealth
+    this.health.health$.subscribe((value) => {
+      this.lgSocketService.emit('change-health', { id: this.id, amount: value })
+    })
   }
 
   public onDestroy(): void {
@@ -139,7 +142,9 @@ export class Asteroid
       return
     }
 
-    this.userService.increaseScore(this._asteroidSize + 1)
+    if (collision.entity2.tag?.includes(Bullet.name)) {
+      this.userService.increaseScore(this._asteroidSize + 1)
+    }
 
     if (this._asteroidSize > 0) {
       this.generateAsteroidFragments(this._asteroidSize <= 2 ? 1 : 2)
@@ -193,7 +198,9 @@ export class Asteroid
 
       const velocity = Vector2.multiply(
         direction.normalized,
-        0.1 * Math.floor(Math.random() * (5 - this._asteroidSize - 2) + 2) * -1,
+        0.1 *
+          Math.floor(Math.random() * (5 - this._asteroidSize - 2) + 2) *
+          -0.7,
       )
 
       const fragment = this.instantiate({
@@ -215,8 +222,16 @@ export class Asteroid
             use: {
               velocity,
               mass: 15 * this._asteroidSize,
-              maxAngularVelocity: 0.009,
-              angularVelocity: 0.05 / this._asteroidSize,
+              maxAngularVelocity: 0.005,
+              angularVelocity: 0.005 / this._asteroidSize,
+            },
+          },
+          {
+            id: '__asteroid_health__',
+            use: {
+              color: '#8d8d8d',
+              maxHealth: this._asteroidSize * 20,
+              health: this._asteroidSize * 20,
             },
           },
         ],
@@ -232,9 +247,12 @@ export class Asteroid
           position,
           velocity,
           mass: 15 * this._asteroidSize,
-          maxAngularVelocity: 0.09,
-          angularVelocity: 0.05 / this._asteroidSize,
+          maxAngularVelocity: 0.005,
+          angularVelocity: 0.005 / this._asteroidSize,
           isFragment: true,
+          color: '#8d8d8d',
+          maxHealth: this._asteroidSize * 20,
+          health: this._asteroidSize * 20,
         },
       })
     }

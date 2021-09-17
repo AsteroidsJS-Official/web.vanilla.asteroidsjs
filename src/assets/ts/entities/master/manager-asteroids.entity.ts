@@ -41,7 +41,7 @@ export class ManagerAsteroids
       this.interval = setInterval(() => {
         this.generateAsteroid()
         this.generateAsteroid()
-      }, 10000)
+      }, 5000)
     } else {
       const screen = this.lgSocketService.screen
 
@@ -93,7 +93,7 @@ export class ManagerAsteroids
 
     const velocity = Vector2.multiply(
       new Vector2(x, y).normalized,
-      0.1 * Math.floor(Math.random() * (5 - asteroidSize + 1 - 2) + 2) * -0.5,
+      0.1 * Math.floor(Math.random() * (5 - asteroidSize + 1 - 2) + 2) * -0.7,
     )
 
     const asteroid = this.instantiate({
@@ -114,8 +114,16 @@ export class ManagerAsteroids
           use: {
             velocity,
             mass: 15 * (asteroidSize + 1),
-            maxAngularVelocity: 0.006,
-            angularVelocity: 0.05 / (asteroidSize + 1),
+            maxAngularVelocity: 0.005,
+            angularVelocity: 0.005 / (asteroidSize + 1),
+          },
+        },
+        {
+          id: '__asteroid_health__',
+          use: {
+            color: '#8d8d8d',
+            maxHealth: (asteroidSize + 1) * 20,
+            health: (asteroidSize + 1) * 20,
           },
         },
       ],
@@ -131,8 +139,11 @@ export class ManagerAsteroids
         image: asteroid.image.src,
         velocity,
         mass: 15 * (asteroidSize + 1),
-        maxAngularVelocity: 0.006,
-        angularVelocity: 0.05 / (asteroidSize + 1),
+        maxAngularVelocity: 0.005,
+        angularVelocity: 0.005 / (asteroidSize + 1),
+        color: '#8d8d8d',
+        maxHealth: (asteroidSize + 1) * 20,
+        health: (asteroidSize + 1) * 20,
       },
     } as ISocketData)
   }
@@ -166,6 +177,14 @@ export class ManagerAsteroids
                     mass: data.mass,
                     maxAngularVelocity: data.maxAngularVelocity,
                     angularVelocity: data.angularVelocity,
+                  },
+                },
+                {
+                  id: '__asteroid_virtual_health__',
+                  use: {
+                    color: data.color,
+                    maxHealth: data.maxHealth,
+                    health: data.health,
                   },
                 },
               ],
