@@ -12,9 +12,11 @@ import {
 
 import { LGSocketService } from '../../services/lg-socket.service'
 
+import { GameOver } from '../game-over.entity'
 import { Asteroid } from './asteroid.entity'
 import { Bullet } from './bullet.entity'
 
+import { GameService } from '../../services/game.service'
 import { UserService } from '../../services/user.service'
 
 import { CircleCollider2 } from '../../components/colliders/circle-collider2.component'
@@ -29,13 +31,11 @@ import { Transform } from '../../components/transform.component'
 import { ICollision2 } from '../../interfaces/collision2.interface'
 import { IOnTriggerEnter } from '../../interfaces/on-trigger-enter.interface'
 
-import { Single } from '../../scenes/single.scene'
-
 /**
  * Class that represents the spaceship entity controlled by the user.
  */
 @Entity({
-  services: [UserService, LGSocketService],
+  services: [UserService, LGSocketService, GameService],
   components: [
     Drawer,
     RenderOverflow,
@@ -92,6 +92,8 @@ export class Spaceship
 
   private lgSocketService: LGSocketService
 
+  private gameService: GameService
+
   /**
    * Property responsible for the spaceship bullet velocity.
    */
@@ -130,6 +132,7 @@ export class Spaceship
   onAwake(): void {
     this.lgSocketService = this.getService(LGSocketService)
     this.userService = this.getService(UserService)
+    this.gameService = this.getService(GameService)
 
     this.transform = this.getComponent(Transform)
     this.rigidbody = this.getComponent(Rigidbody)
@@ -169,8 +172,9 @@ export class Spaceship
     }
 
     if (this.health.health <= 0) {
-      this.scene.unload(this.scene)
-      this.scene.load(Single)
+      this.destroy(this)
+      this.gameService.gameOver = true
+      this.instantiate({ entity: GameOver })
     }
   }
 

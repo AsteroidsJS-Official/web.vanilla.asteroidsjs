@@ -12,6 +12,8 @@ import {
 
 import { LGSocketService } from '../../services/lg-socket.service'
 
+import { GameOver } from '../game-over.entity'
+
 import { Drawer } from '../../components/drawer.component'
 import { Health } from '../../components/health.component'
 import { RenderOverflow } from '../../components/renderers/render-overflow.component'
@@ -88,6 +90,7 @@ export class AsteroidVirtual
     this.lgSocketService.on<string>('destroy').subscribe((id) => {
       if (id === this.id) {
         this.destroy(this)
+        this.instantiate({ entity: GameOver })
       }
     })
   }
