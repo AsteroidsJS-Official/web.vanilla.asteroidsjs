@@ -13,11 +13,13 @@ import { LGSocketService } from '../../services/lg-socket.service'
 import { AsteroidVirtual } from '../virtual/asteroid-virtual.entity'
 import { Asteroid } from './asteroid.entity'
 
+import { GameService } from '../../services/game.service'
+
 /**
  * Class that represents the first entity to be loaded into the game
  */
 @Entity({
-  services: [LGSocketService],
+  services: [LGSocketService, GameService],
 })
 export class ManagerAsteroids
   extends AbstractEntity
@@ -27,14 +29,23 @@ export class ManagerAsteroids
 
   private lgSocketService: LGSocketService
 
+  private gameService: GameService
+
   public isMenu = false
 
   onAwake(): void {
     this.lgSocketService = this.getService(LGSocketService)
+    this.gameService = this.getService(GameService)
   }
 
   onStart(): void {
     if (!this.isMenu) {
+      this.gameService.gameOver$.subscribe((value) => {
+        if (value) {
+          clearInterval(this.interval)
+        }
+      })
+
       for (let i = 0; i < 3; i++) {
         this.generateAsteroid()
       }
