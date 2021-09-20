@@ -22,7 +22,12 @@ import { Transform } from '../../components/transform.component'
  */
 @Entity({
   services: [LGSocketService],
-  components: [Drawer, Transform, RenderOverflow, Health],
+  components: [
+    Drawer,
+    Transform,
+    RenderOverflow,
+    { id: '__spaceship_virtual_health__', class: Health },
+  ],
 })
 export class SpaceshipVirtual
   extends AbstractEntity

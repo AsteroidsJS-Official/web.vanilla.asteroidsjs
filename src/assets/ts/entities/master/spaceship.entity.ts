@@ -12,8 +12,11 @@ import {
 
 import { LGSocketService } from '../../services/lg-socket.service'
 
+import { GameOver } from '../game-over.entity'
+import { Asteroid } from './asteroid.entity'
 import { Bullet } from './bullet.entity'
 
+import { GameService } from '../../services/game.service'
 import { UserService } from '../../services/user.service'
 
 import { CircleCollider2 } from '../../components/colliders/circle-collider2.component'
@@ -28,13 +31,11 @@ import { Transform } from '../../components/transform.component'
 import { ICollision2 } from '../../interfaces/collision2.interface'
 import { IOnTriggerEnter } from '../../interfaces/on-trigger-enter.interface'
 
-import { Single } from '../../scenes/single.scene'
-
 /**
  * Class that represents the spaceship entity controlled by the user.
  */
 @Entity({
-  services: [UserService, LGSocketService],
+  services: [UserService, LGSocketService, GameService],
   components: [
     Drawer,
     RenderOverflow,
@@ -87,13 +88,11 @@ export class Spaceship
   extends AbstractEntity
   implements IOnAwake, IDraw, IOnLateLoop, IOnTriggerEnter, IOnDestroy
 {
-  tag = Spaceship.name
-
-  public isShooting = false
-
   private userService: UserService
 
   private lgSocketService: LGSocketService
+
+  private gameService: GameService
 
   /**
    * Property responsible for the spaceship bullet velocity.
@@ -115,9 +114,13 @@ export class Spaceship
    */
   private rigidbody: Rigidbody
 
-  private health: Health
-
   private image: HTMLImageElement
+
+  public isShooting = false
+
+  public tag = Spaceship.name
+
+  public health: Health
 
   public get direction(): Vector2 {
     return new Vector2(
@@ -129,6 +132,7 @@ export class Spaceship
   onAwake(): void {
     this.lgSocketService = this.getService(LGSocketService)
     this.userService = this.getService(UserService)
+    this.gameService = this.getService(GameService)
 
     this.transform = this.getComponent(Transform)
     this.rigidbody = this.getComponent(Rigidbody)
@@ -149,12 +153,29 @@ export class Spaceship
   }
 
   onTriggerEnter(collision: ICollision2): void {
-    if (collision.entity2.tag?.includes(Bullet.name)) {
+    if (
+      collision.entity2.tag?.includes(Bullet.name) &&
+      (collision.entity2 as unknown as Bullet).userId ===
+        this.userService.userId
+    ) {
       return
     }
 
-    this.scene.unload(this.scene)
-    this.scene.load(Single)
+    if (collision.entity2.tag?.includes(Asteroid.name)) {
+      const asteroid = collision.entity2 as unknown as Asteroid
+      this.health.hurt(asteroid.asteroidSize + 1 * 8)
+    }
+
+    if (collision.entity2.tag?.includes(Bullet.name)) {
+      this.destroy(collision.entity2)
+      this.health.hurt(5)
+    }
+
+    if (this.health.health <= 0 && !this.gameService.gameOver) {
+      this.destroy(this)
+      this.gameService.gameOver = true
+      this.instantiate({ entity: GameOver })
+    }
   }
 
   onLateLoop(): void {
@@ -239,6 +260,7 @@ export class Spaceship
     const bullet = this.instantiate({
       use: {
         tag: `${Bullet.name}`,
+        userId: this.userService.userId,
       },
       entity: Bullet,
       components: [
@@ -262,6 +284,7 @@ export class Spaceship
       id: bullet.id,
       type: Bullet.name,
       data: {
+        userId: bullet.userId,
         position,
         rotation,
         velocity,

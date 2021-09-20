@@ -9,9 +9,9 @@ import {
 
 import { LGSocketService } from '../services/lg-socket.service'
 
+import { ManagerAsteroids } from './manager-asteroids.entity'
 import { Asteroid } from './master/asteroid.entity'
 import { Bullet } from './master/bullet.entity'
-import { ManagerAsteroids } from './master/manager-asteroids.entity'
 import { Score } from './master/score.entity'
 import { Spaceship } from './master/spaceship.entity'
 import { AsteroidVirtual } from './virtual/asteroid-virtual.entity'
@@ -65,12 +65,10 @@ export class Manager extends AbstractEntity implements IOnStart {
     }
 
     this.instantiate({
-      entity: ManagerAsteroids,
-    })
-
-    this.instantiate({
       entity: Score,
     })
+
+    const spaceshipHealth = 30
 
     const spaceship = this.instantiate({
       entity: Spaceship,
@@ -94,11 +92,15 @@ export class Manager extends AbstractEntity implements IOnStart {
         {
           class: Health,
           use: {
-            maxHealth: 30,
-            health: 30,
+            maxHealth: spaceshipHealth,
+            health: spaceshipHealth,
           },
         },
       ],
+    })
+
+    this.instantiate({
+      entity: ManagerAsteroids,
     })
 
     this.lgSocketService.emit('instantiate', {
@@ -110,8 +112,8 @@ export class Manager extends AbstractEntity implements IOnStart {
         spaceshipColor: this.userService.spaceshipColor,
         nickname: this.userService.nickname,
         imageSrc: `./assets/svg/spaceship-${this.userService.spaceshipImage}.svg`,
-        maxHealth: 30,
-        health: 30,
+        maxHealth: spaceshipHealth,
+        health: spaceshipHealth,
       },
     } as ISocketData)
   }
@@ -140,7 +142,7 @@ export class Manager extends AbstractEntity implements IOnStart {
                   },
                 },
                 {
-                  class: Health,
+                  id: '__spaceship_virtual_health__',
                   use: {
                     color: data.spaceshipColor,
                     maxHealth: data.maxHealth,
@@ -154,6 +156,7 @@ export class Manager extends AbstractEntity implements IOnStart {
             this.instantiate({
               use: {
                 id,
+                userId: data.userId,
               },
               entity: BulletVirtual,
               components: [
@@ -180,7 +183,7 @@ export class Manager extends AbstractEntity implements IOnStart {
               use: {
                 id,
                 asteroidSize: data.asteroidSize,
-                image: data.image,
+                imageSrc: data.image,
                 isFragment: !!data.isFragment,
               },
               entity: AsteroidVirtual,
@@ -199,6 +202,14 @@ export class Manager extends AbstractEntity implements IOnStart {
                     mass: data.mass,
                     maxAngularVelocity: data.maxAngularVelocity,
                     angularVelocity: data.angularVelocity,
+                  },
+                },
+                {
+                  id: '__asteroid_virtual_health__',
+                  use: {
+                    color: data.color,
+                    maxHealth: data.maxHealth,
+                    health: data.health,
                   },
                 },
               ],

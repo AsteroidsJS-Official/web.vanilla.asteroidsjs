@@ -14,12 +14,14 @@ import {
 
 import { LGSocketService } from '../../services/lg-socket.service'
 
-import { Spaceship } from './spaceship.entity'
+import { Bullet } from './bullet.entity'
 
+import { GameService } from '../../services/game.service'
 import { UserService } from '../../services/user.service'
 
 import { CircleCollider2 } from '../../components/colliders/circle-collider2.component'
 import { Drawer } from '../../components/drawer.component'
+import { Health } from '../../components/health.component'
 import { RenderOverflow } from '../../components/renderers/render-overflow.component'
 import { Render } from '../../components/renderers/render.component'
 import { Rigidbody } from '../../components/rigidbody.component'
@@ -28,8 +30,11 @@ import { Transform } from '../../components/transform.component'
 import { ICollision2 } from '../../interfaces/collision2.interface'
 import { IOnTriggerEnter } from '../../interfaces/on-trigger-enter.interface'
 
+/**
+ * Class that represents the asteroid entity and it's behavior.
+ */
 @Entity({
-  services: [UserService, LGSocketService],
+  services: [UserService, LGSocketService, GameService],
   components: [
     Render,
     Drawer,
@@ -42,6 +47,10 @@ import { IOnTriggerEnter } from '../../interfaces/on-trigger-enter.interface'
       id: '__asteroid_rigidbody__',
       class: Rigidbody,
     },
+    {
+      id: '__asteroid_health__',
+      class: Health,
+    },
   ],
 })
 export class Asteroid
@@ -52,15 +61,46 @@ export class Asteroid
 
   private lgSocketService: LGSocketService
 
+  private gameService: GameService
+
   private transform: Transform
 
-  private _asteroidSize: number
-
-  public image: HTMLImageElement
+  private health: Health
 
   public tag = Asteroid.name
 
+  /**
+   * Property that defines the asteroid size.
+   *
+   * @example
+   * [0, 1, 2, 3, 4] => 2
+   */
+  private _asteroidSize: number
+
+  /**
+   * Property that defines whether the asteroid was destroyed.
+   */
+  private wasDestroyed = false
+
+  /**
+   * Property that defines the asteroid image.
+   */
+  public image: HTMLImageElement
+
+  /**
+   * Property that defines whether the asteroid is a fragment from
+   * another one.
+   */
   public isFragment = false
+
+  /**
+   * Property that defines the time that the asteroid was generated.
+   */
+  public generationTime: Date
+
+  public get asteroidSize(): number {
+    return this._asteroidSize
+  }
 
   public set asteroidSize(size: number) {
     this._asteroidSize = size
@@ -69,10 +109,15 @@ export class Asteroid
   public onAwake(): void {
     this.userService = this.getService(UserService)
     this.lgSocketService = this.getService(LGSocketService)
+    this.gameService = this.getService(GameService)
+
     this.transform = this.getComponent(Transform)
+    this.health = this.getComponent(Health)
   }
 
   public onStart(): void {
+    this.generationTime = new Date()
+
     if (this.getComponent(Render) || this.getComponent(RenderOverflow)) {
       this.image = new Image()
       if (this._asteroidSize === 0) {
@@ -99,6 +144,10 @@ export class Asteroid
       10 * ((this._asteroidSize + 2) * 2),
       10 * ((this._asteroidSize + 2) * 2),
     )
+
+    this.health.health$.subscribe((value) => {
+      this.lgSocketService.emit('change-health', { id: this.id, amount: value })
+    })
   }
 
   public onDestroy(): void {
@@ -106,20 +155,40 @@ export class Asteroid
   }
 
   public onTriggerEnter(collision: ICollision2): void {
-    if (
-      collision.entity2.tag?.includes(Asteroid.name) ||
-      collision.entity2.tag?.includes(Spaceship.name)
-    ) {
+    if (this.wasDestroyed || collision.entity2.tag?.includes(Asteroid.name)) {
       return
     }
 
-    this.userService.increaseScore(this._asteroidSize + 1)
+    const generationDiff =
+      this.generationTime &&
+      new Date().getTime() - this.generationTime.getTime()
 
-    this.destroy(collision.entity2)
+    if (collision.entity2.tag?.includes(Bullet.name)) {
+      this.destroy(collision.entity2)
+
+      if (generationDiff <= 100) {
+        return
+      }
+
+      this.health.hurt(20)
+    } else if (generationDiff > 100) {
+      this.health.hurt(this.health.maxHealth)
+    }
+
+    if (this.health.health > 0) {
+      return
+    }
+
+    if (collision.entity2.tag?.includes(Bullet.name)) {
+      this.userService.increaseScore(this._asteroidSize + 1)
+    }
 
     if (this._asteroidSize > 0) {
       this.generateAsteroidFragments(this._asteroidSize <= 2 ? 1 : 2)
     }
+
+    this.wasDestroyed = true
+    this.gameService.asteroidsAmount -= 1
 
     this.destroy(this)
   }
@@ -151,7 +220,8 @@ export class Asteroid
   }
 
   /**
-   * Generates two new asteroids from the current asteroid.
+   * Generates new asteroids from the current asteroid according to
+   * the given amount.
    *
    * @param amount The amount of fragments to be generated.
    */
@@ -167,8 +237,12 @@ export class Asteroid
 
       const velocity = Vector2.multiply(
         direction.normalized,
-        0.1 * Math.floor(Math.random() * (5 - this._asteroidSize - 2) + 2) * -1,
+        0.1 *
+          Math.floor(Math.random() * (5 - this._asteroidSize - 2) + 2) *
+          -0.7,
       )
+
+      this.gameService.asteroidsAmount += 1
 
       const fragment = this.instantiate({
         use: {
@@ -189,8 +263,16 @@ export class Asteroid
             use: {
               velocity,
               mass: 15 * this._asteroidSize,
-              maxAngularVelocity: 0.009,
-              angularVelocity: 0.05 / this._asteroidSize,
+              maxAngularVelocity: 0.005,
+              angularVelocity: 0.005 / this._asteroidSize,
+            },
+          },
+          {
+            id: '__asteroid_health__',
+            use: {
+              color: '#8d8d8d',
+              maxHealth: this._asteroidSize * 20,
+              health: this._asteroidSize * 20,
             },
           },
         ],
@@ -206,9 +288,12 @@ export class Asteroid
           position,
           velocity,
           mass: 15 * this._asteroidSize,
-          maxAngularVelocity: 0.09,
-          angularVelocity: 0.05 / this._asteroidSize,
+          maxAngularVelocity: 0.005,
+          angularVelocity: 0.005 / this._asteroidSize,
           isFragment: true,
+          color: '#8d8d8d',
+          maxHealth: this._asteroidSize * 20,
+          health: this._asteroidSize * 20,
         },
       })
     }

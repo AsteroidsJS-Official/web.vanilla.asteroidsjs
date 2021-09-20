@@ -46,7 +46,10 @@ export class Bullet
   private lgSocketService: LGSocketService
 
   public transform: Transform
+
   public rigidbody: Rigidbody
+
+  public userId: string
 
   public get direction(): Vector2 {
     return new Vector2(
@@ -61,7 +64,7 @@ export class Bullet
     this.rigidbody = this.getComponent(Rigidbody)
   }
 
-  public onDestroy(): void {
+  onDestroy(): void {
     this.lgSocketService.emit('destroy', this.id)
   }
 

@@ -249,6 +249,16 @@ function setupSocketScreen() {
     socket.on('change-scene', changeScene)
 
     /**
+     * Emits to all slaves screens that the entity have been damaged or healed.
+     *
+     * @param data The data containing the entity id and its health amount.
+     */
+    function changeHealth(data) {
+      ioScreen.emit('change-health', data)
+    }
+    socket.on('change-health', changeHealth)
+
+    /**
      * Called when a screen is disconnected.
      *
      * @param {string} reason - The reason for the disconnection.

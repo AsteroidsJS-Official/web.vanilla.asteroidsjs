@@ -10,7 +10,12 @@ export class UserService extends AbstractService {
   /**
    * Property that indicates the user score.
    */
-  private readonly score = new BehaviorSubject<number>(0)
+  private readonly _score = new BehaviorSubject<number>(0)
+
+  /**
+   * Property that defines the user id.
+   */
+  public userId = 'fbA8293AA89'
 
   /**
    * Property that defines the user nickname.
@@ -33,7 +38,14 @@ export class UserService extends AbstractService {
    * @return The score observable.
    */
   public get score$(): Observable<number> {
-    return this.score.asObservable()
+    return this._score.asObservable()
+  }
+
+  /**
+   * Property responsible for returning the score value.
+   */
+  public get score(): number {
+    return this._score.value
   }
 
   /**
@@ -42,7 +54,7 @@ export class UserService extends AbstractService {
    * @param amount The amount of points to add to the score.
    */
   public increaseScore(amount: number): void {
-    this.score.next(this.score.value + amount)
+    this._score.next(this._score.value + amount)
   }
 
   /**
@@ -51,13 +63,13 @@ export class UserService extends AbstractService {
    * @param amount The amount of points to set to the score.
    */
   public setScore(amount: number): void {
-    this.score.next(amount)
+    this._score.next(amount)
   }
 
   /**
    * Resets the user score.
    */
   public resetScore(): void {
-    this.score.next(0)
+    this._score.next(0)
   }
 }
