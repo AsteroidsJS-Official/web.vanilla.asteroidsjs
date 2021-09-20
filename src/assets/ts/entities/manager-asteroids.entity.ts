@@ -50,7 +50,9 @@ export class ManagerAsteroids
         this.generateAsteroid()
       }
       this.interval = setInterval(() => {
-        if (this.gameService.asteroidsAmount > 10) {
+        if (
+          this.gameService.asteroidsAmount > this.gameService.maxAsteroidsAmount
+        ) {
           return
         }
 

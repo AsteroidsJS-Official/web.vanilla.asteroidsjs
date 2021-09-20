@@ -18,6 +18,12 @@ export class GameService extends AbstractService {
    */
   private _asteroidsAmount = new BehaviorSubject<number>(0)
 
+  /**
+   * Property that defines the maximum asteroids amount in game,
+   * limiting the generation of new non fragment asteroids.
+   */
+  public maxAsteroidsAmount = 10
+
   public get gameOver$(): Observable<boolean> {
     return this._gameOver.asObservable()
   }
