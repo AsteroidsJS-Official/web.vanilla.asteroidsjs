@@ -30,6 +30,9 @@ import { Transform } from '../../components/transform.component'
 import { ICollision2 } from '../../interfaces/collision2.interface'
 import { IOnTriggerEnter } from '../../interfaces/on-trigger-enter.interface'
 
+/**
+ * Class that represents the asteroid entity and it's behavior.
+ */
 @Entity({
   services: [UserService, LGSocketService, GameService],
   components: [
@@ -64,15 +67,36 @@ export class Asteroid
 
   private health: Health
 
-  private _asteroidSize: number
-
-  private wasDestroyed = false
-
-  public image: HTMLImageElement
-
   public tag = Asteroid.name
 
+  /**
+   * Property that defines the asteroid size.
+   *
+   * @example
+   * [0, 1, 2, 3, 4] => 2
+   */
+  private _asteroidSize: number
+
+  /**
+   * Property that defines whether the asteroid was destroyed.
+   */
+  private wasDestroyed = false
+
+  /**
+   * Property that defines the asteroid image.
+   */
+  public image: HTMLImageElement
+
+  /**
+   * Property that defines whether the asteroid is a fragment from
+   * another one.
+   */
   public isFragment = false
+
+  /**
+   * Property that defines the time that the asteroid was generated.
+   */
+  public generationTime: Date
 
   public get asteroidSize(): number {
     return this._asteroidSize
@@ -92,6 +116,8 @@ export class Asteroid
   }
 
   public onStart(): void {
+    this.generationTime = new Date()
+
     if (this.getComponent(Render) || this.getComponent(RenderOverflow)) {
       this.image = new Image()
       if (this._asteroidSize === 0) {
@@ -133,10 +159,19 @@ export class Asteroid
       return
     }
 
+    const generationDiff =
+      this.generationTime &&
+      new Date().getTime() - this.generationTime.getTime()
+
     if (collision.entity2.tag?.includes(Bullet.name)) {
       this.destroy(collision.entity2)
+
+      if (generationDiff <= 100) {
+        return
+      }
+
       this.health.hurt(20)
-    } else {
+    } else if (generationDiff > 100) {
       this.health.hurt(this.health.maxHealth)
     }
 
@@ -185,7 +220,8 @@ export class Asteroid
   }
 
   /**
-   * Generates two new asteroids from the current asteroid.
+   * Generates new asteroids from the current asteroid according to
+   * the given amount.
    *
    * @param amount The amount of fragments to be generated.
    */
