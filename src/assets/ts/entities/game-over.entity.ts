@@ -35,7 +35,6 @@ export class GameOver extends AbstractEntity implements IOnAwake, IOnStart {
   }
 
   onStart(): void {
-    document.querySelector('ast-score')?.remove()
     this.insertGameOverHtml()
 
     if (this.lgSocketService.screen?.number !== 1) {
@@ -50,6 +49,10 @@ export class GameOver extends AbstractEntity implements IOnAwake, IOnStart {
   }
 
   private async insertGameOverHtml(): Promise<void> {
+    Array.from(document.getElementsByTagName('ast-score')).forEach((e) =>
+      e.remove(),
+    )
+
     const html = await getHtml('game-over', 'ast-game-over')
     html.style.position = 'absolute'
     html.style.top = '0'

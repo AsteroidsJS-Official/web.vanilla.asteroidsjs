@@ -171,7 +171,7 @@ export class Spaceship
       this.health.hurt(5)
     }
 
-    if (this.health.health <= 0) {
+    if (this.health.health <= 0 && !this.gameService.gameOver) {
       this.destroy(this)
       this.gameService.gameOver = true
       this.instantiate({ entity: GameOver })
