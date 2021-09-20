@@ -1,8 +1,8 @@
 import { Scene, AbstractScene, IOnStart } from '@asteroidsjs'
 
-import { Background } from '../entities/background.entity'
-import { ManagerAsteroids } from '../entities/manager-asteroids.entity'
-import { Menu as MenuEntity } from '../entities/menu.entity'
+import { ManagerAsteroids } from '../objects/asteroid/entities/manager-asteroids.entity'
+import { Background } from '../ui/background/entities/background.entity'
+import { Menu as MenuEntity } from '../ui/menu/entities/menu.entity'
 
 @Scene()
 export class Menu extends AbstractScene implements IOnStart {

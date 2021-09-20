@@ -1,7 +1,7 @@
 import { Scene, AbstractScene, IOnStart } from '@asteroidsjs'
 
-import { Background } from '../entities/background.entity'
-import { Manager } from '../entities/manager.entity'
+import { Manager } from '../objects/manager/entities/manager.entity'
+import { Background } from '../ui/background/entities/background.entity'
 
 @Scene()
 export class Single extends AbstractScene implements IOnStart {
