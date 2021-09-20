@@ -9,9 +9,9 @@ import {
 
 import { LGSocketService } from '../services/lg-socket.service'
 
+import { ManagerAsteroids } from './manager-asteroids.entity'
 import { Asteroid } from './master/asteroid.entity'
 import { Bullet } from './master/bullet.entity'
-import { ManagerAsteroids } from './master/manager-asteroids.entity'
 import { Score } from './master/score.entity'
 import { Spaceship } from './master/spaceship.entity'
 import { AsteroidVirtual } from './virtual/asteroid-virtual.entity'
@@ -68,6 +68,8 @@ export class Manager extends AbstractEntity implements IOnStart {
       entity: Score,
     })
 
+    const spaceshipHealth = 30
+
     const spaceship = this.instantiate({
       entity: Spaceship,
       components: [
@@ -90,8 +92,8 @@ export class Manager extends AbstractEntity implements IOnStart {
         {
           class: Health,
           use: {
-            maxHealth: 30,
-            health: 30,
+            maxHealth: spaceshipHealth,
+            health: spaceshipHealth,
           },
         },
       ],
@@ -110,8 +112,8 @@ export class Manager extends AbstractEntity implements IOnStart {
         spaceshipColor: this.userService.spaceshipColor,
         nickname: this.userService.nickname,
         imageSrc: `./assets/svg/spaceship-${this.userService.spaceshipImage}.svg`,
-        maxHealth: 30,
-        health: 30,
+        maxHealth: spaceshipHealth,
+        health: spaceshipHealth,
       },
     } as ISocketData)
   }
