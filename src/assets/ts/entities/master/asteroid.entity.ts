@@ -16,6 +16,7 @@ import { LGSocketService } from '../../services/lg-socket.service'
 
 import { Bullet } from './bullet.entity'
 
+import { GameService } from '../../services/game.service'
 import { UserService } from '../../services/user.service'
 
 import { CircleCollider2 } from '../../components/colliders/circle-collider2.component'
@@ -30,7 +31,7 @@ import { ICollision2 } from '../../interfaces/collision2.interface'
 import { IOnTriggerEnter } from '../../interfaces/on-trigger-enter.interface'
 
 @Entity({
-  services: [UserService, LGSocketService],
+  services: [UserService, LGSocketService, GameService],
   components: [
     Render,
     Drawer,
@@ -57,13 +58,13 @@ export class Asteroid
 
   private lgSocketService: LGSocketService
 
+  private gameService: GameService
+
   private transform: Transform
 
   private health: Health
 
   private _asteroidSize: number
-
-  private timesCollided = 0
 
   private wasDestroyed = false
 
@@ -84,6 +85,8 @@ export class Asteroid
   public onAwake(): void {
     this.userService = this.getService(UserService)
     this.lgSocketService = this.getService(LGSocketService)
+    this.gameService = this.getService(GameService)
+
     this.transform = this.getComponent(Transform)
     this.health = this.getComponent(Health)
   }
@@ -150,6 +153,7 @@ export class Asteroid
     }
 
     this.wasDestroyed = true
+    this.gameService.asteroidsAmount -= 1
 
     this.destroy(this)
   }
@@ -201,6 +205,8 @@ export class Asteroid
           Math.floor(Math.random() * (5 - this._asteroidSize - 2) + 2) *
           -0.7,
       )
+
+      this.gameService.asteroidsAmount += 1
 
       const fragment = this.instantiate({
         use: {
