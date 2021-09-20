@@ -9,12 +9,12 @@ import { Transform } from '../components/transform.component'
 })
 export class Background extends AbstractEntity implements IDraw {
   draw(): void {
-    this.getContext().fillStyle = '#0d0d0d'
-    this.getContext().fillRect(
+    this.getContexts()[0].fillStyle = '#0d0d0d'
+    this.getContexts()[0].fillRect(
       0,
       0,
-      this.getContext().canvas.width,
-      this.getContext().canvas.height,
+      this.getContexts()[0].canvas.width,
+      this.getContexts()[0].canvas.height,
     )
   }
 }

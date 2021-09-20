@@ -69,32 +69,32 @@ export class Bullet
   }
 
   draw(): void {
-    this.getContext().translate(
+    this.getContexts()[0].translate(
       this.transform.canvasPosition.x,
       this.transform.canvasPosition.y,
     )
-    this.getContext().rotate(this.transform.rotation)
+    this.getContexts()[0].rotate(this.transform.rotation)
 
-    this.getContext().shadowColor = 'yellow'
-    this.getContext().shadowBlur = 25
+    this.getContexts()[0].shadowColor = 'yellow'
+    this.getContexts()[0].shadowBlur = 25
 
-    this.getContext().beginPath()
+    this.getContexts()[0].beginPath()
 
-    this.getContext().fillStyle = '#ffc887'
-    this.getContext().rect(
+    this.getContexts()[0].fillStyle = '#ffc887'
+    this.getContexts()[0].rect(
       0,
       0,
       this.transform.dimensions.width,
       this.transform.dimensions.height,
     )
-    this.getContext().fill()
-    this.getContext().closePath()
+    this.getContexts()[0].fill()
+    this.getContexts()[0].closePath()
 
-    this.getContext().shadowColor = 'transparent'
-    this.getContext().shadowBlur = 0
+    this.getContexts()[0].shadowColor = 'transparent'
+    this.getContexts()[0].shadowBlur = 0
 
-    this.getContext().rotate(-this.transform.rotation)
-    this.getContext().translate(
+    this.getContexts()[0].rotate(-this.transform.rotation)
+    this.getContexts()[0].translate(
       -this.transform.canvasPosition.x,
       -this.transform.canvasPosition.y,
     )
@@ -105,12 +105,12 @@ export class Bullet
       this.transform.canvasPosition.x + this.transform.dimensions.width + 50 <
         0 ||
       this.transform.canvasPosition.x - this.transform.dimensions.width - 50 >
-        this.getContext().canvas.width
+        this.getContexts()[0].canvas.width
     const hasOverflowY =
       this.transform.canvasPosition.y + this.transform.dimensions.height + 50 <
         0 ||
       this.transform.canvasPosition.y - this.transform.dimensions.height - 50 >
-        this.getContext().canvas.height
+        this.getContexts()[0].canvas.height
 
     if (hasOverflowX || hasOverflowY) {
       this.destroy(this)

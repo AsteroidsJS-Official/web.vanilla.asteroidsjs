@@ -29,7 +29,7 @@ export abstract class AbstractScene implements IEnabled {
   /**
    * Property that defines an object that represents the canvas context
    */
-  private _context: IContext
+  private _contexts: IContext[]
 
   constructor(
     readonly id: number | string,
@@ -54,8 +54,10 @@ export abstract class AbstractScene implements IEnabled {
    */
   unload<S extends AbstractScene>(scene: string | S | Type<S>): void {
     this.game.unload(scene)
-    if (document.getElementById(this._context.canvas.id)) {
-      document.querySelector('body').removeChild(this._context.canvas)
+    for (const context of this._contexts) {
+      if (document.getElementById(context.canvas.id)) {
+        document.querySelector('body').removeChild(context.canvas)
+      }
     }
   }
 
@@ -76,8 +78,9 @@ export abstract class AbstractScene implements IEnabled {
 
     document.querySelector('body').appendChild(canvas)
 
-    this._context = canvas.getContext('2d')
-    return this._context
+    const context = canvas.getContext('2d')
+    this._contexts.push(context)
+    return context
   }
 
   /**
@@ -98,8 +101,8 @@ export abstract class AbstractScene implements IEnabled {
    *
    * @returns an object that represents the game context
    */
-  getContext(): IContext {
-    return this._context
+  getContexts(): IContext[] {
+    return this._contexts
   }
 
   /**

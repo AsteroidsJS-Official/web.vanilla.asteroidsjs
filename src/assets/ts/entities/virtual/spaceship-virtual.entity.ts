@@ -104,7 +104,7 @@ export class SpaceshipVirtual
   }
 
   private drawTriangle(): void {
-    this.getContext().translate(
+    this.getContexts()[0].translate(
       this.transform.canvasPosition.x,
       this.transform.canvasPosition.y,
     )
@@ -119,9 +119,9 @@ export class SpaceshipVirtual
     //   0 - (this.transform.dimensions.height / 2 + 20),
     // )
 
-    this.getContext().rotate(this.transform.rotation)
+    this.getContexts()[0].rotate(this.transform.rotation)
 
-    this.getContext().drawImage(
+    this.getContexts()[0].drawImage(
       this.image,
       0 - this.transform.dimensions.width / 2,
       0 - this.transform.dimensions.height / 2,
@@ -129,8 +129,8 @@ export class SpaceshipVirtual
       this.transform.dimensions.height,
     )
 
-    this.getContext().rotate(-this.transform.rotation)
-    this.getContext().translate(
+    this.getContexts()[0].rotate(-this.transform.rotation)
+    this.getContexts()[0].translate(
       -this.transform.canvasPosition.x,
       -this.transform.canvasPosition.y,
     )

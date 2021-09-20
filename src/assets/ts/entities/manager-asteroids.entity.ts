@@ -89,8 +89,8 @@ export class ManagerAsteroids
 
     const offset = 150
 
-    const canvasWidth = this.getContext().canvas.width
-    const canvasHeight = this.getContext().canvas.height
+    const canvasWidth = this.getContexts()[0].canvas.width
+    const canvasHeight = this.getContexts()[0].canvas.height
 
     let x = Math.floor(Math.random() * (canvasWidth + offset * 2)) - offset
     let y = Math.floor(Math.random() * (canvasHeight + offset * 2)) - offset

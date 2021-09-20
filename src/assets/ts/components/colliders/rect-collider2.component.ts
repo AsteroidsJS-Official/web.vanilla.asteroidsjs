@@ -23,19 +23,25 @@ export class RectCollider2 extends AbstractCollider {
       return
     }
 
-    this.getContext().translate(this.canvasPosition.x, this.canvasPosition.y)
+    this.getContexts()[0].translate(
+      this.canvasPosition.x,
+      this.canvasPosition.y,
+    )
 
-    this.getContext().beginPath()
-    this.getContext().fillStyle = '#05FF0020'
-    this.getContext().rect(
+    this.getContexts()[0].beginPath()
+    this.getContexts()[0].fillStyle = '#05FF0020'
+    this.getContexts()[0].rect(
       -this.dimensions.width / 2,
       -this.dimensions.height / 2,
       this.dimensions.width,
       this.dimensions.height,
     )
-    this.getContext().fill()
+    this.getContexts()[0].fill()
 
-    this.getContext().translate(-this.canvasPosition.x, -this.canvasPosition.y)
+    this.getContexts()[0].translate(
+      -this.canvasPosition.x,
+      -this.canvasPosition.y,
+    )
   }
 
   /**

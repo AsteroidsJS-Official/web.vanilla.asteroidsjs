@@ -102,8 +102,8 @@ export class Transform extends AbstractComponent {
    */
   get canvasPosition(): Vector2 {
     return new Vector2(
-      this.getContext().canvas.width / 2 + this.position.x,
-      this.getContext().canvas.height / 2 - this.position.y,
+      this.getContexts()[0].canvas.width / 2 + this.position.x,
+      this.getContexts()[0].canvas.height / 2 - this.position.y,
     )
   }
 

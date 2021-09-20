@@ -77,7 +77,7 @@ export class Health extends AbstractComponent implements IOnStart, IDraw {
       return
     }
 
-    this.getContext().translate(
+    this.getContexts()[0].translate(
       this.transform.canvasPosition.x,
       this.transform.canvasPosition.y,
     )
@@ -89,21 +89,26 @@ export class Health extends AbstractComponent implements IOnStart, IDraw {
 
     const y = this.transform.dimensions.height / 2 + 20
 
-    this.getContext().beginPath()
-    this.getContext().fillStyle = this.color || '#ffffff'
-    this.getContext().globalAlpha = 0.35 * this.opacity
-    this.getContext().rect(x, y, this.size, 4)
-    this.getContext().fill()
-    this.getContext().globalAlpha = this.opacity
-    this.getContext().closePath()
+    this.getContexts()[0].beginPath()
+    this.getContexts()[0].fillStyle = this.color || '#ffffff'
+    this.getContexts()[0].globalAlpha = 0.35 * this.opacity
+    this.getContexts()[0].rect(x, y, this.size, 4)
+    this.getContexts()[0].fill()
+    this.getContexts()[0].globalAlpha = this.opacity
+    this.getContexts()[0].closePath()
 
-    this.getContext().beginPath()
-    this.getContext().rect(x, y, (this.health / this.maxHealth) * this.size, 4)
-    this.getContext().fill()
-    this.getContext().globalAlpha = 1
-    this.getContext().closePath()
+    this.getContexts()[0].beginPath()
+    this.getContexts()[0].rect(
+      x,
+      y,
+      (this.health / this.maxHealth) * this.size,
+      4,
+    )
+    this.getContexts()[0].fill()
+    this.getContexts()[0].globalAlpha = 1
+    this.getContexts()[0].closePath()
 
-    this.getContext().translate(
+    this.getContexts()[0].translate(
       -this.transform.canvasPosition.x,
       -this.transform.canvasPosition.y,
     )

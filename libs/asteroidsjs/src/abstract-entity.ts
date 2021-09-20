@@ -117,8 +117,8 @@ export abstract class AbstractEntity implements IEnabled {
    *
    * @returns an object that represents the game context.
    */
-  getContext(): IContext {
-    return this.scene.getContext()
+  getContexts(): IContext[] {
+    return this.scene.getContexts()
   }
 
   /**

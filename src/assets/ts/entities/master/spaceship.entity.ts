@@ -192,7 +192,7 @@ export class Spaceship
   }
 
   public draw(): void {
-    this.getContext().translate(
+    this.getContexts()[0].translate(
       this.transform.canvasPosition.x,
       this.transform.canvasPosition.y,
     )
@@ -207,20 +207,20 @@ export class Spaceship
     //   0 - (this.transform.dimensions.height / 2 + 20),
     // )
 
-    this.getContext().rotate(this.transform.rotation)
+    this.getContexts()[0].rotate(this.transform.rotation)
 
-    this.getContext().beginPath()
-    this.getContext().drawImage(
+    this.getContexts()[0].beginPath()
+    this.getContexts()[0].drawImage(
       this.image,
       0 - this.transform.dimensions.width / 2,
       0 - this.transform.dimensions.height / 2,
       this.transform.dimensions.width,
       this.transform.dimensions.height,
     )
-    this.getContext().closePath()
+    this.getContexts()[0].closePath()
 
-    this.getContext().rotate(-this.transform.rotation)
-    this.getContext().translate(
+    this.getContexts()[0].rotate(-this.transform.rotation)
+    this.getContexts()[0].translate(
       -this.transform.canvasPosition.x,
       -this.transform.canvasPosition.y,
     )

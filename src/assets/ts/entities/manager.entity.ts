@@ -37,10 +37,9 @@ export class Manager extends AbstractEntity implements IOnStart {
     this.userService = this.getService(UserService)
     this.lgSocketService = this.getService(LGSocketService)
 
-    this.scene.getContext().canvas.width = this.lgSocketService.canvasTotalWidth
-    this.scene.getContext().canvas.height =
-      this.lgSocketService.canvasTotalHeight
-    this.scene.getContext().canvas.style.transform = `translateX(-${this.lgSocketService.displacement}px)`
+    this.getContexts()[0].canvas.width = this.lgSocketService.canvasTotalWidth
+    this.getContexts()[0].canvas.height = this.lgSocketService.canvasTotalHeight
+    this.getContexts()[0].canvas.style.transform = `translateX(-${this.lgSocketService.displacement}px)`
 
     if (this.lgSocketService.screen?.number === 1) {
       setTimeout(() => {

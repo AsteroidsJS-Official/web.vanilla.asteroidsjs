@@ -21,16 +21,22 @@ export class CircleCollider2 extends AbstractCollider {
       return
     }
 
-    this.getContext().translate(this.canvasPosition.x, this.canvasPosition.y)
-    this.getContext().rotate(this.transform.rotation)
+    this.getContexts()[0].translate(
+      this.canvasPosition.x,
+      this.canvasPosition.y,
+    )
+    this.getContexts()[0].rotate(this.transform.rotation)
 
-    this.getContext().beginPath()
-    this.getContext().fillStyle = '#05FF0060'
-    this.getContext().arc(0, 0, this.dimensions.width / 2, 0, 360)
-    this.getContext().fill()
+    this.getContexts()[0].beginPath()
+    this.getContexts()[0].fillStyle = '#05FF0060'
+    this.getContexts()[0].arc(0, 0, this.dimensions.width / 2, 0, 360)
+    this.getContexts()[0].fill()
 
-    this.getContext().rotate(-this.transform.rotation)
-    this.getContext().translate(-this.canvasPosition.x, -this.canvasPosition.y)
+    this.getContexts()[0].rotate(-this.transform.rotation)
+    this.getContexts()[0].translate(
+      -this.canvasPosition.x,
+      -this.canvasPosition.y,
+    )
   }
 
   /**

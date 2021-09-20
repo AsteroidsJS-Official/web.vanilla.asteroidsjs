@@ -195,12 +195,12 @@ export class Asteroid
 
   public onLoop(): void {
     const overflowingX = isOverflowingX(
-      this.getContext().canvas.width,
+      this.getContexts()[0].canvas.width,
       this.transform.position.x,
       this.transform.totalDimensions.width,
     )
     const overflowingY = isOverflowingY(
-      this.getContext().canvas.height,
+      this.getContexts()[0].canvas.height,
       this.transform.position.y,
       this.transform.totalDimensions.height,
     )
@@ -300,24 +300,24 @@ export class Asteroid
   }
 
   private drawAsteroid(): void {
-    this.getContext().translate(
+    this.getContexts()[0].translate(
       this.transform.canvasPosition.x,
       this.transform.canvasPosition.y,
     )
-    this.getContext().rotate(this.transform.rotation)
+    this.getContexts()[0].rotate(this.transform.rotation)
 
-    this.getContext().beginPath()
-    this.getContext().drawImage(
+    this.getContexts()[0].beginPath()
+    this.getContexts()[0].drawImage(
       this.image,
       0 - this.transform.dimensions.width / 2,
       0 - this.transform.dimensions.height / 2,
       this.transform.dimensions.width,
       this.transform.dimensions.height,
     )
-    this.getContext().closePath()
+    this.getContexts()[0].closePath()
 
-    this.getContext().rotate(-this.transform.rotation)
-    this.getContext().translate(
+    this.getContexts()[0].rotate(-this.transform.rotation)
+    this.getContexts()[0].translate(
       -this.transform.canvasPosition.x,
       -this.transform.canvasPosition.y,
     )
