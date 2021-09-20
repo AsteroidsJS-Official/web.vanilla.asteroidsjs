@@ -1,7 +1,7 @@
 import { Scene, AbstractScene, IOnStart } from '@asteroidsjs'
 
 import { Background } from '../entities/background.entity'
-import { ManagerAsteroids } from '../entities/master/manager-asteroids.entity'
+import { ManagerAsteroids } from '../entities/manager-asteroids.entity'
 import { Menu as MenuEntity } from '../entities/menu.entity'
 
 @Scene()
