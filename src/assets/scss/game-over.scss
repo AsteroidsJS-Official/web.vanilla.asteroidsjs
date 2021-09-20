@@ -1,16 +1,5 @@
 @import './variables.scss';
 
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-
-  width: 100vw;
-  height: 100vh;
-
-  background-color: $overlayColor;
-}
-
 .game-over-container {
   display: flex;
   flex-direction: column;
@@ -23,7 +12,11 @@
 
   font-family: 'Neptunus';
 
-  transition: opacity 0.2s;
+  opacity: 0;
+
+  animation-name: show-game-over-screen;
+  animation-duration: 0.25s;
+  animation-fill-mode: forwards;
 
   & .game-over-title {
     font-size: 3rem;
@@ -60,5 +53,14 @@
   &.hide {
     opacity: 0;
     pointer-events: none;
+  }
+}
+
+@keyframes show-game-over-screen {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
