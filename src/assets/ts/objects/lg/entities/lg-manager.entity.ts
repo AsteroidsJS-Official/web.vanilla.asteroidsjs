@@ -1,18 +1,22 @@
 import { AbstractEntity, Entity, IOnAwake } from '@asteroidsjs'
 
 import { LGSocketService } from '../../../shared/services/lg-socket.service'
+import { SocketService } from '../../../shared/services/socket.service'
 
 /**
  * Entity responsible for managing the screen socket connection.
  */
 @Entity({
-  services: [LGSocketService],
+  services: [LGSocketService, SocketService],
 })
 export class LGManager extends AbstractEntity implements IOnAwake {
   private lgSocketService: LGSocketService
 
+  private socketService: SocketService
+
   onAwake(): void {
     this.lgSocketService = this.getService(LGSocketService)
+    this.socketService = this.getService(SocketService)
   }
 
   onStart(): void {
@@ -41,7 +45,7 @@ export class LGManager extends AbstractEntity implements IOnAwake {
     } else if (!this.lgSocketService.isMasterConnected) {
       this.connect(1)
     } else {
-      this.lgSocketService
+      this.socketService
         .emit<unknown, boolean>('check-connection-waiting', {})
         .subscribe((isMasterWaiting: boolean) => {
           if (isMasterWaiting) {

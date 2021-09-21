@@ -8,15 +8,16 @@ import {
 } from '@asteroidsjs'
 
 import { LGSocketService } from '../../../shared/services/lg-socket.service'
+import { SocketService } from '../../../shared/services/socket.service'
 
-import { ManagerAsteroids } from '../../asteroid/entities/manager-asteroids.entity'
-import { Asteroid } from '../../asteroid/entities/asteroid.entity'
-import { Bullet } from '../../bullet/entities/bullet.entity'
 import { Score } from '../../../ui/score/entities/score.entity'
-import { Spaceship } from '../../spaceship/entities/spaceship.entity'
 import { AsteroidVirtual } from '../../asteroid/entities/asteroid-virtual.entity'
+import { Asteroid } from '../../asteroid/entities/asteroid.entity'
+import { ManagerAsteroids } from '../../asteroid/entities/manager-asteroids.entity'
 import { BulletVirtual } from '../../bullet/entities/bullet-virtual.entity'
+import { Bullet } from '../../bullet/entities/bullet.entity'
 import { SpaceshipVirtual } from '../../spaceship/entities/spaceship-virtual.entity'
+import { Spaceship } from '../../spaceship/entities/spaceship.entity'
 
 import { UserService } from '../../../shared/services/user.service'
 
@@ -26,16 +27,19 @@ import { Health } from '../../../shared/components/health.component'
  * Class that represents the first entity to be loaded into the game
  */
 @Entity({
-  services: [UserService, LGSocketService],
+  services: [UserService, LGSocketService, SocketService],
 })
 export class Manager extends AbstractEntity implements IOnStart {
   private userService: UserService
 
   private lgSocketService: LGSocketService
 
+  private socketService: SocketService
+
   public onStart(): void {
     this.userService = this.getService(UserService)
     this.lgSocketService = this.getService(LGSocketService)
+    this.socketService = this.getService(SocketService)
 
     this.getContexts()[0].canvas.width = this.lgSocketService.canvasTotalWidth
     this.getContexts()[0].canvas.height = this.lgSocketService.canvasTotalHeight
@@ -102,7 +106,7 @@ export class Manager extends AbstractEntity implements IOnStart {
       entity: ManagerAsteroids,
     })
 
-    this.lgSocketService.emit('instantiate', {
+    this.socketService.emit('instantiate', {
       id: spaceship.id,
       type: Spaceship.name,
       data: {
@@ -118,7 +122,7 @@ export class Manager extends AbstractEntity implements IOnStart {
   }
 
   private virtual(): void {
-    this.lgSocketService
+    this.socketService
       .on<ISocketData>('instantiate')
       .subscribe(({ id, type, data }) => {
         switch (type) {

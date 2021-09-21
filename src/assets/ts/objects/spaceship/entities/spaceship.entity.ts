@@ -10,7 +10,7 @@ import {
   Vector2,
 } from '@asteroidsjs'
 
-import { LGSocketService } from '../../../shared/services/lg-socket.service'
+import { SocketService } from '../../../shared/services/socket.service'
 
 import { GameOver } from '../../../ui/game-over/entities/game-over.entity'
 import { Asteroid } from '../../asteroid/entities/asteroid.entity'
@@ -22,11 +22,11 @@ import { UserService } from '../../../shared/services/user.service'
 import { CircleCollider2 } from '../../../shared/components/colliders/circle-collider2.component'
 import { Drawer } from '../../../shared/components/drawer.component'
 import { Health } from '../../../shared/components/health.component'
-import { Input } from '../components/input.component'
 import { RenderOverflow } from '../../../shared/components/renderers/render-overflow.component'
 import { Render } from '../../../shared/components/renderers/render.component'
 import { Rigidbody } from '../../../shared/components/rigidbody.component'
 import { Transform } from '../../../shared/components/transform.component'
+import { Input } from '../components/input.component'
 
 import { ICollision2 } from '../../../shared/interfaces/collision2.interface'
 import { IOnTriggerEnter } from '../../../shared/interfaces/on-trigger-enter.interface'
@@ -35,7 +35,7 @@ import { IOnTriggerEnter } from '../../../shared/interfaces/on-trigger-enter.int
  * Class that represents the spaceship entity controlled by the user.
  */
 @Entity({
-  services: [UserService, LGSocketService, GameService],
+  services: [UserService, GameService, SocketService],
   components: [
     Drawer,
     RenderOverflow,
@@ -90,9 +90,9 @@ export class Spaceship
 {
   private userService: UserService
 
-  private lgSocketService: LGSocketService
-
   private gameService: GameService
+
+  private socketService: SocketService
 
   /**
    * Property responsible for the spaceship bullet velocity.
@@ -130,7 +130,7 @@ export class Spaceship
   }
 
   onAwake(): void {
-    this.lgSocketService = this.getService(LGSocketService)
+    this.socketService = this.getService(SocketService)
     this.userService = this.getService(UserService)
     this.gameService = this.getService(GameService)
 
@@ -149,7 +149,7 @@ export class Spaceship
   }
 
   onDestroy(): void {
-    this.lgSocketService.emit('destroy', this.id)
+    this.socketService.emit('destroy', this.id)
   }
 
   onTriggerEnter(collision: ICollision2): void {
@@ -179,7 +179,7 @@ export class Spaceship
   }
 
   onLateLoop(): void {
-    this.lgSocketService.emit('update-slaves', {
+    this.socketService.emit('update-slaves', {
       id: this.id,
       data: {
         position: this.transform.position,
@@ -280,7 +280,7 @@ export class Spaceship
       ],
     })
 
-    this.lgSocketService.emit('instantiate', {
+    this.socketService.emit('instantiate', {
       id: bullet.id,
       type: Bullet.name,
       data: {

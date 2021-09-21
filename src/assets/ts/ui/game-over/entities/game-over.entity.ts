@@ -7,6 +7,7 @@ import {
 } from '@asteroidsjs'
 
 import { LGSocketService } from '../../../shared/services/lg-socket.service'
+import { SocketService } from '../../../shared/services/socket.service'
 
 import { GameService } from '../../../shared/services/game.service'
 import { UserService } from '../../../shared/services/user.service'
@@ -19,10 +20,12 @@ import { Single } from '../../../scenes/single.scene'
  * after the user death.
  */
 @Entity({
-  services: [GameService, LGSocketService, UserService],
+  services: [GameService, LGSocketService, UserService, SocketService],
 })
 export class GameOver extends AbstractEntity implements IOnAwake, IOnStart {
   private lgSocketService: LGSocketService
+
+  private socketService: SocketService
 
   private userService: UserService
 
@@ -30,6 +33,7 @@ export class GameOver extends AbstractEntity implements IOnAwake, IOnStart {
 
   onAwake(): void {
     this.lgSocketService = this.getService(LGSocketService)
+    this.socketService = this.getService(SocketService)
     this.userService = this.getService(UserService)
     this.gameService = this.getService(GameService)
   }
@@ -38,7 +42,7 @@ export class GameOver extends AbstractEntity implements IOnAwake, IOnStart {
     this.insertGameOverHtml()
 
     if (this.lgSocketService.screen?.number !== 1) {
-      this.lgSocketService.on<string>('change-scene').subscribe((scene) => {
+      this.socketService.on<string>('change-scene').subscribe((scene) => {
         if (scene === 'single') {
           this.loadSinglePlayer()
         } else if (scene === 'menu') {
@@ -74,13 +78,13 @@ export class GameOver extends AbstractEntity implements IOnAwake, IOnStart {
 
       if (respawnButton && backButton) {
         respawnButton.addEventListener('click', () => {
-          this.lgSocketService.emit('change-scene', 'single')
+          this.socketService.emit('change-scene', 'single')
 
           this.loadSinglePlayer()
         })
 
         backButton.addEventListener('click', () => {
-          this.lgSocketService.emit('change-scene', 'menu')
+          this.socketService.emit('change-scene', 'menu')
 
           this.loadMenu()
         })

@@ -9,17 +9,20 @@ import {
 } from '@asteroidsjs'
 
 import { LGSocketService } from '../../../shared/services/lg-socket.service'
+import { SocketService } from '../../../shared/services/socket.service'
 
 import { AsteroidVirtual } from './asteroid-virtual.entity'
 import { Asteroid } from './asteroid.entity'
 
 import { GameService } from '../../../shared/services/game.service'
 
+import { isMobile } from '../../../utils/platform'
+
 /**
  * Class that represents the first entity to be loaded into the game
  */
 @Entity({
-  services: [LGSocketService, GameService],
+  services: [LGSocketService, GameService, SocketService],
 })
 export class ManagerAsteroids
   extends AbstractEntity
@@ -31,11 +34,14 @@ export class ManagerAsteroids
 
   private gameService: GameService
 
+  private socketService: SocketService
+
   public isMenu = false
 
   onAwake(): void {
     this.lgSocketService = this.getService(LGSocketService)
     this.gameService = this.getService(GameService)
+    this.socketService = this.getService(SocketService)
   }
 
   onStart(): void {
@@ -62,11 +68,11 @@ export class ManagerAsteroids
     } else {
       const screen = this.lgSocketService.screen
 
-      if (!screen) {
+      if (!screen && !isMobile) {
         return
       }
 
-      if (screen.number === 1) {
+      if (isMobile || screen.number === 1) {
         setTimeout(() => {
           for (let i = 0; i < 4; i++) {
             this.generateAsteroid()
@@ -149,7 +155,11 @@ export class ManagerAsteroids
       ],
     })
 
-    this.lgSocketService.emit('instantiate', {
+    if (isMobile) {
+      return
+    }
+
+    this.socketService.emit('instantiate', {
       id: asteroid.id,
       type: Asteroid.name,
       data: {
@@ -169,7 +179,7 @@ export class ManagerAsteroids
   }
 
   private listenForAsteroids(): void {
-    this.lgSocketService
+    this.socketService
       .on<ISocketData>('instantiate')
       .subscribe(({ id, type, data }) => {
         switch (type) {

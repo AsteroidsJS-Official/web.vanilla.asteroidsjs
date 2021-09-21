@@ -12,6 +12,7 @@ import {
   LGSocketService,
   LoadScreensData,
 } from '../../../shared/services/lg-socket.service'
+import { SocketService } from '../../../shared/services/socket.service'
 
 import { Menu } from '../../../scenes/menu.scene'
 
@@ -20,13 +21,15 @@ import { Menu } from '../../../scenes/menu.scene'
  * and connection menu.
  */
 @Entity({
-  services: [LGSocketService],
+  services: [LGSocketService, SocketService],
 })
 export class LGScreenMenu
   extends AbstractEntity
   implements IOnAwake, IOnStart, IOnDestroy
 {
   private lgSocketService: LGSocketService
+
+  private socketService: SocketService
 
   /**
    * Property that represents the screen elements.
@@ -60,6 +63,7 @@ export class LGScreenMenu
 
   onAwake(): void {
     this.lgSocketService = this.getService(LGSocketService)
+    this.socketService = this.getService(SocketService)
   }
 
   onStart(): void {
@@ -67,7 +71,7 @@ export class LGScreenMenu
       if (screen?.number === 1) {
         this.insertMasterHtml()
 
-        this.lgSocketService
+        this.socketService
           .on<IScreen>('slave-connected')
           .subscribe((screen) => {
             console.log(screen.number + ' connected!')
@@ -76,7 +80,7 @@ export class LGScreenMenu
             this.updateScreensStatus()
           })
 
-        this.lgSocketService
+        this.socketService
           .on<number>('slave-disconnected')
           .subscribe((screenNumber) => {
             console.log(screenNumber + ' disconnected!')
@@ -90,7 +94,7 @@ export class LGScreenMenu
           document.querySelector('h3.waiting-info')?.classList.remove('hide')
         })
 
-        this.lgSocketService.on<string>('change-scene').subscribe((scene) => {
+        this.socketService.on<string>('change-scene').subscribe((scene) => {
           if (scene === 'menu') {
             this.loadMenu()
           }
@@ -102,14 +106,14 @@ export class LGScreenMenu
       if (isMasterConnected && !this.lgSocketService.screen) {
         this.insertSlaveHtml()
 
-        this.lgSocketService.on('waiting-connection').subscribe(() => {
+        this.socketService.on('waiting-connection').subscribe(() => {
           document.querySelector('.waiting-info.title')?.classList.add('hide')
           document
             .querySelector<HTMLButtonElement>('.connect-button')
             ?.classList.remove('hide')
         })
 
-        this.lgSocketService.on('cancel-connection').subscribe(() => {
+        this.socketService.on('cancel-connection').subscribe(() => {
           document.querySelector('h3.waiting-info')?.classList.add('hide')
           document
             .querySelector<HTMLButtonElement>('.connect-button')
@@ -161,7 +165,7 @@ export class LGScreenMenu
     })
 
     confirmButton.addEventListener('click', () => {
-      this.lgSocketService.emit(
+      this.socketService.emit(
         'set-screen-amount',
         this.lgSocketService.screenAmount,
       )
@@ -284,7 +288,7 @@ export class LGScreenMenu
    * Animates the current page elements and stand by slave connections.
    */
   private waitForScreensConnection(): void {
-    this.lgSocketService.emit('wait-for-slaves')
+    this.socketService.emit('wait-for-slaves')
 
     const screenAmount = this.lgSocketService.screenAmount
 
@@ -405,7 +409,7 @@ export class LGScreenMenu
           this.lgSocketService.screenAmount &&
         this.lgSocketService.screen.number === 1
       ) {
-        this.lgSocketService
+        this.socketService
           .emit('get-screens')
           .subscribe((data: LoadScreensData) => {
             if (!data) {
@@ -414,7 +418,7 @@ export class LGScreenMenu
 
             this.lgSocketService.screens = data.screens
 
-            this.lgSocketService.emit('change-scene', 'menu')
+            this.socketService.emit('change-scene', 'menu')
 
             this.scene.unload(this.scene)
             document.querySelector('ast-lg-screen')?.remove()
@@ -429,7 +433,7 @@ export class LGScreenMenu
    * Loads the main menu on slave screens.
    */
   private loadMenu() {
-    this.lgSocketService
+    this.socketService
       .emit('get-screens')
       .subscribe((data: LoadScreensData) => {
         if (!data) {

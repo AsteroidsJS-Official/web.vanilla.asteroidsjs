@@ -7,25 +7,29 @@ import {
 } from '@asteroidsjs'
 
 import { LGSocketService } from '../../../shared/services/lg-socket.service'
+import { SocketService } from '../../../shared/services/socket.service'
 
 import { loadMenu } from '../../../menu'
 import { Single } from '../../../scenes/single.scene'
 
 @Entity({
-  services: [LGSocketService],
+  services: [LGSocketService, SocketService],
 })
 export class Menu extends AbstractEntity implements IOnAwake, IOnStart {
   private lgSocketService: LGSocketService
 
+  private socketService: SocketService
+
   onAwake(): void {
     this.lgSocketService = this.getService(LGSocketService)
+    this.socketService = this.getService(SocketService)
   }
 
   onStart(): void {
     if (this.lgSocketService.screen?.number === 1) {
       this.insertMenuHtml()
     } else {
-      this.lgSocketService.on<string>('change-scene').subscribe((scene) => {
+      this.socketService.on<string>('change-scene').subscribe((scene) => {
         if (scene === 'single') {
           this.loadSinglePlayer()
         }
@@ -64,7 +68,7 @@ export class Menu extends AbstractEntity implements IOnAwake, IOnStart {
 
     if (playSPButton) {
       playSPButton.addEventListener('click', () => {
-        this.lgSocketService.emit('change-scene', 'single')
+        this.lgSocketService.changeScene('single')
         this.loadSinglePlayer()
       })
     }
