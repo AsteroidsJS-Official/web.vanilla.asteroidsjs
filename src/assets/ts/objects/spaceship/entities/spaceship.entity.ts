@@ -25,7 +25,7 @@ import { Health } from '../../../shared/components/health.component'
 import { Input } from '../components/input.component'
 import { RenderOverflow } from '../../../shared/components/renderers/render-overflow.component'
 import { Render } from '../../../shared/components/renderers/render.component'
-import { Rigidbody } from '../../../shared/components/rigidbody.component'
+import { Rigidbody } from '../../../shared/components/rigidbody/rigidbody.component'
 import { Transform } from '../../../shared/components/transform.component'
 
 import { ICollision2 } from '../../../shared/interfaces/collision2.interface'

@@ -8,7 +8,7 @@ import {
 
 import { Spaceship } from '../entities/spaceship.entity'
 
-import { Rigidbody } from '../../../shared/components/rigidbody.component'
+import { Rigidbody } from '../../../shared/components/rigidbody/rigidbody.component'
 
 import { IGameKeys } from '../interfaces/input.interface'
 

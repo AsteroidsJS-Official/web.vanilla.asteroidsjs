@@ -9,14 +9,14 @@ import {
 
 import { LGSocketService } from '../../../shared/services/lg-socket.service'
 
-import { ManagerAsteroids } from '../../asteroid/entities/manager-asteroids.entity'
-import { Asteroid } from '../../asteroid/entities/asteroid.entity'
-import { Bullet } from '../../bullet/entities/bullet.entity'
 import { Score } from '../../../ui/score/entities/score.entity'
-import { Spaceship } from '../../spaceship/entities/spaceship.entity'
 import { AsteroidVirtual } from '../../asteroid/entities/asteroid-virtual.entity'
+import { Asteroid } from '../../asteroid/entities/asteroid.entity'
+import { ManagerAsteroids } from '../../asteroid/entities/manager-asteroids.entity'
 import { BulletVirtual } from '../../bullet/entities/bullet-virtual.entity'
+import { Bullet } from '../../bullet/entities/bullet.entity'
 import { SpaceshipVirtual } from '../../spaceship/entities/spaceship-virtual.entity'
+import { Spaceship } from '../../spaceship/entities/spaceship.entity'
 
 import { UserService } from '../../../shared/services/user.service'
 
