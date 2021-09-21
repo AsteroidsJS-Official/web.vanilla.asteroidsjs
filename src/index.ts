@@ -2,17 +2,20 @@ import './global.scss'
 import 'reflect-metadata'
 import './assets/ts/menu.ts'
 
-import { AsteroidsFactory } from '@asteroidsjs'
+import { AbstractScene, AsteroidsFactory, Type } from '@asteroidsjs'
 
+import { isMobile } from './assets/ts/utils/platform'
+
+import { ControllerMenu } from './assets/ts/scenes/controller-menu.scene'
 import { LGScreen } from './assets/ts/scenes/lg-screen.scene'
 
 /**
  * Creates and starts the game.
  */
-function bootstrap(): void {
+function bootstrap<S extends AbstractScene>(scene: Type<S>): void {
   const game = AsteroidsFactory.create({
-    bootstrap: [LGScreen],
+    bootstrap: [scene],
   })
   game.start()
 }
-bootstrap()
+bootstrap(isMobile ? ControllerMenu : LGScreen)
