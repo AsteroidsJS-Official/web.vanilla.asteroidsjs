@@ -17,6 +17,6 @@
     },
     "lib": ["es6", "dom"]
   },
-  "include": ["src/**/*.ts", "libs/**/*.ts"],
+  "include": ["src/**/*", "libs/**/*"],
   "exclude": ["node_modules", "**/*.spec.ts"]
 }
