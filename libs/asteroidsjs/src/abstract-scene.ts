@@ -29,7 +29,7 @@ export abstract class AbstractScene implements IEnabled {
   /**
    * Property that defines an object that represents the canvas context
    */
-  private _contexts: IContext[]
+  private _contexts: IContext[] = []
 
   constructor(
     readonly id: number | string,
