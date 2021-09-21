@@ -13,7 +13,7 @@ import { LGSocketService } from '../../../shared/services/lg-socket.service'
 
 import { Drawer } from '../../../shared/components/drawer.component'
 import { Render } from '../../../shared/components/renderers/render.component'
-import { Rigidbody } from '../../../shared/components/rigidbody.component'
+import { Rigidbody } from '../../../shared/components/rigidbody/rigidbody.component'
 import { Transform } from '../../../shared/components/transform.component'
 
 import { IBullet } from '../interfaces/bullet.interface'

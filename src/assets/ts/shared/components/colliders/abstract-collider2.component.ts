@@ -12,7 +12,7 @@ import {
   angleToVector2,
 } from '@asteroidsjs'
 
-import { Rigidbody } from '../rigidbody.component'
+import { Rigidbody } from '../rigidbody/rigidbody.component'
 import { Transform } from '../transform.component'
 
 import { ICollision2 } from '../../interfaces/collision2.interface'

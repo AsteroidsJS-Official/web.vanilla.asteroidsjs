@@ -8,7 +8,7 @@ import {
   Vector2,
 } from '@asteroidsjs'
 
-import { Transform } from './transform.component'
+import { Transform } from '../transform.component'
 /**
  * Component that adds physical behaviors such as velocity and
  * acceleration to an entity

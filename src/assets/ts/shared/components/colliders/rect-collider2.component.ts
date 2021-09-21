@@ -2,7 +2,7 @@
 
 import { abs, AbstractEntity, Component, Rect, Vector2 } from '@asteroidsjs'
 
-import { Rigidbody } from '../rigidbody.component'
+import { Rigidbody } from '../rigidbody/rigidbody.component'
 import { Transform } from '../transform.component'
 import { AbstractCollider } from './abstract-collider2.component'
 import { CircleCollider2 } from './circle-collider2.component'

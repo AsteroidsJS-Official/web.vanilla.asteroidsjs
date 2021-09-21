@@ -20,6 +20,8 @@ export interface IAsteroidsApplication {
     options?: IInstantiateOptions<E>,
   ): E extends AbstractEntity ? E : AbstractEntity
 
+  getScene<S extends AbstractScene>(type: Type<S>): S
+
   find<C extends AbstractComponent>(component: Type<C>): C[]
 
   destroy<T extends AbstractEntity | AbstractComponent>(instance: T): void

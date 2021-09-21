@@ -201,6 +201,18 @@ class AsteroidsApplication implements IAsteroidsApplication {
   }
 
   /**
+   * Method that finds some scene with the specified type
+   *
+   * @param type defines the scene type
+   * @returns an object that represents the scene instance
+   */
+  getScene<S extends AbstractScene>(type: Type<S>) {
+    return this.scenes.find(
+      (scene) => scene.constructor.name === type.name,
+    ) as S
+  }
+
+  /**
    * Method that adds a new component to a specific entity instance
    *
    * @param component defines the component type
