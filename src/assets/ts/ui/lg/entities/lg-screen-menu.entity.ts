@@ -8,7 +8,10 @@ import {
   IScreen,
 } from '@asteroidsjs'
 
-import { LGSocketService, LoadScreensData } from '../../../shared/services/lg-socket.service'
+import {
+  LGSocketService,
+  LoadScreensData,
+} from '../../../shared/services/lg-socket.service'
 
 import { Menu } from '../../../scenes/menu.scene'
 
@@ -326,6 +329,8 @@ export class LGScreenMenu
     screenCancelButton.classList.remove('hide')
 
     screenCancelButton.addEventListener('click', () => {
+      clearTimeout(this.connectionTimeout)
+
       this.lgSocketService.cancelConnection()
 
       screenCancelButton.classList.add('hide')
