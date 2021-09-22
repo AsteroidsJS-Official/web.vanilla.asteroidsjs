@@ -89,7 +89,7 @@ function setupServer() {
 
   const router = express.Router()
 
-  router.use(express.static(path.resolve(__dirname, '../dist')))
+  router.use('/', express.static(path.resolve(__dirname, '../dist')))
 
   router.use('/screen', express.static(path.resolve(__dirname, '../dist')))
 
@@ -257,6 +257,17 @@ function setupSocketScreen() {
       ioScreen.emit('change-health', data)
     }
     socket.on('change-health', changeHealth)
+
+    /**
+     * Emits to screens that the user has updated it's data from the mobile
+     * controller.
+     *
+     * @param {string} data The player updated data.
+     */
+    function updatePlayer(data) {
+      ioScreen.emit('update-player', data)
+    }
+    socket.on('update-player', updatePlayer)
 
     /**
      * Called when a screen is disconnected.
