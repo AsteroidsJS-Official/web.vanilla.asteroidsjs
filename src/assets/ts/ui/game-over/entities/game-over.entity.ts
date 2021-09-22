@@ -1,9 +1,14 @@
 import {
   AbstractEntity,
+  appendChildren,
+  destroyMultipleElements,
   Entity,
+  getElement,
   getHtml,
   IOnAwake,
+  IOnDestroy,
   IOnStart,
+  removeClass,
 } from '@asteroidsjs'
 
 import { LGSocketService } from '../../../shared/services/lg-socket.service'
@@ -14,6 +19,7 @@ import { UserService } from '../../../shared/services/user.service'
 
 import { Menu } from '../../../scenes/menu.scene'
 import { Single } from '../../../scenes/single.scene'
+import { Subscription } from 'rxjs'
 
 /**
  * Class that represents the game over entity that is shown
@@ -22,7 +28,10 @@ import { Single } from '../../../scenes/single.scene'
 @Entity({
   services: [GameService, LGSocketService, UserService, SocketService],
 })
-export class GameOver extends AbstractEntity implements IOnAwake, IOnStart {
+export class GameOver
+  extends AbstractEntity
+  implements IOnAwake, IOnStart, IOnDestroy
+{
   private lgSocketService: LGSocketService
 
   private socketService: SocketService
@@ -30,6 +39,8 @@ export class GameOver extends AbstractEntity implements IOnAwake, IOnStart {
   private userService: UserService
 
   private gameService: GameService
+
+  private sceneSubscription: Subscription
 
   onAwake(): void {
     this.lgSocketService = this.getService(LGSocketService)
@@ -41,52 +52,50 @@ export class GameOver extends AbstractEntity implements IOnAwake, IOnStart {
   onStart(): void {
     this.insertGameOverHtml()
 
-    if (this.lgSocketService.screen?.number !== 1) {
-      this.socketService.on<string>('change-scene').subscribe((scene) => {
+    this.sceneSubscription = this.socketService
+      .on<string>('change-scene')
+      .subscribe((scene) => {
         if (scene === 'single') {
           this.loadSinglePlayer()
         } else if (scene === 'menu') {
           this.loadMenu()
         }
       })
-    }
+  }
+
+  onDestroy(): void {
+    this.sceneSubscription.unsubscribe()
   }
 
   private async insertGameOverHtml(): Promise<void> {
-    Array.from(document.getElementsByTagName('ast-score')).forEach((e) =>
-      e.remove(),
-    )
+    destroyMultipleElements('ast-score')
 
     const html = await getHtml('game-over', 'ast-game-over')
     html.style.position = 'absolute'
     html.style.top = '0'
     html.style.left = '0'
 
-    document.body.appendChild(html)
+    appendChildren(document.body, html)
 
     if (this.lgSocketService.screen?.number === 1) {
-      document.querySelector('.game-over-container')?.classList.remove('hide')
+      removeClass('.game-over-container', 'hide')
 
-      const score = document.querySelector('ast-game-over .score .amount')
+      const score = getElement('ast-game-over .score .amount')
 
       if (score) {
         score.innerHTML = this.userService.score.toString()
       }
 
-      const respawnButton = document.querySelector('.respawn-button')
-      const backButton = document.querySelector('.back-button')
+      const respawnButton = getElement<HTMLButtonElement>('.respawn-button')
+      const backButton = getElement<HTMLButtonElement>('.back-button')
 
       if (respawnButton && backButton) {
         respawnButton.addEventListener('click', () => {
-          this.socketService.emit('change-scene', 'single')
-
-          this.loadSinglePlayer()
+          this.lgSocketService.changeScene('single')
         })
 
         backButton.addEventListener('click', () => {
-          this.socketService.emit('change-scene', 'menu')
-
-          this.loadMenu()
+          this.lgSocketService.changeScene('menu')
         })
       }
     }
@@ -94,17 +103,17 @@ export class GameOver extends AbstractEntity implements IOnAwake, IOnStart {
 
   private loadSinglePlayer(): void {
     this.gameService.gameOver = false
-    this.scene.unload(this.scene)
-    document.querySelector('ast-game-over')?.remove()
+    destroyMultipleElements('ast-game-over')
 
+    this.scene.unload(this.scene)
     this.scene.load(Single)
   }
 
   private loadMenu(): void {
     this.gameService.gameOver = false
-    this.scene.unload(this.scene)
-    document.querySelector('ast-game-over')?.remove()
+    destroyMultipleElements('ast-game-over')
 
+    this.scene.unload(this.scene)
     this.scene.load(Menu)
   }
 }

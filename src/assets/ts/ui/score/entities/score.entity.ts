@@ -1,9 +1,13 @@
 import {
   AbstractEntity,
+  appendChildren,
+  destroyMultipleElements,
   Entity,
+  getElement,
   getHtml,
   IOnAwake,
   IOnDestroy,
+  IOnStart,
 } from '@asteroidsjs'
 
 import { UserService } from '../../../shared/services/user.service'
@@ -11,40 +15,56 @@ import { UserService } from '../../../shared/services/user.service'
 @Entity({
   services: [UserService],
 })
-export class Score extends AbstractEntity implements IOnAwake, IOnDestroy {
+export class Score
+  extends AbstractEntity
+  implements IOnAwake, IOnStart, IOnDestroy
+{
   private userService: UserService
 
   public score = 0
 
   onAwake(): void {
     this.userService = this.getService(UserService)
+  }
 
+  onStart(): void {
     this.userService.score$.subscribe((score) => {
       this.increaseScore(score)
     })
 
-    getHtml('score', 'ast-score').then((html) => {
-      const scoreEl = html.getElementsByClassName('score')[0]
-      if (scoreEl) {
-        this.score = +scoreEl.innerHTML
-        this.userService.setScore(this.score)
-      }
-
-      document.body.appendChild(html)
-    })
+    this.insertScoreHtml()
   }
 
   onDestroy(): void {
-    const scoreEl = document.querySelector('ast-score')
-
-    if (scoreEl) {
-      scoreEl.remove()
-    }
+    destroyMultipleElements('ast-score')
   }
 
+  /**
+   * Inserts the score HTML into the body.
+   */
+  private async insertScoreHtml(): Promise<void> {
+    destroyMultipleElements('ast-score')
+
+    const html = await getHtml('score', 'ast-score')
+    const score = html.getElementsByClassName('score')[0]
+
+    if (score) {
+      this.score = +score.innerHTML
+      this.userService.setScore(this.score)
+    }
+
+    appendChildren(document.body, html)
+  }
+
+  /**
+   * Increases the score according to the given amount.
+   *
+   * @param amount The amount of points to be added.
+   * @returns The new points amount.
+   */
   public increaseScore(amount: number): number {
     this.score = amount
-    const scoreEl = document.querySelector('.score-container > .score')
+    const scoreEl = getElement('.score-container > .score')
 
     if (scoreEl) {
       scoreEl.innerHTML = this.score.toString()
