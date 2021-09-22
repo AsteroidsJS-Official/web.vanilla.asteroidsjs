@@ -23,6 +23,7 @@ import { IPlayer } from '../../../shared/interfaces/player.interface'
 
 import { isMobile } from './../../../utils/platform'
 
+import { Joystick } from '../../../scenes/joystick.scene'
 import { Single } from '../../../scenes/single.scene'
 import { Subscription } from 'rxjs'
 
@@ -255,6 +256,12 @@ export class Menu
 
     playSPButton.addEventListener('click', () => {
       this.lgSocketService.changeScene('single')
+
+      if (isMobile) {
+        destroyMultipleElements('ast-controller-menu')
+        this.scene.unload(this.scene)
+        this.scene.load(Joystick)
+      }
     })
 
     colorButtons.forEach((button) => {
