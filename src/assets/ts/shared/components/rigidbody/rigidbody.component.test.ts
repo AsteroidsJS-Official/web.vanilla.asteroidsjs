@@ -17,11 +17,13 @@ describe('rigidbody', () => {
   @Entity()
   class TestEntity extends AbstractEntity {}
 
-  let scene: TestScene
   let app: IAsteroidsApplication
+  let scene: TestScene
 
   beforeAll(() => {
-    app = AsteroidsFactory.create({ bootstrap: [TestScene] })
+    app = AsteroidsFactory.create({
+      bootstrap: [TestScene],
+    })
     app.start()
     scene = app.getScene(TestScene)
   })

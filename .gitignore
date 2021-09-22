@@ -5,3 +5,6 @@
 
 # Environments
 .env
+
+# Tests
+/coverage

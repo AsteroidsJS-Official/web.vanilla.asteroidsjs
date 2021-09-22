@@ -1,8 +1,7 @@
 import { AbstractComponent, Component, IDraw, IOnAwake } from '@asteroidsjs'
+import { hasDraw } from '@asteroidsjs/src/utils/validations'
 
 import { Transform } from './transform.component'
-
-import { hasDraw } from '@asteroidsjs/src/utils/validations'
 
 @Component({
   required: [Transform],

@@ -98,9 +98,9 @@ export class Manager extends AbstractEntity implements IOnStart {
       ],
     })
 
-    this.instantiate({
-      entity: ManagerAsteroids,
-    })
+    // this.instantiate({
+    //   entity: ManagerAsteroids,
+    // })
 
     this.lgSocketService.emit('instantiate', {
       id: spaceship.id,

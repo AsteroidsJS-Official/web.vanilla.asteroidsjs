@@ -1,8 +1,7 @@
 import { AbstractComponent, Component, IOnStart } from '@asteroidsjs'
+import { IOnRender } from '@asteroidsjs/src/interfaces/on-render.interface'
 
 import { Drawer } from '../drawer.component'
-
-import { IOnRender } from '@asteroidsjs/src/interfaces/on-render.interface'
 
 /**
  * Class that represents the component responsible for rendering the
