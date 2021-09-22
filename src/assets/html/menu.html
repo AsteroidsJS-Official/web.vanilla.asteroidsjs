@@ -62,7 +62,7 @@
 
       <div class="spaceship-skin-container">
         <img
-          id="spaceship-skin"
+          class="spaceship-skin"
           src="./assets/svg/spaceship-grey.svg"
           alt="Spaceship Skin"
         />
@@ -116,83 +116,4 @@
       />
     </svg>
   </button>
-
-  <div class="modal-container">
-    <div class="overlay"></div>
-
-    <div class="auth-modal">
-      <button class="close-button auth">
-        <svg
-          width="307"
-          height="307"
-          viewBox="0 0 307 307"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M137 16.5C137 7.3873 144.387 0 153.5 0C162.613 0 170 7.3873 170 16.5V290.5C170 299.613 162.613 307 153.5 307C144.387 307 137 299.613 137 290.5V16.5Z"
-            fill="currentColor"
-          />
-          <path
-            d="M16.5 170C7.3873 170 0 162.613 0 153.5C0 144.387 7.3873 137 16.5 137H290.5C299.613 137 307 144.387 307 153.5C307 162.613 299.613 170 290.5 170H16.5Z"
-            fill="currentColor"
-          />
-        </svg>
-      </button>
-
-      <h1 id="auth-modal-title">LOGIN</h1>
-
-      <div class="nickname-input-container auth-input-container">
-        <input
-          id="nickname-input"
-          name="nickname"
-          type="text"
-          class="nickname-input auth-form"
-          required
-        />
-        <label for="nickname" class="nickname-label auth-label">Nickname</label>
-      </div>
-
-      <div class="email-input-container auth-input-container">
-        <input
-          id="email-input"
-          name="email"
-          type="text"
-          class="email-input auth-form"
-          required
-        />
-        <label for="email" class="email-label auth-label">E-mail</label>
-      </div>
-
-      <div class="password-input-container auth-input-container">
-        <input
-          id="password-input"
-          name="password"
-          type="password"
-          class="password-input auth-form"
-          required
-        />
-        <label for="password" class="password-label auth-label">Password</label>
-      </div>
-
-      <div class="confirm-password-input-container auth-input-container">
-        <input
-          id="confirm-password-input"
-          name="confirm-password"
-          type="password"
-          class="confirm-password-input auth-form"
-          required
-        />
-        <label for="confirm-password" class="confirm-password-label auth-label"
-          >Confirm password</label
-        >
-      </div>
-
-      <button class="auth-button">LOGIN</button>
-
-      <button class="auth-switch-button">Already have an account?</button>
-    </div>
-
-    <div class="settings-modal"></div>
-  </div>
 </div>
