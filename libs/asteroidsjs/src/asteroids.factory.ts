@@ -125,15 +125,18 @@ class AsteroidsApplication implements IAsteroidsApplication {
       }
     }
 
+    instance.order =
+      options.order ?? this.getOrderFromMetadata(options.entity) ?? 0
+
     // convert all the components and providers to providers
     const components = this.toProviders([
-      ...(this.getComponentsInMetadata(options.entity) ?? []),
+      ...(this.getComponentsFromMetadata(options.entity) ?? []),
       ...(options.components ?? []),
     ])
 
     // convert all the services and providers to providers
     const services = this.toProviders([
-      ...(this.getServicesInMetadata(options.entity) ?? []),
+      ...(this.getServicesFromMetadata(options.entity) ?? []),
       ...(options.services ?? []),
     ])
 
@@ -161,7 +164,12 @@ class AsteroidsApplication implements IAsteroidsApplication {
       // creates the components
       instance.components = components
         .filter((c) => !!c.class)
-        .map((c) => new c.class(c.id, instance))
+        .map((c) => {
+          const order = this.getOrderFromMetadata(c.class) ?? 0
+          const component = new c.class(c.id, instance)
+          component.order = order
+          return component
+        })
     }
 
     const instances = [instance, ...instance.components, ...instance.services]
@@ -371,13 +379,29 @@ class AsteroidsApplication implements IAsteroidsApplication {
   }
 
   /**
+   * Method tat, given a component or entity type, it returns it
+   * rendering order value.
+   *
+   * @param target defines the entity or component type.
+   * @returns the entity or component order.
+   */
+  private getOrderFromMetadata<T extends AbstractEntity | AbstractComponent>(
+    target: Type<T>,
+  ): number {
+    return (
+      Reflect.getMetadata(ENTITY_OPTIONS, target)?.order ??
+      Reflect.getMetadata(COMPONENT_OPTIONS, target)?.order
+    )
+  }
+
+  /**
    * Method that, given an entity, it takes from the metadata all it
    * components, passed in the "components" property
    *
    * @param entity defines the entity type
    * @returns an array with all the component types
    */
-  private getComponentsInMetadata<E extends AbstractEntity>(
+  private getComponentsFromMetadata<E extends AbstractEntity>(
     entity: Type<E>,
   ): Type<AbstractComponent>[] {
     return Reflect.getMetadata(ENTITY_OPTIONS, entity)?.components
@@ -390,7 +414,7 @@ class AsteroidsApplication implements IAsteroidsApplication {
    * @param target defines the entity or component or service type
    * @returns an array with all the service types
    */
-  private getServicesInMetadata<
+  private getServicesFromMetadata<
     T extends AbstractEntity | AbstractService | AbstractComponent,
   >(target: Type<T>): Type<AbstractService>[] {
     return (
@@ -411,7 +435,7 @@ class AsteroidsApplication implements IAsteroidsApplication {
       (p) => p.constructor.name === service.name,
     )
     if (!instance) {
-      const services = this.getServicesInMetadata(service).map((p) =>
+      const services = this.getServicesFromMetadata(service).map((p) =>
         this.findOrCreateService(p),
       )
       instance = new service(generateUUID(), this, services)

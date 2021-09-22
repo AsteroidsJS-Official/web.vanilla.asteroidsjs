@@ -36,6 +36,7 @@ import { IOnTriggerEnter } from '../../../shared/interfaces/on-trigger-enter.int
  * Class that represents the spaceship entity controlled by the user.
  */
 @Entity({
+  order: 1,
   services: [UserService, LGSocketService, GameService],
   components: [
     Drawer,

@@ -14,6 +14,11 @@ import { AbstractScene } from './abstract-scene'
  */
 export abstract class AbstractEntity implements IEnabled {
   /**
+   * Property that defines the rendering order of each entity.
+   */
+  order = 0
+
+  /**
    * Property that defines a number used to synchronize the application
    * physics.
    */

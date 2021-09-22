@@ -24,6 +24,7 @@ export class Drawer extends AbstractComponent implements IOnAwake, IDraw {
       .filter((c) => c.constructor.name !== Drawer.name)
 
     ;[...entities, ...components]
+      .sort((current, previous) => current.order - previous.order)
       .filter((instance) => hasDraw(instance))
       .forEach((instance) => (instance as any).draw())
   }
