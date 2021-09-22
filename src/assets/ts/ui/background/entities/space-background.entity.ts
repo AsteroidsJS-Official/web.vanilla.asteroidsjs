@@ -7,14 +7,14 @@ import { Transform } from '../../../shared/components/transform.component'
 @Entity({
   components: [Drawer, Transform, Render],
 })
-export class Background extends AbstractEntity implements IDraw {
+export class SpaceBackground extends AbstractEntity implements IDraw {
   draw(): void {
-    // this.getContexts()[0].fillStyle = '#ffffff00'
-    // this.getContexts()[0].fillRect(
-    //   0,
-    //   0,
-    //   this.getContexts()[0].canvas.width,
-    //   this.getContexts()[0].canvas.height,
-    // )
+    this.getContexts()[1].fillStyle = 'rgb(13, 13, 13, 0.25)'
+    this.getContexts()[1].fillRect(
+      0,
+      0,
+      this.getContexts()[1].canvas.width,
+      this.getContexts()[1].canvas.height,
+    )
   }
 }

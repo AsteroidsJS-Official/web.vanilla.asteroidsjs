@@ -1,8 +1,7 @@
 import { AbstractComponent, Component, IDraw, IOnAwake } from '@asteroidsjs'
+import { hasDraw } from '@asteroidsjs/src/utils/validations'
 
 import { Transform } from './transform.component'
-
-import { hasDraw } from '@asteroidsjs/src/utils/validations'
 
 @Component({
   required: [Transform],
@@ -25,6 +24,7 @@ export class Drawer extends AbstractComponent implements IOnAwake, IDraw {
       .filter((c) => c.constructor.name !== Drawer.name)
 
     ;[...entities, ...components]
+      .sort((current, previous) => current.order - previous.order)
       .filter((instance) => hasDraw(instance))
       .forEach((instance) => (instance as any).draw())
   }

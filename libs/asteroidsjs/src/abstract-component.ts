@@ -13,6 +13,11 @@ import { Type } from './interfaces/type.interface'
  */
 export abstract class AbstractComponent implements IEnabled {
   /**
+   * Property that defines the rendering order of each entity.
+   */
+  order = 0
+
+  /**
    * Property that defines a number used to synchronize the application
    * physics.
    */

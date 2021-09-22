@@ -36,6 +36,10 @@ export class Vector2 {
 
   public constructor(public x = 0, public y = 0) {}
 
+  public clone(): Vector2 {
+    return new Vector2(this.x, this.y)
+  }
+
   /**
    * Method that calculates the distance between two vectors using
    * `Euclidean distance`

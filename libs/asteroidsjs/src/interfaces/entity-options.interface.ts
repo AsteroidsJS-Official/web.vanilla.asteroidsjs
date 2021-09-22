@@ -27,4 +27,6 @@ export interface IEntityOptions {
    * will be instantiated and passed as dependency to the new entity
    */
   services?: (Type<AbstractService> | IProvider<AbstractService>)[]
+
+  order?: number
 }

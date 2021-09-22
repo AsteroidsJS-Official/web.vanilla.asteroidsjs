@@ -1,4 +1,11 @@
-import { AbstractComponent, Component, Rect, Vector2 } from '@asteroidsjs'
+import {
+  AbstractComponent,
+  angleToVector2,
+  Component,
+  Rect,
+  Vector2,
+  vector2ToAngle,
+} from '@asteroidsjs'
 
 /**
  * Component that adds soma spacial behaviours such as position and rotation
@@ -79,7 +86,15 @@ export class Transform extends AbstractComponent {
     if (!this.parent) {
       return this._position
     }
-    return Vector2.sum(this.parent.position, this.localPosition)
+    return Vector2.sum(
+      this.parent.position,
+      Vector2.multiply(
+        angleToVector2(
+          vector2ToAngle(this.localPosition.normalized) - this.rotation,
+        ),
+        this.localPosition.magnitude,
+      ),
+    )
   }
 
   /**

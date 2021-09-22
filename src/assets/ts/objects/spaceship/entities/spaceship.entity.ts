@@ -22,11 +22,11 @@ import { UserService } from '../../../shared/services/user.service'
 import { CircleCollider2 } from '../../../shared/components/colliders/circle-collider2.component'
 import { Drawer } from '../../../shared/components/drawer.component'
 import { Health } from '../../../shared/components/health.component'
-import { Input } from '../components/input.component'
 import { RenderOverflow } from '../../../shared/components/renderers/render-overflow.component'
 import { Render } from '../../../shared/components/renderers/render.component'
 import { Rigidbody } from '../../../shared/components/rigidbody/rigidbody.component'
 import { Transform } from '../../../shared/components/transform.component'
+import { Input } from '../components/input.component'
 
 import { ICollision2 } from '../../../shared/interfaces/collision2.interface'
 import { IOnTriggerEnter } from '../../../shared/interfaces/on-trigger-enter.interface'
@@ -35,6 +35,7 @@ import { IOnTriggerEnter } from '../../../shared/interfaces/on-trigger-enter.int
  * Class that represents the spaceship entity controlled by the user.
  */
 @Entity({
+  order: 1,
   services: [UserService, LGSocketService, GameService],
   components: [
     Drawer,
@@ -144,7 +145,6 @@ export class Spaceship
       this.image = new Image()
       this.image.src = `./assets/svg/spaceship-${this.userService.spaceshipImage}.svg`
     }
-
     this.health.color = this.userService.spaceshipColor
   }
 
