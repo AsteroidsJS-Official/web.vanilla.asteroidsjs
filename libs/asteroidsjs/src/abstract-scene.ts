@@ -73,12 +73,15 @@ export abstract class AbstractScene implements IEnabled {
     canvas.id = options.name ?? '' + generateUUID()
 
     options ??= {} as ICanvasOptions
+    canvas.style.zIndex = options.sortingLayer ?? '0'
     canvas.width = options.width ?? window.innerWidth
     canvas.height = options.height ?? window.innerHeight
 
     document.querySelector('body').appendChild(canvas)
 
-    const context = canvas.getContext('2d')
+    const context: IContext = canvas.getContext('2d')
+    context.mode = options.mode
+
     this._contexts.push(context)
     return context
   }

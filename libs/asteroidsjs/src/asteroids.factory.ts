@@ -306,6 +306,15 @@ class AsteroidsApplication implements IAsteroidsApplication {
    */
   private startRenderLoop(): void {
     requestAnimationFrame(() => this.startRenderLoop())
+
+    const cleanableContexts = this.scenes
+      .map((s) => s.getContexts())
+      .flat()
+      .filter((c) => c.mode === 'clear')
+
+    cleanableContexts.forEach((c) =>
+      c.clearRect(0, 0, window.innerWidth, window.innerHeight),
+    )
     ;[...this.entities, ...this.components].forEach((value) => {
       if (hasOnRender(value) && value.enabled) {
         value.onRender()
