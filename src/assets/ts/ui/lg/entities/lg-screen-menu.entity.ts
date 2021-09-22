@@ -1,5 +1,6 @@
 import {
   AbstractEntity,
+  destroyMultipleElements,
   Entity,
   getHtml,
   IOnAwake,
@@ -418,10 +419,10 @@ export class LGScreenMenu
 
             this.lgSocketService.screens = data.screens
 
-            this.socketService.emit('change-scene', 'menu')
+            this.lgSocketService.changeScene('menu')
 
+            destroyMultipleElements('ast-lg-screen')
             this.scene.unload(this.scene)
-            document.querySelector('ast-lg-screen')?.remove()
 
             this.scene.load(Menu)
           })
@@ -443,8 +444,8 @@ export class LGScreenMenu
         this.lgSocketService.screens = data.screens
         this.lgSocketService.screenAmount = data.screenAmount
 
+        destroyMultipleElements('ast-lg-screen-slave')
         this.scene.unload(this.scene)
-        document.querySelector('ast-lg-screen-slave')?.remove()
 
         this.scene.load(Menu)
       })
