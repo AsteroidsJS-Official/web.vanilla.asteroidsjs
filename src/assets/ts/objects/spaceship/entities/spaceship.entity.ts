@@ -15,7 +15,6 @@ import { LGSocketService } from '../../../shared/services/lg-socket.service'
 import { GameOver } from '../../../ui/game-over/entities/game-over.entity'
 import { Asteroid } from '../../asteroid/entities/asteroid.entity'
 import { Bullet } from '../../bullet/entities/bullet.entity'
-import { Trailing } from './trailing.entity'
 
 import { GameService } from '../../../shared/services/game.service'
 import { UserService } from '../../../shared/services/user.service'
@@ -146,20 +145,6 @@ export class Spaceship
       this.image = new Image()
       this.image.src = `./assets/svg/spaceship-${this.userService.spaceshipImage}.svg`
     }
-
-    this.instantiate({
-      entity: Trailing,
-      components: [
-        {
-          id: '__trailing_transform__',
-          use: {
-            parent: this.transform,
-            localPosition: new Vector2(0, -20),
-          },
-        },
-      ],
-    })
-
     this.health.color = this.userService.spaceshipColor
   }
 
