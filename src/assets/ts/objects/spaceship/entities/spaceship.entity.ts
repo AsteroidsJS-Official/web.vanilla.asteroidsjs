@@ -15,6 +15,7 @@ import { LGSocketService } from '../../../shared/services/lg-socket.service'
 import { GameOver } from '../../../ui/game-over/entities/game-over.entity'
 import { Asteroid } from '../../asteroid/entities/asteroid.entity'
 import { Bullet } from '../../bullet/entities/bullet.entity'
+import { Trailing } from './trailing.entity'
 
 import { GameService } from '../../../shared/services/game.service'
 import { UserService } from '../../../shared/services/user.service'
@@ -22,11 +23,11 @@ import { UserService } from '../../../shared/services/user.service'
 import { CircleCollider2 } from '../../../shared/components/colliders/circle-collider2.component'
 import { Drawer } from '../../../shared/components/drawer.component'
 import { Health } from '../../../shared/components/health.component'
-import { Input } from '../components/input.component'
 import { RenderOverflow } from '../../../shared/components/renderers/render-overflow.component'
 import { Render } from '../../../shared/components/renderers/render.component'
 import { Rigidbody } from '../../../shared/components/rigidbody/rigidbody.component'
 import { Transform } from '../../../shared/components/transform.component'
+import { Input } from '../components/input.component'
 
 import { ICollision2 } from '../../../shared/interfaces/collision2.interface'
 import { IOnTriggerEnter } from '../../../shared/interfaces/on-trigger-enter.interface'
@@ -144,6 +145,19 @@ export class Spaceship
       this.image = new Image()
       this.image.src = `./assets/svg/spaceship-${this.userService.spaceshipImage}.svg`
     }
+
+    this.instantiate({
+      entity: Trailing,
+      components: [
+        {
+          id: '__trailing_transform__',
+          use: {
+            parent: this.transform,
+            localPosition: new Vector2(0, -20),
+          },
+        },
+      ],
+    })
 
     this.health.color = this.userService.spaceshipColor
   }
