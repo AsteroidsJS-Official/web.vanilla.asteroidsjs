@@ -59,6 +59,8 @@ export class Bullet
   }
 
   onAwake(): void {
+    this.socketService = this.getService(SocketService)
+
     this.transform = this.getComponent(Transform)
     this.rigidbody = this.getComponent(Rigidbody)
   }
