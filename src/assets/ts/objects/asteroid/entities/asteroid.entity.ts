@@ -12,7 +12,7 @@ import {
   Vector2,
 } from '@asteroidsjs'
 
-import { LGSocketService } from '../../../shared/services/lg-socket.service'
+import { SocketService } from '../../../shared/services/socket.service'
 
 import { Bullet } from '../../bullet/entities/bullet.entity'
 
@@ -34,7 +34,7 @@ import { IOnTriggerEnter } from '../../../shared/interfaces/on-trigger-enter.int
  * Class that represents the asteroid entity and it's behavior.
  */
 @Entity({
-  services: [UserService, LGSocketService, GameService],
+  services: [UserService, GameService, SocketService],
   components: [
     Render,
     Drawer,
@@ -59,7 +59,7 @@ export class Asteroid
 {
   private userService: UserService
 
-  private lgSocketService: LGSocketService
+  private socketService: SocketService
 
   private gameService: GameService
 
@@ -108,7 +108,7 @@ export class Asteroid
 
   public onAwake(): void {
     this.userService = this.getService(UserService)
-    this.lgSocketService = this.getService(LGSocketService)
+    this.socketService = this.getService(SocketService)
     this.gameService = this.getService(GameService)
 
     this.transform = this.getComponent(Transform)
@@ -146,12 +146,12 @@ export class Asteroid
     )
 
     this.health.health$.subscribe((value) => {
-      this.lgSocketService.emit('change-health', { id: this.id, amount: value })
+      this.socketService.emit('change-health', { id: this.id, amount: value })
     })
   }
 
   public onDestroy(): void {
-    this.lgSocketService.emit('destroy', this.id)
+    this.socketService.emit('destroy', this.id)
   }
 
   public onTriggerEnter(collision: ICollision2): void {
@@ -278,7 +278,7 @@ export class Asteroid
         ],
       })
 
-      this.lgSocketService.emit('instantiate', {
+      this.socketService.emit('instantiate', {
         id: fragment.id,
         type: Asteroid.name,
         data: {

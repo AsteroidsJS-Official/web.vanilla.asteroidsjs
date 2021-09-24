@@ -7,6 +7,8 @@
 @import './assets/scss/score.scss';
 @import './assets/scss/game-over.scss';
 @import './assets/scss/canvas.scss';
+@import './assets/scss/modals.scss';
+@import './assets/scss/joystick.scss';
 
 * {
   box-sizing: border-box;
@@ -14,6 +16,14 @@
   padding: 0;
 
   overflow: hidden;
+}
+
+input,
+textarea,
+button,
+select,
+a {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 @font-face {

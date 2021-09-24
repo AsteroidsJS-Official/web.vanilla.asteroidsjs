@@ -1,35 +1,8 @@
-import { AbstractService, IScreen, Service } from '@asteroidsjs'
+import { AbstractService, IOnAwake, IScreen, Service } from '@asteroidsjs'
 
-import io from 'socket.io-client/dist/socket.io.js'
+import { SocketService } from './socket.service'
 
 import { BehaviorSubject, Observable } from 'rxjs'
-
-type SocketEmitEvents =
-  | 'change-scene'
-  | 'change-health'
-  | 'connect-screen'
-  | 'set-screen-amount'
-  | 'get-screens'
-  | 'instantiate'
-  | 'destroy'
-  | 'update-slaves'
-  | 'start-game'
-  | 'disconnect'
-  | 'check-connection-waiting'
-  | 'cancel-connection'
-  | 'wait-for-slaves'
-
-type SocketOnEvents =
-  | 'change-scene'
-  | 'change-health'
-  | 'instantiate'
-  | 'destroy'
-  | 'update-screen'
-  | 'start-game'
-  | 'slave-connected'
-  | 'slave-disconnected'
-  | 'waiting-connection'
-  | 'cancel-connection'
 
 export type LoadScreensData = {
   screens: IScreen[]
@@ -39,14 +12,11 @@ export type LoadScreensData = {
 /**
  * Service responsible for socket liquid galaxy management.
  */
-@Service()
-export class LGSocketService extends AbstractService {
-  /**
-   * Property that defines the liquid galaxy socket.
-   */
-  private readonly socket = io(
-    `${window.location.protocol}//${window.location.host}`,
-  )
+@Service({
+  services: [SocketService],
+})
+export class LGSocketService extends AbstractService implements IOnAwake {
+  private socketService: SocketService
 
   /**
    * Property that defines the amount of screens to be connected.
@@ -129,36 +99,17 @@ export class LGSocketService extends AbstractService {
     this._isMasterConnected.next(value)
   }
 
-  /**
-   * Emits some data to the given event.
-   *
-   * @param event The event name to emit to.
-   * @param data The data to send to the socket listener.
-   * @returns An observable that listens to the socket emittion response.
-   */
-  emit<T = Record<string, unknown>, R = Record<string, unknown>>(
-    event: SocketEmitEvents,
-    data?: T,
-  ): Observable<R> {
-    const subject = new BehaviorSubject<R>(void 0)
-    this.socket.emit(event, data, (response: R) => {
-      subject.next(response)
-    })
-    return subject.asObservable()
+  onAwake(): void {
+    this.socketService = this.getService(SocketService)
   }
 
   /**
-   * Gets an observable that listens for the given event emittionq.
+   * Emits to all screens to change to a specific scene.
    *
-   * @param event The event to listen to.
-   * @returns An observable that listens to the event emittion.
+   * @param scene The scene to be loaded.
    */
-  on<T = Record<string, unknown>>(event: SocketOnEvents): Observable<T> {
-    return new Observable((subscriber) => {
-      this.socket.on(event, (data: T) => {
-        subscriber.next(data)
-      })
-    })
+  changeScene(scene: string): void {
+    this.socketService.emit('change-scene', scene)
   }
 
   /**
@@ -168,19 +119,21 @@ export class LGSocketService extends AbstractService {
    */
   loadScreens(): Observable<IScreen[]> {
     return new Observable((subscriber) => {
-      this.emit('get-screens', {}).subscribe((data: LoadScreensData) => {
-        if (!data) {
-          return
-        }
+      this.socketService
+        .emit('get-screens', {})
+        .subscribe((data: LoadScreensData) => {
+          if (!data) {
+            return
+          }
 
-        this.screens = data.screens
-        this.screenAmount = data.screenAmount
-        const master = this.getScreenByNumber(1)
+          this.screens = data.screens
+          this.screenAmount = data.screenAmount
+          const master = this.getScreenByNumber(1)
 
-        this.isMasterConnected = master && master.isConnected
+          this.isMasterConnected = master && master.isConnected
 
-        subscriber.next(this.screens)
-      })
+          subscriber.next(this.screens)
+        })
     })
   }
 
@@ -192,29 +145,31 @@ export class LGSocketService extends AbstractService {
    */
   connectScreen(screenNumber?: number): Observable<IScreen> {
     return new Observable((subscriber) => {
-      this.emit<{ number: number; width: number; height: number }, IScreen>(
-        'connect-screen',
-        {
-          number: screenNumber,
-          width: window.innerWidth,
-          height: window.innerHeight,
-        },
-      ).subscribe((screen: IScreen) => {
-        if (!screen) {
-          return
-        }
+      this.socketService
+        .emit<{ number: number; width: number; height: number }, IScreen>(
+          'connect-screen',
+          {
+            number: screenNumber,
+            width: window.innerWidth,
+            height: window.innerHeight,
+          },
+        )
+        .subscribe((screen: IScreen) => {
+          if (!screen) {
+            return
+          }
 
-        console.log(screen)
+          console.log(screen)
 
-        this.screen = screen
-        this.addScreen(screen)
+          this.screen = screen
+          this.addScreen(screen)
 
-        if (screen.number === 1) {
-          this.isMasterConnected = true
-        }
+          if (screen.number === 1) {
+            this.isMasterConnected = true
+          }
 
-        subscriber.next(screen)
-      })
+          subscriber.next(screen)
+        })
     })
   }
 
@@ -357,7 +312,7 @@ export class LGSocketService extends AbstractService {
    * Emits to all screens that master is not waiting for connections anymore.
    */
   cancelConnection(): void {
-    this.emit('cancel-connection')
+    this.socketService.emit('cancel-connection')
 
     const master = this.getScreenByNumber(1)
 

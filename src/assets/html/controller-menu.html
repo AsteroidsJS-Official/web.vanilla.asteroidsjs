@@ -1,48 +1,4 @@
-<div class="menu-container overlay">
-  <section class="play-buttons">
-    <span class="play-game-selector">
-      <button
-        id="play-singleplayer-button"
-        aria-label="SINGLEPLAYER"
-        class="play-singleplayer-button"
-      >
-        SINGLEPLAYER
-      </button>
-      <img
-        src="./assets/svg/spaceship-sp.svg"
-        alt="play-singleplayer-spaceship"
-      />
-    </span>
-
-    <span class="play-game-selector">
-      <button
-        id="play-local-multiplayer-button"
-        aria-label="LOCAL MULTIPLAYER"
-        class="play-local-multiplayer-button"
-      >
-        LOCAL MULTIPLAYER
-      </button>
-      <img
-        src="./assets/svg/spaceship-lmp.svg"
-        alt="play-local-multiplayer-spaceship"
-      />
-    </span>
-
-    <span class="play-game-selector">
-      <button
-        id="play-online-multiplayer-button"
-        aria-label="ONLINE MULTIPLAYER"
-        class="play-online-multiplayer-button"
-      >
-        ONLINE MULTIPLAYER
-      </button>
-      <img
-        src="./assets/svg/spaceship-omp.svg"
-        alt="play-online-multiplayer-spaceship"
-      />
-    </span>
-  </section>
-
+<div class="controller-menu-container overlay">
   <section class="player-customization">
     <div class="spaceship-customization">
       <button class="spaceship-skin-picker previous">
@@ -101,6 +57,8 @@
     <button class="login-button">Login with my account</button>
   </section>
 
+  <button class="play-button">Play</button>
+
   <button class="settings-button">
     <svg
       width="155"
@@ -116,4 +74,34 @@
       />
     </svg>
   </button>
+</div>
+
+<div class="controller-play-menu-container overlay hide">
+  <section class="play-buttons">
+    <button
+      id="play-singleplayer-button"
+      aria-label="SINGLEPLAYER"
+      class="play-singleplayer-button"
+    >
+      SINGLEPLAYER
+    </button>
+
+    <button
+      id="play-local-multiplayer-button"
+      aria-label="LOCAL MULTIPLAYER"
+      class="play-local-multiplayer-button"
+    >
+      LOCAL MULTIPLAYER
+    </button>
+
+    <button
+      id="play-online-multiplayer-button"
+      aria-label="ONLINE MULTIPLAYER"
+      class="play-online-multiplayer-button"
+    >
+      ONLINE MULTIPLAYER
+    </button>
+  </section>
+
+  <button class="back-button">BACK</button>
 </div>

@@ -89,7 +89,7 @@ function setupServer() {
 
   const router = express.Router()
 
-  router.use(express.static(path.resolve(__dirname, '../dist')))
+  router.use('/', express.static(path.resolve(__dirname, '../dist')))
 
   router.use('/screen', express.static(path.resolve(__dirname, '../dist')))
 
@@ -239,9 +239,19 @@ function setupSocketScreen() {
     socket.on('update-slaves', updateSlaves)
 
     /**
+     * Emits to all screens and controllers that the game is over.
+     *
+     * @param {Object} player The player that has died.
+     */
+    function gameOver(player) {
+      ioScreen.emit('game-over', player)
+    }
+    socket.on('game-over', gameOver)
+
+    /**
      * Emits to all slaves screens that the scene has changed.
      *
-     * @param scene The scene name.
+     * @param {string} scene The scene name.
      */
     function changeScene(scene) {
       ioScreen.emit('change-scene', scene)
@@ -251,12 +261,33 @@ function setupSocketScreen() {
     /**
      * Emits to all slaves screens that the entity have been damaged or healed.
      *
-     * @param data The data containing the entity id and its health amount.
+     * @param {{ id: string, health: number }} data The data containing the entity id and its health amount.
      */
     function changeHealth(data) {
       ioScreen.emit('change-health', data)
     }
     socket.on('change-health', changeHealth)
+
+    /**
+     * Emits to screens that the user has updated it's data from the mobile
+     * controller.
+     *
+     * @param {string} data The player updated data.
+     */
+    function updatePlayer(data) {
+      ioScreen.emit('update-player', data)
+    }
+    socket.on('update-player', updatePlayer)
+
+    /**
+     * Emits to  all screens that the user joystick actions were updated.
+     *
+     * @param {string} actions The joystick actions.
+     */
+    function updateActions(actions) {
+      ioScreen.emit('update-actions', actions)
+    }
+    socket.on('update-actions', updateActions)
 
     /**
      * Called when a screen is disconnected.

@@ -1,5 +1,7 @@
 import { AbstractService, Service } from '@asteroidsjs'
 
+import { IPlayer } from '../interfaces/player.interface'
+
 import { BehaviorSubject, Observable } from 'rxjs'
 
 /**
@@ -46,6 +48,18 @@ export class UserService extends AbstractService {
    */
   public get score(): number {
     return this._score.value
+  }
+
+  /**
+   * Property responsible for returning the player data.
+   */
+  public get player(): IPlayer {
+    return {
+      id: this.userId,
+      color: this.spaceshipImage,
+      nickname: this.nickname,
+      score: this.score,
+    }
   }
 
   /**

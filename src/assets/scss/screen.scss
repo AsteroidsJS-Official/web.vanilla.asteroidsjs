@@ -20,6 +20,13 @@ body {
   background-color: $overlayColor;
 }
 
+.background {
+  position: relative;
+
+  width: 100vw;
+  height: 100vh;
+}
+
 .lg-screen-container {
   display: flex;
   flex-direction: column;

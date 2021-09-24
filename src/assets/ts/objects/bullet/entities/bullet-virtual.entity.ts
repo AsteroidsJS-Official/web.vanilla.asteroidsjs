@@ -8,7 +8,7 @@ import {
   Vector2,
 } from '@asteroidsjs'
 
-import { LGSocketService } from '../../../shared/services/lg-socket.service'
+import { SocketService } from '../../../shared/services/socket.service'
 
 import { Drawer } from '../../../shared/components/drawer.component'
 import { Render } from '../../../shared/components/renderers/render.component'
@@ -18,7 +18,7 @@ import { Transform } from '../../../shared/components/transform.component'
 import { IBullet } from '../interfaces/bullet.interface'
 
 @Entity({
-  services: [LGSocketService],
+  services: [SocketService],
   components: [
     Drawer,
     Render,
@@ -36,7 +36,7 @@ export class BulletVirtual
   extends AbstractEntity
   implements IBullet, IDraw, IOnAwake, IOnLoop, IOnStart
 {
-  private lgSocketService: LGSocketService
+  private socketService: SocketService
 
   public transform: Transform
 
@@ -52,13 +52,13 @@ export class BulletVirtual
   }
 
   onAwake(): void {
-    this.lgSocketService = this.getService(LGSocketService)
+    this.socketService = this.getService(SocketService)
     this.transform = this.getComponent(Transform)
     this.rigidbody = this.getComponent(Rigidbody)
   }
 
   onStart(): void {
-    this.lgSocketService.on<string>('destroy').subscribe((id) => {
+    this.socketService.on<string>('destroy').subscribe((id) => {
       if (id === this.id) {
         this.destroy(this)
       }

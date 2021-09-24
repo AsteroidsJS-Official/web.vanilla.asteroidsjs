@@ -10,9 +10,8 @@ import {
   Vector2,
 } from '@asteroidsjs'
 
-import { LGSocketService } from '../../../shared/services/lg-socket.service'
+import { SocketService } from '../../../shared/services/socket.service'
 
-import { GameOver } from '../../../ui/game-over/entities/game-over.entity'
 import { Asteroid } from '../../asteroid/entities/asteroid.entity'
 import { Bullet } from '../../bullet/entities/bullet.entity'
 
@@ -36,7 +35,7 @@ import { IOnTriggerEnter } from '../../../shared/interfaces/on-trigger-enter.int
  */
 @Entity({
   order: 1,
-  services: [UserService, LGSocketService, GameService],
+  services: [UserService, GameService, SocketService],
   components: [
     Drawer,
     RenderOverflow,
@@ -83,6 +82,10 @@ import { IOnTriggerEnter } from '../../../shared/interfaces/on-trigger-enter.int
         angularForce: 0.000003,
       },
     },
+    {
+      id: '__spaceship_health__',
+      class: Health,
+    },
   ],
 })
 export class Spaceship
@@ -91,9 +94,9 @@ export class Spaceship
 {
   private userService: UserService
 
-  private lgSocketService: LGSocketService
-
   private gameService: GameService
+
+  private socketService: SocketService
 
   /**
    * Property responsible for the spaceship bullet velocity.
@@ -131,7 +134,7 @@ export class Spaceship
   }
 
   onAwake(): void {
-    this.lgSocketService = this.getService(LGSocketService)
+    this.socketService = this.getService(SocketService)
     this.userService = this.getService(UserService)
     this.gameService = this.getService(GameService)
 
@@ -149,7 +152,7 @@ export class Spaceship
   }
 
   onDestroy(): void {
-    this.lgSocketService.emit('destroy', this.id)
+    this.socketService.emit('destroy', this.id)
   }
 
   onTriggerEnter(collision: ICollision2): void {
@@ -174,12 +177,11 @@ export class Spaceship
     if (this.health.health <= 0 && !this.gameService.gameOver) {
       this.destroy(this)
       this.gameService.gameOver = true
-      this.instantiate({ entity: GameOver })
     }
   }
 
   onLateLoop(): void {
-    this.lgSocketService.emit('update-slaves', {
+    this.socketService.emit('update-slaves', {
       id: this.id,
       data: {
         position: this.transform.position,
@@ -280,7 +282,7 @@ export class Spaceship
       ],
     })
 
-    this.lgSocketService.emit('instantiate', {
+    this.socketService.emit('instantiate', {
       id: bullet.id,
       type: Bullet.name,
       data: {

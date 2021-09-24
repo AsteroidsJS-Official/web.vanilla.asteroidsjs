@@ -10,9 +10,7 @@ import {
   Rect,
 } from '@asteroidsjs'
 
-import { LGSocketService } from '../../../shared/services/lg-socket.service'
-
-import { GameOver } from '../../../ui/game-over/entities/game-over.entity'
+import { SocketService } from '../../../shared/services/socket.service'
 
 import { Drawer } from '../../../shared/components/drawer.component'
 import { Health } from '../../../shared/components/health.component'
@@ -22,7 +20,7 @@ import { Rigidbody } from '../../../shared/components/rigidbody/rigidbody.compon
 import { Transform } from '../../../shared/components/transform.component'
 
 @Entity({
-  services: [LGSocketService],
+  services: [SocketService],
   components: [
     Render,
     Drawer,
@@ -44,7 +42,7 @@ export class AsteroidVirtual
   extends AbstractEntity
   implements IOnAwake, IOnStart, IDraw, IOnLoop
 {
-  private lgSocketService: LGSocketService
+  private socketService: SocketService
 
   private transform: Transform
 
@@ -63,7 +61,7 @@ export class AsteroidVirtual
   }
 
   public onAwake(): void {
-    this.lgSocketService = this.getService(LGSocketService)
+    this.socketService = this.getService(SocketService)
     this.transform = this.getComponent(Transform)
     this.health = this.getComponent(Health)
   }
@@ -79,7 +77,7 @@ export class AsteroidVirtual
       10 * ((this._asteroidSize + 2) * 2),
     )
 
-    this.lgSocketService
+    this.socketService
       .on<{ id: string; amount: number }>('change-health')
       .subscribe(({ id, amount }) => {
         if (id === this.id) {
@@ -87,10 +85,9 @@ export class AsteroidVirtual
         }
       })
 
-    this.lgSocketService.on<string>('destroy').subscribe((id) => {
+    this.socketService.on<string>('destroy').subscribe((id) => {
       if (id === this.id) {
         this.destroy(this)
-        this.instantiate({ entity: GameOver })
       }
     })
   }
