@@ -17,6 +17,14 @@
   overflow: hidden;
 }
 
+input,
+textarea,
+button,
+select,
+a {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
 @font-face {
   font-family: 'Neptunus';
   src: url('./assets/fonts/Neptunus/Neptunus.ttf');
