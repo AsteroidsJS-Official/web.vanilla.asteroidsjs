@@ -3,30 +3,40 @@ import {
   Component,
   IOnAwake,
   IOnLoop,
+  IOnStart,
   Vector2,
 } from '@asteroidsjs'
+
+import { SocketService } from '../../../shared/services/socket.service'
 
 import { Spaceship } from '../entities/spaceship.entity'
 
 import { Rigidbody } from '../../../shared/components/rigidbody.component'
 
+import { IJoystickActions } from '../../../shared/interfaces/joystick.interface'
 import { IGameKeys } from '../interfaces/input.interface'
 
 import { fromEvent } from 'rxjs'
 
-// TODO: put the direction property in the "Transform" component
-
 /**
  * Class that represents the component that allows  the user interaction
- * with the game
+ * with the game.
  */
 @Component({
   required: [Rigidbody],
+  services: [SocketService],
 })
-export class Input extends AbstractComponent implements IOnAwake, IOnLoop {
-  force: number
+export class Input
+  extends AbstractComponent
+  implements IOnAwake, IOnStart, IOnLoop
+{
+  public force: number
 
-  angularForce: number
+  public angularForce: number
+
+  private socketService: SocketService
+
+  private actions: IJoystickActions
 
   /**
    * Property that contains the pressed keys and whether they are pressed
@@ -56,13 +66,34 @@ export class Input extends AbstractComponent implements IOnAwake, IOnLoop {
     this.spaceship = this.getEntityAs<Spaceship>()
     this.rigidbody = this.getComponent(Rigidbody)
 
-    this.keyPressed()
+    this.socketService = this.getService(SocketService)
+
+    this.listenKeys()
+  }
+
+  onStart(): void {
+    this.socketService
+      .on<IJoystickActions>('update-actions')
+      .subscribe((actions) => {
+        this.actions = actions
+
+        if (actions.rotating === 'right') {
+          this.setGameKeyPressed('ArrowRight', true)
+          this.setGameKeyPressed('ArrowLeft', false)
+        } else if (actions.rotating === 'left') {
+          this.setGameKeyPressed('ArrowRight', false)
+          this.setGameKeyPressed('ArrowLeft', true)
+        } else {
+          this.setGameKeyPressed('ArrowRight', false)
+          this.setGameKeyPressed('ArrowLeft', false)
+        }
+      })
   }
 
   /**
-   * Captures the pressed key and checks the corresponding action
+   * Captures the pressed key and checks the corresponding action.
    */
-  public keyPressed(): void {
+  public listenKeys(): void {
     fromEvent(window, 'keydown').subscribe((e: KeyboardEvent) => {
       this.setGameKeyPressed(e.code, true)
     })
@@ -112,15 +143,23 @@ export class Input extends AbstractComponent implements IOnAwake, IOnLoop {
       !Object.entries(this.gameKeys)
         .filter((item) => item[0] === 'left' || item[0] === 'right')
         .map((item) => item[1])
-        .reduce((prev, cur) => prev || cur, false)
+        .reduce((prev, cur) => prev || cur, false) &&
+      (!this.actions || !this.actions.rotating)
     ) {
       this.rigidbody.angularVelocity = 0
       this.rigidbody.angularResultant = 0
     }
 
-    if (this.gameKeys['shoot'] && !this.spaceship.isShooting) {
+    if (
+      ((this.actions && this.actions.isShooting) || this.gameKeys['shoot']) &&
+      !this.spaceship.isShooting
+    ) {
       this.spaceship.isShooting = true
-    } else if (!this.gameKeys['shoot'] && this.spaceship.isShooting) {
+    } else if (
+      (!this.actions || !this.actions.isShooting) &&
+      !this.gameKeys['shoot'] &&
+      this.spaceship.isShooting
+    ) {
       this.spaceship.isShooting = false
     }
 
@@ -128,14 +167,17 @@ export class Input extends AbstractComponent implements IOnAwake, IOnLoop {
       this.spaceship.shoot()
     }
 
-    if (this.gameKeys['up']) {
+    if (this.gameKeys['up'] || (this.actions && this.actions.isBoosting)) {
       this.rigidbody.resultant = Vector2.sum(
         this.rigidbody.resultant,
         Vector2.multiply(this.spaceship.direction, this.force),
       )
     }
+
+    // FIXME: Fix infinite angular resultant
     if (this.gameKeys['right']) {
       this.rigidbody.angularResultant += this.angularForce
+      // this.rigidbody.angularVelocity = this.rigidbody.maxAngularVelocity
 
       if (this.gameKeys['left']) {
         this.rigidbody.angularResultant = 0
@@ -143,6 +185,7 @@ export class Input extends AbstractComponent implements IOnAwake, IOnLoop {
     }
     if (this.gameKeys['left']) {
       this.rigidbody.angularResultant += -this.angularForce
+      // this.rigidbody.angularVelocity = -this.rigidbody.maxAngularVelocity
 
       if (this.gameKeys['right']) {
         this.rigidbody.angularResultant = 0
