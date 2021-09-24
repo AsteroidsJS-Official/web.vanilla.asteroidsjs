@@ -21,6 +21,12 @@ export class Rigidbody
   implements IOnAwake, IOnLoop, IOnFixedLoop
 {
   /**
+   * Property that defines an error value used to avoid some unexpected
+   * behaviours like the "friction vibration".
+   */
+  public error = 0.001
+
+  /**
    * Property that defines the entity mass, that directly interfers with
    * the inertia of the entity
    */
@@ -31,12 +37,6 @@ export class Rigidbody
    * to some rigidbody that desacelerates it based on the velocity value
    */
   public friction = 0
-
-  /**
-   * Property that defines the sum of all the forces applied to the
-   * entity, resulting in a movement or not
-   */
-  public resultant = new Vector2()
 
   /**
    * Property that defines the sum of all the forces applied to the
@@ -53,6 +53,12 @@ export class Rigidbody
    * Property that defines the max velocity that entity can reach
    */
   public maxVelocity = Infinity
+
+  /**
+   * Property that defines the sum of all the forces applied to the
+   * entity, resulting in a movement or not
+   */
+  private _resultant = new Vector2()
 
   /**
    * Property that defines the current entity velocity
@@ -84,7 +90,23 @@ export class Rigidbody
       const result = this.maxVelocity / vector.magnitude
       vector = new Vector2(vector.x * result, vector.y * result)
     }
-    this._velocity = vector
+    this._velocity = vector.magnitude < this.error ? new Vector2() : vector
+  }
+
+  /**
+   * Property that defines the sum of all the forces applied to the
+   * entity, resulting in a movement or not
+   */
+  public get resultant(): Vector2 {
+    return this._resultant
+  }
+
+  /**
+   * Property that defines the sum of all the forces applied to the
+   * entity, resulting in a movement or not
+   */
+  public set resultant(value: Vector2) {
+    this._resultant = value.magnitude < this.error ? new Vector2() : value
   }
 
   /**
