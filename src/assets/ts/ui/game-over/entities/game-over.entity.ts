@@ -17,6 +17,9 @@ import { SocketService } from '../../../shared/services/socket.service'
 import { GameService } from '../../../shared/services/game.service'
 import { UserService } from '../../../shared/services/user.service'
 
+import { isMobile } from '../../../utils/platform'
+
+import { Joystick } from '../../../scenes/joystick.scene'
 import { Menu } from '../../../scenes/menu.scene'
 import { Single } from '../../../scenes/single.scene'
 import { Subscription } from 'rxjs'
@@ -55,10 +58,18 @@ export class GameOver
     this.sceneSubscription = this.socketService
       .on<string>('change-scene')
       .subscribe((scene) => {
+        console.log(scene)
+
         if (scene === 'single') {
-          this.loadSinglePlayer()
+          if (isMobile) {
+            this.loadJoystick()
+          } else {
+            this.loadSinglePlayer()
+          }
         } else if (scene === 'menu') {
           this.loadMenu()
+        } else if ((scene = 'joystick')) {
+          this.loadJoystick()
         }
       })
   }
@@ -77,7 +88,7 @@ export class GameOver
 
     appendChildren(document.body, html)
 
-    if (this.lgSocketService.screen?.number === 1) {
+    if (this.lgSocketService.screen?.number === 1 || isMobile) {
       removeClass('.game-over-container', 'hide')
 
       const score = getElement('ast-game-over .score .amount')
@@ -89,15 +100,17 @@ export class GameOver
       const respawnButton = getElement<HTMLButtonElement>('.respawn-button')
       const backButton = getElement<HTMLButtonElement>('.back-button')
 
-      if (respawnButton && backButton) {
-        respawnButton.addEventListener('click', () => {
-          this.lgSocketService.changeScene('single')
-        })
-
-        backButton.addEventListener('click', () => {
-          this.lgSocketService.changeScene('menu')
-        })
+      if (!(respawnButton && backButton)) {
+        return
       }
+
+      respawnButton.addEventListener('click', () => {
+        this.lgSocketService.changeScene('single')
+      })
+
+      backButton.addEventListener('click', () => {
+        this.lgSocketService.changeScene('menu')
+      })
     }
   }
 
@@ -115,5 +128,13 @@ export class GameOver
 
     this.scene.unload(this.scene)
     this.scene.load(Menu)
+  }
+
+  private loadJoystick(): void {
+    this.gameService.gameOver = false
+    destroyMultipleElements('ast-game-over')
+
+    this.scene.unload(this.scene)
+    this.scene.load(Joystick)
   }
 }
