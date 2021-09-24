@@ -19,7 +19,7 @@ import { SocketService } from '../../../shared/services/socket.service'
 
 import { UserService } from '../../../shared/services/user.service'
 
-import { IPlayer } from '../../../shared/interfaces/player.interface'
+import { IPlayerVisual } from '../../../shared/interfaces/player.interface'
 
 import { isMobile } from './../../../utils/platform'
 
@@ -273,6 +273,11 @@ export class Menu
 
     this.userService.nickname = inputGuest.value
 
+    this.socketService.emit('update-player', {
+      nickname: this.userService.nickname,
+      color: this.userService.spaceshipImage,
+    })
+
     inputGuest.addEventListener('input', (event: InputEvent) => {
       this.userService.nickname = (event.target as HTMLInputElement).value
       this.socketService.emit('update-player', {
@@ -281,28 +286,43 @@ export class Menu
       })
     })
 
-    this.socketService.on<IPlayer>('update-player').subscribe((player) => {
-      this.userService.nickname = player.nickname
-      inputGuest.value = player.nickname
+    this.socketService
+      .on<IPlayerVisual>('update-player')
+      .subscribe((player) => {
+        this.userService.nickname = player.nickname
+        inputGuest.value = player.nickname
 
-      const colorButton = getElement<HTMLButtonElement>(
-        '.color-button.' + player.color,
-      )
+        const colorButton = getElement<HTMLButtonElement>(
+          '.color-button.' + player.color,
+        )
 
-      if (!colorButton) {
-        return
-      }
+        if (!colorButton) {
+          return
+        }
 
-      removeClass('.color-button.' + this.userService.spaceshipImage, 'active')
-      addClass(colorButton, 'active')
+        removeClass(
+          '.color-button.' + this.userService.spaceshipImage,
+          'active',
+        )
+        addClass(colorButton, 'active')
 
-      this.userService.spaceshipColor = colorButton.style.backgroundColor
-      this.userService.spaceshipImage = player.color
+        this.userService.spaceshipColor = colorButton.style.backgroundColor
+        this.userService.spaceshipImage = player.color
 
-      const spaceshipSkin = getElement<HTMLImageElement>('.spaceship-skin')
+        window.localStorage.setItem('asteroidsjs_nickname', player.nickname)
 
-      spaceshipSkin.src = `./assets/svg/spaceship-${player.color}.svg`
-    })
+        window.localStorage.setItem(
+          'asteroidsjs_spaceship_color',
+          JSON.stringify({
+            rgb: colorButton.style.backgroundColor,
+            name: player.color,
+          }),
+        )
+
+        const spaceshipSkin = getElement<HTMLImageElement>('.spaceship-skin')
+
+        spaceshipSkin.src = `./assets/svg/spaceship-${player.color}.svg`
+      })
   }
 
   private loadSinglePlayer(): void {
