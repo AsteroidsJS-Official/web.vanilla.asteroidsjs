@@ -1,6 +1,8 @@
 import {
   AbstractEntity,
   Entity,
+  IOnAwake,
+  IOnDestroy,
   IOnStart,
   ISocketData,
   Rect,
@@ -10,6 +12,7 @@ import {
 import { LGSocketService } from '../../../shared/services/lg-socket.service'
 import { SocketService } from '../../../shared/services/socket.service'
 
+import { GameOver } from '../../../ui/game-over/entities/game-over.entity'
 import { Score } from '../../../ui/score/entities/score.entity'
 import { AsteroidVirtual } from '../../asteroid/entities/asteroid-virtual.entity'
 import { Asteroid } from '../../asteroid/entities/asteroid.entity'
@@ -19,28 +22,42 @@ import { Bullet } from '../../bullet/entities/bullet.entity'
 import { SpaceshipVirtual } from '../../spaceship/entities/spaceship-virtual.entity'
 import { Spaceship } from '../../spaceship/entities/spaceship.entity'
 
+import { GameService } from '../../../shared/services/game.service'
 import { UserService } from '../../../shared/services/user.service'
 
-import { Health } from '../../../shared/components/health.component'
+import { Subscription } from 'rxjs'
 
 /**
  * Class that represents the first entity to be loaded into the game
  */
 @Entity({
-  services: [UserService, LGSocketService, SocketService],
+  services: [UserService, LGSocketService, SocketService, GameService],
 })
-export class Manager extends AbstractEntity implements IOnStart {
+export class Manager
+  extends AbstractEntity
+  implements IOnAwake, IOnStart, IOnDestroy
+{
   private userService: UserService
 
   private lgSocketService: LGSocketService
 
   private socketService: SocketService
 
-  public onStart(): void {
+  private gameService: GameService
+
+  /**
+   * Property responsible for keeping the game over subscription.
+   */
+  private gameOverSubscription: Subscription
+
+  onAwake(): void {
     this.userService = this.getService(UserService)
     this.lgSocketService = this.getService(LGSocketService)
     this.socketService = this.getService(SocketService)
+    this.gameService = this.getService(GameService)
+  }
 
+  onStart(): void {
     this.getContexts()[0].canvas.width = this.lgSocketService.canvasTotalWidth
     this.getContexts()[0].canvas.height = this.lgSocketService.canvasTotalHeight
     this.getContexts()[0].canvas.style.transform = `translateX(-${this.lgSocketService.displacement}px)`
@@ -54,7 +71,21 @@ export class Manager extends AbstractEntity implements IOnStart {
     }
   }
 
+  onDestroy(): void {
+    this.gameOverSubscription.unsubscribe()
+  }
+
   private master(): void {
+    this.gameOverSubscription = this.gameService.gameOver$.subscribe(
+      (isGameOver) => {
+        if (isGameOver) {
+          this.instantiate({ entity: GameOver })
+
+          this.socketService.emit('game-over', this.userService.player)
+        }
+      },
+    )
+
     const color = window.localStorage.getItem('asteroidsjs_spaceship_color')
     const nickname = window.localStorage.getItem('asteroidsjs_nickname')
 
@@ -93,7 +124,7 @@ export class Manager extends AbstractEntity implements IOnStart {
           },
         },
         {
-          class: Health,
+          id: '__spaceship_health__',
           use: {
             maxHealth: spaceshipHealth,
             health: spaceshipHealth,
