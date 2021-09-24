@@ -12,7 +12,6 @@ import {
 
 import { SocketService } from '../../../shared/services/socket.service'
 
-import { GameOver } from '../../../ui/game-over/entities/game-over.entity'
 import { Asteroid } from '../../asteroid/entities/asteroid.entity'
 import { Bullet } from '../../bullet/entities/bullet.entity'
 
@@ -81,6 +80,10 @@ import { IOnTriggerEnter } from '../../../shared/interfaces/on-trigger-enter.int
         force: 0.01,
         angularForce: 0.000003,
       },
+    },
+    {
+      id: '__spaceship_health__',
+      class: Health,
     },
   ],
 })
@@ -174,7 +177,6 @@ export class Spaceship
     if (this.health.health <= 0 && !this.gameService.gameOver) {
       this.destroy(this)
       this.gameService.gameOver = true
-      this.instantiate({ entity: GameOver })
     }
   }
 
