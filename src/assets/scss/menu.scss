@@ -130,6 +130,7 @@
 
 .controller-menu-container {
   flex-direction: column;
+  gap: 20px;
 
   transition: opacity 0.2s;
 
@@ -174,6 +175,11 @@
   }
 
   & button.settings-button {
+    top: 20px;
+    right: 20px;
+    bottom: unset;
+    left: unset;
+
     &:hover svg {
       color: #c4c4c4;
 
