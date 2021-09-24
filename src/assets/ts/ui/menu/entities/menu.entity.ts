@@ -59,6 +59,8 @@ export class Menu
 
     if (this.lgSocketService.screen?.number === 1 || isMobile) {
       this.insertMenuHtml()
+    } else {
+      this.insertSlaveMenuHtml()
     }
 
     this.lgSocketService.setCanvasSize()
@@ -74,6 +76,14 @@ export class Menu
   }
 
   onDestroy(): void {
+    destroyMultipleElements('ast-menu')
+    destroyMultipleElements('ast-controller-menu')
+    destroyMultipleElements('.overlay')
+
+    if (!this.sceneSubscription) {
+      return
+    }
+
     this.sceneSubscription.unsubscribe()
   }
 
@@ -325,10 +335,20 @@ export class Menu
       })
   }
 
-  private loadSinglePlayer(): void {
-    destroyMultipleElements('ast-menu')
-    this.scene.unload(this.scene)
+  private insertSlaveMenuHtml(): void {
+    destroyMultipleElements('.overlay')
 
+    const div = createElement('div')
+    div.classList.add('overlay')
+
+    appendChildren(document.body, div)
+  }
+
+  /**
+   * Unloads the current scene and loads the single player scene.
+   */
+  private loadSinglePlayer(): void {
+    this.scene.unload(this.scene)
     this.scene.load(Single)
   }
 }

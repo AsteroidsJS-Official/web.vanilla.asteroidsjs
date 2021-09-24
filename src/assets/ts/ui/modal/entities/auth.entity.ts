@@ -6,17 +6,35 @@ import {
   Entity,
   getElement,
   getHtml,
+  IOnAwake,
   IOnDestroy,
   IOnStart,
   removeClass,
 } from '@asteroidsjs'
 
-@Entity()
-export class Auth extends AbstractEntity implements IOnStart, IOnDestroy {
+import { LGSocketService } from '../../../shared/services/lg-socket.service'
+
+import { isMobile } from '../../../utils/platform'
+
+@Entity({
+  services: [LGSocketService],
+})
+export class Auth
+  extends AbstractEntity
+  implements IOnAwake, IOnStart, IOnDestroy
+{
+  private lgSocketService: LGSocketService
+
   public isSigningUp = false
 
+  onAwake(): void {
+    this.lgSocketService = this.getService(LGSocketService)
+  }
+
   onStart(): void {
-    this.insertAuthHtml()
+    if (this.lgSocketService.screen?.number === 1 || isMobile) {
+      this.insertAuthHtml()
+    }
   }
 
   onDestroy(): void {

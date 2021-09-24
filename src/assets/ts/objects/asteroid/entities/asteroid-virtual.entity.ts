@@ -12,8 +12,6 @@ import {
 
 import { SocketService } from '../../../shared/services/socket.service'
 
-import { GameOver } from '../../../ui/game-over/entities/game-over.entity'
-
 import { Drawer } from '../../../shared/components/drawer.component'
 import { Health } from '../../../shared/components/health.component'
 import { RenderOverflow } from '../../../shared/components/renderers/render-overflow.component'
@@ -90,7 +88,6 @@ export class AsteroidVirtual
     this.socketService.on<string>('destroy').subscribe((id) => {
       if (id === this.id) {
         this.destroy(this)
-        this.instantiate({ entity: GameOver })
       }
     })
   }

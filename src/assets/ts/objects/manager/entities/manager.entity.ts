@@ -72,7 +72,7 @@ export class Manager
   }
 
   onDestroy(): void {
-    this.gameOverSubscription.unsubscribe()
+    this.gameOverSubscription?.unsubscribe()
   }
 
   private master(): void {
@@ -153,6 +153,12 @@ export class Manager
   }
 
   private virtual(): void {
+    this.gameOverSubscription = this.socketService
+      .on('game-over')
+      .subscribe(() => {
+        this.instantiate({ entity: GameOver })
+      })
+
     this.socketService
       .on<ISocketData>('instantiate')
       .subscribe(({ id, type, data }) => {

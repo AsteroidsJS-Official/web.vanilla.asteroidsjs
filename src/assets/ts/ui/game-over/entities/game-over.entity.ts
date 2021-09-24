@@ -1,6 +1,7 @@
 import {
   AbstractEntity,
   appendChildren,
+  createElement,
   destroyMultipleElements,
   Entity,
   getElement,
@@ -53,7 +54,13 @@ export class GameOver
   }
 
   onStart(): void {
-    this.insertGameOverHtml()
+    if (this.lgSocketService.screen?.number === 1 || isMobile) {
+      this.insertGameOverHtml()
+    } else {
+      this.insertSlaveGameOverHtml()
+    }
+
+    console.log('start')
 
     this.sceneSubscription = this.socketService
       .on<string>('change-scene')
@@ -75,7 +82,11 @@ export class GameOver
   }
 
   onDestroy(): void {
-    this.sceneSubscription.unsubscribe()
+    destroyMultipleElements('ast-game-over')
+    destroyMultipleElements('.overlay')
+
+    this.gameService.gameOver = false
+    this.sceneSubscription?.unsubscribe()
   }
 
   private async insertGameOverHtml(): Promise<void> {
@@ -88,52 +99,52 @@ export class GameOver
 
     appendChildren(document.body, html)
 
-    if (this.lgSocketService.screen?.number === 1 || isMobile) {
-      removeClass('.game-over-container', 'hide')
+    removeClass('.game-over-container', 'hide')
 
-      const score = getElement('ast-game-over .score .amount')
+    const score = getElement('ast-game-over .score .amount')
 
-      if (score) {
-        score.innerHTML = this.userService.score.toString()
-      }
-
-      const respawnButton = getElement<HTMLButtonElement>('.respawn-button')
-      const backButton = getElement<HTMLButtonElement>('.back-button')
-
-      if (!(respawnButton && backButton)) {
-        return
-      }
-
-      respawnButton.addEventListener('click', () => {
-        this.lgSocketService.changeScene('single')
-      })
-
-      backButton.addEventListener('click', () => {
-        this.lgSocketService.changeScene('menu')
-      })
+    if (score) {
+      score.innerHTML = this.userService.score.toString()
     }
+
+    const respawnButton = getElement<HTMLButtonElement>('.respawn-button')
+    const backButton = getElement<HTMLButtonElement>('.back-button')
+
+    if (!(respawnButton && backButton)) {
+      return
+    }
+
+    respawnButton.addEventListener('click', () => {
+      this.lgSocketService.changeScene('single')
+      console.log('emit single')
+    })
+
+    backButton.addEventListener('click', () => {
+      this.lgSocketService.changeScene('menu')
+      console.log('emit menu')
+    })
+  }
+
+  private insertSlaveGameOverHtml(): void {
+    destroyMultipleElements('.overlay')
+
+    const div = createElement('div')
+    div.classList.add('overlay')
+
+    appendChildren(document.body, div)
   }
 
   private loadSinglePlayer(): void {
-    this.gameService.gameOver = false
-    destroyMultipleElements('ast-game-over')
-
     this.scene.unload(this.scene)
     this.scene.load(Single)
   }
 
   private loadMenu(): void {
-    this.gameService.gameOver = false
-    destroyMultipleElements('ast-game-over')
-
     this.scene.unload(this.scene)
     this.scene.load(Menu)
   }
 
   private loadJoystick(): void {
-    this.gameService.gameOver = false
-    destroyMultipleElements('ast-game-over')
-
     this.scene.unload(this.scene)
     this.scene.load(Joystick)
   }

@@ -16,6 +16,7 @@ import {
 import { SocketService } from '../../../shared/services/socket.service'
 
 import { Menu } from '../../../scenes/menu.scene'
+import { Subscription } from 'rxjs'
 
 /**
  * Entity responsible for creating and managing the screen selection
@@ -31,6 +32,12 @@ export class LGScreenMenu
   private lgSocketService: LGSocketService
 
   private socketService: SocketService
+
+  private sceneSubscription: Subscription
+
+  private waitingConnectionSub: Subscription
+
+  private cancelConnectionSub: Subscription
 
   /**
    * Property that represents the screen elements.
@@ -95,7 +102,7 @@ export class LGScreenMenu
           document.querySelector('h3.waiting-info')?.classList.remove('hide')
         })
 
-        this.socketService.on<string>('change-scene').subscribe((scene) => {
+        this.sceneSubscription = this.socketService.on<string>('change-scene').subscribe((scene) => {
           if (scene === 'menu') {
             this.loadMenu()
           }
@@ -107,14 +114,14 @@ export class LGScreenMenu
       if (isMasterConnected && !this.lgSocketService.screen) {
         this.insertSlaveHtml()
 
-        this.socketService.on('waiting-connection').subscribe(() => {
+        this.waitingConnectionSub = this.socketService.on('waiting-connection').subscribe(() => {
           document.querySelector('.waiting-info.title')?.classList.add('hide')
           document
             .querySelector<HTMLButtonElement>('.connect-button')
             ?.classList.remove('hide')
         })
 
-        this.socketService.on('cancel-connection').subscribe(() => {
+        this.cancelConnectionSub = this.socketService.on('cancel-connection').subscribe(() => {
           document.querySelector('h3.waiting-info')?.classList.add('hide')
           document
             .querySelector<HTMLButtonElement>('.connect-button')
@@ -129,6 +136,9 @@ export class LGScreenMenu
 
   onDestroy(): void {
     clearTimeout(this.connectionTimeout)
+    this.sceneSubscription?.unsubscribe()
+    this.waitingConnectionSub?.unsubscribe()
+    this.cancelConnectionSub?.unsubscribe()
   }
 
   /**
