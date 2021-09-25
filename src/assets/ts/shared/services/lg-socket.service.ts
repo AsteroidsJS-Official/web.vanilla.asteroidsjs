@@ -2,6 +2,8 @@ import { AbstractService, IOnAwake, IScreen, Service } from '@asteroidsjs'
 
 import { SocketService } from './socket.service'
 
+import { GameService } from './game.service'
+
 import { BehaviorSubject, Observable } from 'rxjs'
 
 export type LoadScreensData = {
@@ -13,9 +15,11 @@ export type LoadScreensData = {
  * Service responsible for socket liquid galaxy management.
  */
 @Service({
-  services: [SocketService],
+  services: [GameService, SocketService],
 })
 export class LGSocketService extends AbstractService implements IOnAwake {
+  private gameService: GameService
+
   private socketService: SocketService
 
   /**
@@ -100,6 +104,7 @@ export class LGSocketService extends AbstractService implements IOnAwake {
   }
 
   onAwake(): void {
+    this.gameService = this.getService(GameService)
     this.socketService = this.getService(SocketService)
   }
 
@@ -110,6 +115,21 @@ export class LGSocketService extends AbstractService implements IOnAwake {
    */
   changeScene(scene: string): void {
     this.socketService.emit('change-scene', scene)
+  }
+
+  startGame(): void {
+    this.socketService.emit('start-game')
+    this.gameService.isInGame = true
+  }
+
+  getGameStatus(): Observable<boolean> {
+    return new Observable((subscriber) => {
+      this.socketService
+        .emit<unknown, boolean>('get-game-status')
+        .subscribe((isInGame) => {
+          subscriber.next(isInGame)
+        })
+    })
   }
 
   /**
