@@ -79,6 +79,11 @@ let ioScreen = null
 let isWaitingForSlaves = false
 
 /**
+ * Whether the screen connection phase has finished.
+ */
+let isInGame = false
+
+/**
  * Function that starts the application, serving the main "index.html" and
  * making public the "dist" folder.
  */
@@ -176,6 +181,24 @@ function setupSocketScreen() {
       screensBySide = Math.floor(amount / 2)
     }
     socket.on('set-screen-amount', setScreenAmount)
+
+    /**
+     * Sets the 'isInGame' property to true.
+     */
+    function startGame() {
+      isInGame = true
+    }
+    socket.on('start-game', startGame)
+
+    /**
+     * Gets the current game status.
+     *
+     * @param {(isInGame: boolean) => void} callback
+     */
+    function getGameStatus(_, callback) {
+      callback(isInGame)
+    }
+    socket.on('get-game-status', getGameStatus)
 
     function cancelConnection() {
       screens = {
