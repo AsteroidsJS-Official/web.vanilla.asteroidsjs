@@ -15,6 +15,8 @@ import {
 } from '../../../shared/services/lg-socket.service'
 import { SocketService } from '../../../shared/services/socket.service'
 
+import { GameService } from '../../../shared/services/game.service'
+
 import { Menu } from '../../../scenes/menu.scene'
 import { Subscription } from 'rxjs'
 
@@ -23,15 +25,19 @@ import { Subscription } from 'rxjs'
  * and connection menu.
  */
 @Entity({
-  services: [LGSocketService, SocketService],
+  services: [GameService, LGSocketService, SocketService],
 })
 export class LGScreenMenu
   extends AbstractEntity
   implements IOnAwake, IOnStart, IOnDestroy
 {
+  private gameService: GameService
+
   private lgSocketService: LGSocketService
 
   private socketService: SocketService
+
+  private screenSubscription: Subscription
 
   private sceneSubscription: Subscription
 
@@ -70,72 +76,93 @@ export class LGScreenMenu
   private connectionTimeout: NodeJS.Timeout
 
   onAwake(): void {
+    this.gameService = this.getService(GameService)
     this.lgSocketService = this.getService(LGSocketService)
     this.socketService = this.getService(SocketService)
   }
 
   onStart(): void {
-    this.lgSocketService.screen$.subscribe((screen) => {
-      if (screen?.number === 1) {
-        this.insertMasterHtml()
+    if (this.gameService.isInGame) {
+      return
+    }
 
-        this.socketService
-          .on<IScreen>('slave-connected')
-          .subscribe((screen) => {
-            console.log(screen.number + ' connected!')
+    this.screenSubscription = this.lgSocketService.screen$.subscribe(
+      (screen) => {
+        if (screen?.number === 1) {
+          this.insertMasterHtml()
 
-            this.lgSocketService.addScreen(screen)
-            this.updateScreensStatus()
+          this.socketService
+            .on<IScreen>('slave-connected')
+            .subscribe((screen) => {
+              console.log(screen.number + ' connected!')
+
+              this.lgSocketService.addScreen(screen)
+              this.updateScreensStatus()
+            })
+
+          this.socketService
+            .on<number>('slave-disconnected')
+            .subscribe((screenNumber) => {
+              console.log(screenNumber + ' disconnected!')
+
+              this.lgSocketService.disconnectScreen(screenNumber)
+              this.updateScreensStatus()
+            })
+        } else if (screen) {
+          this.insertSlaveHtml().then(() => {
+            document.querySelector('.waiting-info.title')?.classList.add('hide')
+            document.querySelector('h3.waiting-info')?.classList.remove('hide')
           })
 
-        this.socketService
-          .on<number>('slave-disconnected')
-          .subscribe((screenNumber) => {
-            console.log(screenNumber + ' disconnected!')
-
-            this.lgSocketService.disconnectScreen(screenNumber)
-            this.updateScreensStatus()
-          })
-      } else if (screen) {
-        this.insertSlaveHtml().then(() => {
-          document.querySelector('.waiting-info.title')?.classList.add('hide')
-          document.querySelector('h3.waiting-info')?.classList.remove('hide')
-        })
-
-        this.sceneSubscription = this.socketService.on<string>('change-scene').subscribe((scene) => {
-          if (scene === 'menu') {
-            this.loadMenu()
-          }
-        })
-      }
-    })
+          this.sceneSubscription = this.socketService
+            .on<string>('change-scene')
+            .subscribe((scene) => {
+              if (scene === 'menu') {
+                this.loadMenu()
+              }
+            })
+        }
+      },
+    )
 
     this.lgSocketService.isMasterConnected$.subscribe((isMasterConnected) => {
-      if (isMasterConnected && !this.lgSocketService.screen) {
+      if (
+        isMasterConnected &&
+        !this.lgSocketService.screen &&
+        !this.gameService.isInGame
+      ) {
         this.insertSlaveHtml()
 
-        this.waitingConnectionSub = this.socketService.on('waiting-connection').subscribe(() => {
-          document.querySelector('.waiting-info.title')?.classList.add('hide')
-          document
-            .querySelector<HTMLButtonElement>('.connect-button')
-            ?.classList.remove('hide')
-        })
+        this.waitingConnectionSub = this.socketService
+          .on('waiting-connection')
+          .subscribe(() => {
+            document.querySelector('.waiting-info.title')?.classList.add('hide')
+            document
+              .querySelector<HTMLButtonElement>('.connect-button')
+              ?.classList.remove('hide')
+          })
 
-        this.cancelConnectionSub = this.socketService.on('cancel-connection').subscribe(() => {
-          document.querySelector('h3.waiting-info')?.classList.add('hide')
-          document
-            .querySelector<HTMLButtonElement>('.connect-button')
-            ?.classList.add('hide')
-          document
-            .querySelector('.waiting-info.title')
-            ?.classList.remove('hide')
-        })
+        this.cancelConnectionSub = this.socketService
+          .on('cancel-connection')
+          .subscribe(() => {
+            document.querySelector('h3.waiting-info')?.classList.add('hide')
+            document
+              .querySelector<HTMLButtonElement>('.connect-button')
+              ?.classList.add('hide')
+            document
+              .querySelector('.waiting-info.title')
+              ?.classList.remove('hide')
+          })
       }
     })
   }
 
   onDestroy(): void {
+    destroyMultipleElements('ast-lg-screen-slave')
+    destroyMultipleElements('ast-lg-screen')
+
     clearTimeout(this.connectionTimeout)
+    this.screenSubscription.unsubscribe()
     this.sceneSubscription?.unsubscribe()
     this.waitingConnectionSub?.unsubscribe()
     this.cancelConnectionSub?.unsubscribe()
@@ -149,6 +176,12 @@ export class LGScreenMenu
     html.style.position = 'absolute'
     html.style.top = '0'
     html.style.left = '0'
+
+    if (this.gameService.isInGame) {
+      html.remove()
+      return
+    }
+
     document.body.appendChild(html)
 
     const decreaseButton =
@@ -207,6 +240,12 @@ export class LGScreenMenu
     html.style.position = 'absolute'
     html.style.top = '0'
     html.style.left = '0'
+
+    if (this.gameService.isInGame) {
+      html.remove()
+      return
+    }
+
     document.body.appendChild(html)
 
     const screenSlaveEl = document.getElementsByTagName('ast-lg-screen-slave')
@@ -429,11 +468,12 @@ export class LGScreenMenu
 
             this.lgSocketService.screens = data.screens
 
+            this.lgSocketService.startGame()
             this.lgSocketService.changeScene('menu')
 
             destroyMultipleElements('ast-lg-screen')
-            this.scene.unload(this.scene)
 
+            this.scene.unload(this.scene)
             this.scene.load(Menu)
           })
       }
@@ -454,9 +494,7 @@ export class LGScreenMenu
         this.lgSocketService.screens = data.screens
         this.lgSocketService.screenAmount = data.screenAmount
 
-        destroyMultipleElements('ast-lg-screen-slave')
         this.scene.unload(this.scene)
-
         this.scene.load(Menu)
       })
   }

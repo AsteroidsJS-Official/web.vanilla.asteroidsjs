@@ -1,15 +1,31 @@
-import { AbstractEntity, Entity, IOnAwake } from '@asteroidsjs'
+import {
+  AbstractEntity,
+  destroyMultipleElements,
+  Entity,
+  IOnAwake,
+  IOnDestroy,
+  IOnStart,
+} from '@asteroidsjs'
 
 import { LGSocketService } from '../../../shared/services/lg-socket.service'
 import { SocketService } from '../../../shared/services/socket.service'
+
+import { GameService } from '../../../shared/services/game.service'
+
+import { Menu } from '../../../scenes/menu.scene'
 
 /**
  * Entity responsible for managing the screen socket connection.
  */
 @Entity({
-  services: [LGSocketService, SocketService],
+  services: [GameService, LGSocketService, SocketService],
 })
-export class LGManager extends AbstractEntity implements IOnAwake {
+export class LGManager
+  extends AbstractEntity
+  implements IOnAwake, IOnStart, IOnDestroy
+{
+  private gameService: GameService
+
   private lgSocketService: LGSocketService
 
   private socketService: SocketService
@@ -17,12 +33,18 @@ export class LGManager extends AbstractEntity implements IOnAwake {
   onAwake(): void {
     this.lgSocketService = this.getService(LGSocketService)
     this.socketService = this.getService(SocketService)
+    this.gameService = this.getService(GameService)
   }
 
   onStart(): void {
     this.lgSocketService.loadScreens().subscribe(() => {
       this.autoConnect()
     })
+  }
+
+  onDestroy(): void {
+    destroyMultipleElements('ast-lg-screen-slave')
+    destroyMultipleElements('ast-lg-screen')
   }
 
   /**
@@ -42,7 +64,10 @@ export class LGManager extends AbstractEntity implements IOnAwake {
 
     if (screenExists && !isScreenConnected) {
       this.connect(localScreenNumber)
-    } else if (!this.lgSocketService.isMasterConnected) {
+    } else if (
+      !this.lgSocketService.isMasterConnected &&
+      (!localScreenNumber || localScreenNumber === 1)
+    ) {
       this.connect(1)
     } else {
       this.socketService
@@ -63,6 +88,15 @@ export class LGManager extends AbstractEntity implements IOnAwake {
   private connect(screenNumber?: number): void {
     this.lgSocketService.connectScreen(screenNumber).subscribe((screen) => {
       this.setScreenPath(screen.number)
+
+      this.lgSocketService.getGameStatus().subscribe((isInGame) => {
+        if (isInGame) {
+          this.gameService.isInGame = true
+
+          this.scene.unload(this.scene)
+          this.scene.load(Menu)
+        }
+      })
     })
   }
 
