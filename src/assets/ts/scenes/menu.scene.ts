@@ -10,6 +10,7 @@ export class Menu extends AbstractScene implements IOnStart {
   onStart(): void {
     this.createCanvas({
       name: 'menu',
+      mode: 'clear',
     })
     this.instantiate({ entity: Background })
     this.instantiate({ entity: MenuEntity })
