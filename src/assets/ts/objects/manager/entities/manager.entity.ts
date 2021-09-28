@@ -133,9 +133,9 @@ export class Manager
       ],
     })
 
-    // this.instantiate({
-    //   entity: ManagerAsteroids,
-    // })
+    this.instantiate({
+      entity: ManagerAsteroids,
+    })
 
     this.socketService.emit('instantiate', {
       id: spaceship.id,
