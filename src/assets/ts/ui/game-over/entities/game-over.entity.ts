@@ -6,6 +6,7 @@ import {
   Entity,
   getElement,
   getHtml,
+  getMultipleElements,
   IOnAwake,
   IOnDestroy,
   IOnStart,
@@ -60,13 +61,9 @@ export class GameOver
       this.insertSlaveGameOverHtml()
     }
 
-    console.log('start')
-
     this.sceneSubscription = this.socketService
       .on<string>('change-scene')
       .subscribe((scene) => {
-        console.log(scene)
-
         if (scene === 'single') {
           if (isMobile) {
             this.loadJoystick()
@@ -91,6 +88,9 @@ export class GameOver
 
   private async insertGameOverHtml(): Promise<void> {
     destroyMultipleElements('ast-score')
+    getMultipleElements('canvas').forEach((canvas) => {
+      canvas.style.pointerEvents = 'none'
+    })
 
     const html = await getHtml('game-over', 'ast-game-over')
     html.style.position = 'absolute'
@@ -115,13 +115,14 @@ export class GameOver
     }
 
     respawnButton.addEventListener('click', () => {
+      getMultipleElements('canvas').forEach((canvas) => {
+        canvas.style.pointerEvents = 'unset'
+      })
       this.lgSocketService.changeScene('single')
-      console.log('emit single')
     })
 
     backButton.addEventListener('click', () => {
       this.lgSocketService.changeScene('menu')
-      console.log('emit menu')
     })
   }
 
