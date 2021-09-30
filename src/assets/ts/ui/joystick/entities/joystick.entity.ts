@@ -21,6 +21,7 @@ import { UserService } from '../../../shared/services/user.service'
 import { IJoystickActions } from '../../../shared/interfaces/joystick.interface'
 import { IPlayer } from '../../../shared/interfaces/player.interface'
 
+import { Menu } from '../../../scenes/menu.scene'
 import nipplejs, { JoystickManager } from 'nipplejs'
 import { Subscription } from 'rxjs'
 
@@ -49,6 +50,16 @@ export class Joystick
   private gameOverSubscription: Subscription
 
   /**
+   * Property responsible for keeping the player kill subscription.
+   */
+  private playerKillSubscription: Subscription
+
+  /**
+   * Property responsible for keeping the scene subscription.
+   */
+  private sceneSubscription: Subscription
+
+  /**
    * Property that defines whether the boost lock button is active.
    */
   private isBoostLocked = false
@@ -71,6 +82,28 @@ export class Joystick
   onStart(): void {
     this.insertJoystickHtml()
 
+    this.sceneSubscription = this.socketService
+      .on<string>('change-scene')
+      .subscribe((scene) => {
+        if (scene === 'menu') {
+          destroyMultipleElements('ast-joystick')
+          this.scene.unload(this.scene)
+          this.scene.load(Menu)
+        }
+      })
+
+    this.playerKillSubscription = this.socketService
+      .on<{ userId: string; joystickId: string; score: number }>(
+        'player-killed',
+      )
+      .subscribe((data) => {
+        if (data.joystickId === this.userService.userId) {
+          this.userService.setScore(data.score)
+          destroyMultipleElements('ast-joystick')
+          this.instantiate({ entity: GameOver })
+        }
+      })
+
     this.gameOverSubscription = this.socketService
       .on<IPlayer>('game-over')
       .subscribe((player) => {
@@ -81,7 +114,9 @@ export class Joystick
   }
 
   onDestroy(): void {
-    this.gameOverSubscription.unsubscribe()
+    this.gameOverSubscription?.unsubscribe()
+    this.playerKillSubscription?.unsubscribe()
+    this.sceneSubscription?.unsubscribe()
   }
 
   /**
@@ -201,7 +236,10 @@ export class Joystick
    * Emits to socket the current joystick actions status.
    */
   private emitActions(): void {
-    this.socketService.emit('update-actions', this.actions)
+    this.socketService.emit('update-actions', {
+      userId: this.userService.userId,
+      actions: this.actions,
+    })
     this.actions.activatedSkill = false
   }
 }
