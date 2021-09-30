@@ -32,6 +32,18 @@ export class GameService extends AbstractService {
    */
   public isInGame = false
 
+  /**
+   * Property that defines whether the master is in a local multiplayer
+   * game.
+   */
+  public isInLocalMPGame = false
+
+  /**
+   * Property that defines whether the user is connected to any
+   * multiplayer game.
+   */
+  public isConnectedToRoom = false
+
   public get gameOver$(): Observable<boolean> {
     return this._gameOver.asObservable()
   }
