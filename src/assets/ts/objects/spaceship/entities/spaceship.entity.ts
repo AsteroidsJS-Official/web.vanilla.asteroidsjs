@@ -120,9 +120,15 @@ export class Spaceship
 
   private image: HTMLImageElement
 
+  public imageSrc: string
+
   public isShooting = false
 
   public tag = Spaceship.name
+
+  public userId = ''
+
+  public joystickId = ''
 
   public health: Health
 
@@ -146,9 +152,8 @@ export class Spaceship
   onStart(): void {
     if (this.getComponent(Render) || this.getComponent(RenderOverflow)) {
       this.image = new Image()
-      this.image.src = `./assets/svg/spaceship-${this.userService.spaceshipImage}.svg`
+      this.image.src = this.imageSrc
     }
-    this.health.color = this.userService.spaceshipColor
   }
 
   onDestroy(): void {
@@ -158,8 +163,7 @@ export class Spaceship
   onTriggerEnter(collision: ICollision2): void {
     if (
       collision.entity2.tag?.includes(Bullet.name) &&
-      (collision.entity2 as unknown as Bullet).userId ===
-        this.userService.userId
+      (collision.entity2 as unknown as Bullet).userId === this.userId
     ) {
       return
     }
@@ -174,9 +178,22 @@ export class Spaceship
       this.health.hurt(5)
     }
 
+    if (collision.entity2.tag?.includes(Spaceship.name)) {
+      this.health.hurt(15)
+    }
+
     if (this.health.health <= 0 && !this.gameService.gameOver) {
+      if (!this.gameService.isInLocalMPGame) {
+        this.gameService.gameOver = true
+      } else {
+        this.socketService.emit('player-killed', {
+          playerId: this.userId,
+          joystickId: this.joystickId,
+          score: this.userService.score,
+        })
+      }
+
       this.destroy(this)
-      this.gameService.gameOver = true
     }
   }
 
@@ -191,6 +208,10 @@ export class Spaceship
         maxHealth: this.health.maxHealth,
       },
     })
+
+    if (!this.gameService.isInLocalMPGame) {
+      return
+    }
   }
 
   public draw(): void {
@@ -262,7 +283,7 @@ export class Spaceship
     const bullet = this.instantiate({
       use: {
         tag: `${Bullet.name}`,
-        userId: this.userService.userId,
+        userId: this.userId,
       },
       entity: Bullet,
       components: [
