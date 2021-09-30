@@ -106,6 +106,10 @@ export class Manager
 
     const spaceship = this.instantiate({
       entity: Spaceship,
+      use: {
+        imageSrc: `./assets/svg/spaceship-${this.userService.spaceshipImage}.svg`,
+        userId: this.userService.userId,
+      },
       components: [
         {
           id: '__spaceship_transform__',
@@ -128,6 +132,7 @@ export class Manager
           use: {
             maxHealth: spaceshipHealth,
             health: spaceshipHealth,
+            color: this.userService.spaceshipColor,
           },
         },
       ],
