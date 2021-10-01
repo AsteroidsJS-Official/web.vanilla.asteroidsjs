@@ -46,6 +46,7 @@ export class Auth
     html.style.position = 'absolute'
     html.style.top = '0'
     html.style.left = '0'
+    html.style.zIndex = '20'
 
     appendChildren(document.body, html)
 
