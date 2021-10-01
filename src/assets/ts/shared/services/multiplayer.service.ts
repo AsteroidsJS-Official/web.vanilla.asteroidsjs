@@ -7,7 +7,7 @@ import { UserService } from './user.service'
 
 import { IPlayer } from '../interfaces/player.interface'
 
-import { Observable } from 'rxjs'
+import { BehaviorSubject, Observable } from 'rxjs'
 
 @Service({
   services: [GameService, SocketService, UserService],
@@ -19,7 +19,21 @@ export class MultiplayerService extends AbstractService implements IOnAwake {
 
   private userService: UserService
 
-  public players: { [id: string]: IPlayer } = {}
+  private _players = new BehaviorSubject<{ [id: string]: IPlayer }>({})
+
+  // public players: { [id: string]: IPlayer } = {}
+
+  public get players$(): Observable<{ [id: string]: IPlayer }> {
+    return this._players.asObservable()
+  }
+
+  public get players(): { [id: string]: IPlayer } {
+    return this._players.value
+  }
+
+  public set players(players: { [id: string]: IPlayer }) {
+    this._players.next(players)
+  }
 
   public get lobbyStatus(): Observable<boolean> {
     return new Observable((subscriber) => {
@@ -62,7 +76,9 @@ export class MultiplayerService extends AbstractService implements IOnAwake {
   listenConnections(): Observable<IPlayer> {
     return new Observable((subscriber) => {
       this.socketService.on<IPlayer>('player-connected').subscribe((player) => {
-        this.players[player.id] = player
+        const players = { ...this.players }
+        players[player.id] = player
+        this.players = players
         subscriber.next(player)
       })
     })
@@ -73,7 +89,9 @@ export class MultiplayerService extends AbstractService implements IOnAwake {
       this.socketService
         .on<IPlayer>('player-disconnected')
         .subscribe((player) => {
-          delete this.players[player.id]
+          const players = { ...this.players }
+          delete players[player.id]
+          this.players = players
           subscriber.next(player)
         })
     })
@@ -99,8 +117,31 @@ export class MultiplayerService extends AbstractService implements IOnAwake {
     this.socketService.emit('change-scene', 'menu')
   }
 
+  increasePlayerScore(playerId: string, points: number): void {
+    if (!this.players[playerId]) {
+      return
+    }
+
+    const players = { ...this.players }
+    players[playerId].score += points
+    this.players = players
+  }
+
+  decreasePlayerScore(playerId: string, points: number): void {
+    if (!this.players[playerId]) {
+      return
+    }
+
+    const players = { ...this.players }
+    const score = players[playerId].score
+    players[playerId].score = score - points < 0 ? 0 : score - points
+    this.players = players
+  }
+
   updatePlayer(player: IPlayer): void {
-    this.players[player.id] = player
+    const players = { ...this.players }
+    players[player.id] = player
+    this.players = players
     this.socketService.emit('update-player-data', player)
   }
 
