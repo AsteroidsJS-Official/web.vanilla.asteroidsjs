@@ -132,6 +132,8 @@ export class Spaceship
 
   private visibilityInterval: NodeJS.Timer
 
+  private wasDestroyed = false
+
   private image: HTMLImageElement
 
   public imageSrc: string
@@ -178,6 +180,25 @@ export class Spaceship
         this.isVisible = !this.isVisible
       }, 200)
     }
+
+    this.health.health$.subscribe((amount) => {
+      if (amount <= 0 && !this.gameService.gameOver) {
+        if (!this.gameService.isInLocalMPGame) {
+          this.gameService.gameOver = true
+        } else {
+          this.socketService.emit('player-killed', {
+            playerId: this.userId,
+            joystickId: this.joystickId,
+            score: this.userService.score,
+          })
+
+          this.multiplayerService.decreasePlayerScore(this.userId, 20)
+        }
+
+        this.wasDestroyed = true
+        this.destroy(this)
+      }
+    })
   }
 
   onDestroy(): void {
@@ -185,8 +206,14 @@ export class Spaceship
   }
 
   onTriggerEnter(collision: ICollision2): void {
+    if (this.wasDestroyed) {
+      return
+    }
+
     if (collision.entity2.tag?.includes(Spaceship.name)) {
-      this.health.hurt(15)
+      const enemySpaceship = collision.entity2 as unknown as Spaceship
+      enemySpaceship.health.hurt(enemySpaceship.health.maxHealth)
+      this.health.hurt(this.health.maxHealth)
     }
 
     if (
@@ -205,26 +232,12 @@ export class Spaceship
       this.destroy(collision.entity2)
       this.health.hurt(5)
 
-      if (this.health.health <= 0 && this.gameService.isInLocalMPGame) {
+      if (this.health.health <= 0) {
         const bullet = collision.entity2 as unknown as Bullet
         this.multiplayerService.increasePlayerScore(bullet.userId, 50)
+
+        this.wasDestroyed = true
       }
-    }
-
-    if (this.health.health <= 0 && !this.gameService.gameOver) {
-      if (!this.gameService.isInLocalMPGame) {
-        this.gameService.gameOver = true
-      } else {
-        this.socketService.emit('player-killed', {
-          playerId: this.userId,
-          joystickId: this.joystickId,
-          score: this.userService.score,
-        })
-
-        this.multiplayerService.decreasePlayerScore(this.userId, 20)
-      }
-
-      this.destroy(this)
     }
   }
 
