@@ -321,7 +321,7 @@ class AsteroidsApplication implements IAsteroidsApplication {
       .filter((c) => c.mode === 'clear')
 
     cleanableContexts.forEach((c) =>
-      c.clearRect(0, 0, window.innerWidth, window.innerHeight),
+      c.clearRect(0, 0, c.canvas.width, c.canvas.height),
     )
     ;[...this.entities, ...this.components].forEach((value) => {
       if (hasOnRender(value) && value.enabled) {
