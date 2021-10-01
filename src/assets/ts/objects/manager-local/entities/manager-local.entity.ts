@@ -15,11 +15,13 @@ import { SocketService } from '../../../shared/services/socket.service'
 import { ScoreMultiplayer } from '../../../ui/score/entities/score-multiplayer.entity'
 import { AsteroidVirtual } from '../../asteroid/entities/asteroid-virtual.entity'
 import { Asteroid } from '../../asteroid/entities/asteroid.entity'
+import { ManagerAsteroids } from '../../asteroid/entities/manager-asteroids.entity'
 import { BulletVirtual } from '../../bullet/entities/bullet-virtual.entity'
 import { Bullet } from '../../bullet/entities/bullet.entity'
 import { SpaceshipVirtual } from '../../spaceship/entities/spaceship-virtual.entity'
 import { Spaceship } from '../../spaceship/entities/spaceship.entity'
 
+import { GameService } from '../../../shared/services/game.service'
 import { MultiplayerService } from '../../../shared/services/multiplayer.service'
 import { UserService } from '../../../shared/services/user.service'
 
@@ -31,19 +33,27 @@ import { Menu } from '../../../scenes/menu.scene'
 import { Subscription } from 'rxjs'
 
 @Entity({
-  services: [UserService, LGSocketService, MultiplayerService, SocketService],
+  services: [
+    GameService,
+    LGSocketService,
+    MultiplayerService,
+    SocketService,
+    UserService,
+  ],
 })
 export class ManagerLocal
   extends AbstractEntity
   implements IOnAwake, IOnStart, IOnDestroy
 {
-  private userService: UserService
+  private gameService: GameService
 
   private lgSocketService: LGSocketService
 
   private multiplayerService: MultiplayerService
 
   private socketService: SocketService
+
+  private userService: UserService
 
   private connectionSubscription: Subscription
 
@@ -56,10 +66,11 @@ export class ManagerLocal
   private spaceships: { [id: string]: Spaceship } = {}
 
   onAwake(): void {
-    this.userService = this.getService(UserService)
+    this.gameService = this.getService(GameService)
     this.lgSocketService = this.getService(LGSocketService)
     this.multiplayerService = this.getService(MultiplayerService)
     this.socketService = this.getService(SocketService)
+    this.userService = this.getService(UserService)
   }
 
   onStart(): void {
@@ -84,7 +95,10 @@ export class ManagerLocal
   private master(): void {
     this.multiplayerService.openLobby()
 
+    this.gameService.maxAsteroidsAmount = 5
+
     this.instantiate({ entity: ScoreMultiplayer })
+    this.instantiate({ entity: ManagerAsteroids })
 
     this.connectionSubscription = this.multiplayerService
       .listenConnections()
