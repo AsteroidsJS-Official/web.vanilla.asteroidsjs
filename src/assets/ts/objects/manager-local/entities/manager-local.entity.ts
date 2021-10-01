@@ -237,7 +237,13 @@ export class ManagerLocal
   }
 
   private instantiateSpaceship(player: IPlayer): Spaceship {
-    const playerPosition = new Vector2(Math.floor(Math.random() * 500), 0)
+    const canvasHeight = this.getContexts()[0].canvas.height
+    const canvasWidth = this.getContexts()[0].canvas.width
+
+    const playerPosition = new Vector2(
+      Math.floor(Math.random() * canvasWidth) - canvasWidth / 2,
+      Math.floor(Math.random() * canvasHeight) - canvasHeight / 2,
+    )
 
     const spaceship = this.instantiate({
       entity: Spaceship,
