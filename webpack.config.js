@@ -70,6 +70,17 @@ module.exports = {
         ],
       },
       {
+        test: /\.mp3$/i,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: 'assets/audios/[name].[ext]',
+            },
+          },
+        ],
+      },
+      {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
         type: 'asset/resource',
         generator: {
@@ -106,6 +117,10 @@ module.exports = {
         {
           from: path.resolve(__dirname, './src/assets/svg'),
           to: path.resolve(__dirname, './dist/assets/svg'),
+        },
+        {
+          from: path.resolve(__dirname, './src/assets/audios'),
+          to: path.resolve(__dirname, './dist/assets/audios'),
         },
       ],
     }),

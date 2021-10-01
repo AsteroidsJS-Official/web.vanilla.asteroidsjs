@@ -18,6 +18,7 @@ import { Bullet } from '../../bullet/entities/bullet.entity'
 import { GameService } from '../../../shared/services/game.service'
 import { UserService } from '../../../shared/services/user.service'
 
+import { AudioSource } from '../../../shared/components/audio-source.component'
 import { CircleCollider2 } from '../../../shared/components/colliders/circle-collider2.component'
 import { Drawer } from '../../../shared/components/drawer.component'
 import { Health } from '../../../shared/components/health.component'
@@ -39,6 +40,12 @@ import { IOnTriggerEnter } from '../../../shared/interfaces/on-trigger-enter.int
   components: [
     Drawer,
     RenderOverflow,
+    {
+      class: AudioSource,
+      use: {
+        spatial: true,
+      },
+    },
     {
       class: CircleCollider2,
       use: {
@@ -118,6 +125,8 @@ export class Spaceship
    */
   private rigidbody: Rigidbody
 
+  private audioSource: AudioSource
+
   private image: HTMLImageElement
 
   public isShooting = false
@@ -140,6 +149,7 @@ export class Spaceship
 
     this.transform = this.getComponent(Transform)
     this.rigidbody = this.getComponent(Rigidbody)
+    this.audioSource = this.getComponent(AudioSource)
     this.health = this.getComponent(Health)
   }
 
@@ -234,6 +244,8 @@ export class Spaceship
     }
 
     this.lastShot = new Date()
+
+    this.audioSource.playOneShot('./assets/audios/shot.mp3')
 
     this.createBullet((2 * Math.PI) / 5, 7.5)
     this.createBullet(-(2 * Math.PI) / 5, 5.5)
