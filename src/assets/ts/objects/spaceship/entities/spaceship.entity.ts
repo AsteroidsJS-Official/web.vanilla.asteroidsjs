@@ -31,6 +31,8 @@ import { Input } from '../components/input.component'
 import { ICollision2 } from '../../../shared/interfaces/collision2.interface'
 import { IOnTriggerEnter } from '../../../shared/interfaces/on-trigger-enter.interface'
 
+import { Subscription } from 'rxjs'
+
 /**
  * Class that represents the spaceship entity controlled by the user.
  */
@@ -128,6 +130,8 @@ export class Spaceship
    */
   private generationTime: Date
 
+  private healthSubscription: Subscription
+
   private isVisible = false
 
   private visibilityInterval: NodeJS.Timer
@@ -181,18 +185,25 @@ export class Spaceship
       }, 200)
     }
 
-    this.health.health$.subscribe((amount) => {
+    this.healthSubscription = this.health.health$.subscribe((amount) => {
       if (amount <= 0 && !this.gameService.gameOver) {
         if (!this.gameService.isInLocalMPGame) {
           this.gameService.gameOver = true
         } else {
+          const score =
+            this.multiplayerService.getPlayerById(this.userId)?.score || 0
           this.socketService.emit('player-killed', {
             playerId: this.userId,
             joystickId: this.joystickId,
-            score: this.userService.score,
+            score,
           })
 
-          this.multiplayerService.decreasePlayerScore(this.userId, 20)
+          this.multiplayerService.decreasePlayerScore(
+            this.userId,
+            score - Math.round(score * 0.3) <= 20
+              ? score
+              : Math.round(score * 0.3),
+          )
         }
 
         this.wasDestroyed = true
@@ -203,6 +214,7 @@ export class Spaceship
 
   onDestroy(): void {
     this.socketService.emit('destroy', this.id)
+    this.healthSubscription?.unsubscribe()
   }
 
   onTriggerEnter(collision: ICollision2): void {
