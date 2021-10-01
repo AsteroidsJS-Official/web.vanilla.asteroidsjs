@@ -101,6 +101,8 @@ export class Spaceship
 
   private socketService: SocketService
 
+  private drawer: Drawer
+
   /**
    * Property responsible for the spaceship bullet velocity.
    */
@@ -120,6 +122,15 @@ export class Spaceship
    * Property that contains the spaceship physics.
    */
   private rigidbody: Rigidbody
+
+  /**
+   * Property that defines the time that the spaceship was generated.
+   */
+  private generationTime: Date
+
+  private isVisible = false
+
+  private visibilityInterval: NodeJS.Timer
 
   private image: HTMLImageElement
 
@@ -151,12 +162,21 @@ export class Spaceship
     this.transform = this.getComponent(Transform)
     this.rigidbody = this.getComponent(Rigidbody)
     this.health = this.getComponent(Health)
+    this.drawer = this.getComponent(Drawer)
   }
 
   onStart(): void {
+    this.generationTime = new Date()
+    this.getComponents(CircleCollider2).forEach((c) => (c.enabled = false))
+    this.addTags('intangible')
+
     if (this.getComponent(Render) || this.getComponent(RenderOverflow)) {
       this.image = new Image()
       this.image.src = this.imageSrc
+
+      this.visibilityInterval = setInterval(() => {
+        this.isVisible = !this.isVisible
+      }, 200)
     }
   }
 
@@ -165,6 +185,10 @@ export class Spaceship
   }
 
   onTriggerEnter(collision: ICollision2): void {
+    if (collision.entity2.tag?.includes(Spaceship.name)) {
+      this.health.hurt(15)
+    }
+
     if (
       collision.entity2.tag?.includes(Bullet.name) &&
       (collision.entity2 as unknown as Bullet).userId === this.userId
@@ -187,10 +211,6 @@ export class Spaceship
       }
     }
 
-    if (collision.entity2.tag?.includes(Spaceship.name)) {
-      this.health.hurt(15)
-    }
-
     if (this.health.health <= 0 && !this.gameService.gameOver) {
       if (!this.gameService.isInLocalMPGame) {
         this.gameService.gameOver = true
@@ -209,6 +229,26 @@ export class Spaceship
   }
 
   onLateLoop(): void {
+    const generationDiff = new Date().getTime() - this.generationTime.getTime()
+
+    if (generationDiff > 1600) {
+      clearInterval(this.visibilityInterval)
+      this.isVisible = true
+      this.drawer.enabled = true
+      this.removeTags('intangible')
+      this.getComponents(CircleCollider2).forEach((c) => (c.enabled = true))
+    }
+
+    if (this.drawer.enabled && !this.isVisible && this.hasTag('intangible')) {
+      this.drawer.enabled = false
+    } else if (
+      !this.drawer.enabled &&
+      this.isVisible &&
+      this.hasTag('intangible')
+    ) {
+      this.drawer.enabled = true
+    }
+
     this.socketService.emit('update-slaves', {
       id: this.id,
       data: {
@@ -261,7 +301,10 @@ export class Spaceship
   }
 
   public shoot(): void {
-    if (this.lastShot && new Date().getTime() - this.lastShot.getTime() < 400) {
+    if (
+      (this.lastShot && new Date().getTime() - this.lastShot.getTime() < 400) ||
+      this.hasTag('intangible')
+    ) {
       return
     }
 
