@@ -132,10 +132,18 @@ export class Rigidbody
   }
 
   onFixedLoop(): void {
+    if (!this.enabled) {
+      return
+    }
+
     this.refreshDeltaTime()
   }
 
   public onLoop(): void {
+    if (!this.enabled) {
+      return
+    }
+
     this.updateRotation()
     this.updatePosition()
     this.applyFriction()
