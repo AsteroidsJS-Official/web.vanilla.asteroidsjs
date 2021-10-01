@@ -51,6 +51,10 @@ export class MultiplayerService extends AbstractService implements IOnAwake {
     this.userService = this.getService(UserService)
   }
 
+  getPlayerById(playerId: string): IPlayer {
+    return this.players[playerId]
+  }
+
   connectMe(playerId?: string): void {
     this.gameService.isConnectedToRoom = true
     const player = this.userService.player
@@ -59,6 +63,7 @@ export class MultiplayerService extends AbstractService implements IOnAwake {
       player.id = playerId
     }
 
+    player.score = 0
     this.socketService.emit('connect-player', player)
   }
 
