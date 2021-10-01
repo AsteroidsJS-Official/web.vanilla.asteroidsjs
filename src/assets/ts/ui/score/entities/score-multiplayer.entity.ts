@@ -73,7 +73,7 @@ export class ScoreMultiplayer
     const rows: HTMLElement[] = []
 
     Object.values(players)
-      .sort((p1, p2) => p1.score - p2.score)
+      .sort((p1, p2) => (p1.score - p2.score <= 0 ? 1 : -1))
       .slice(0, 5)
       .forEach((p) => {
         const scoreRow = getElement('.score-row.p-' + p.id)
