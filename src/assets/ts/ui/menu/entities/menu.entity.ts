@@ -185,14 +185,12 @@ export class Menu
       },
     ]
 
-    if (!isMobile || this.userService.isMaster) {
-      inputGuest.addEventListener('input', (e: InputEvent) => {
-        window.localStorage.setItem(
-          'asteroidsjs_nickname',
-          (e.target as HTMLInputElement).value,
-        )
-      })
-    }
+    inputGuest.addEventListener('input', (e: InputEvent) => {
+      window.localStorage.setItem(
+        'asteroidsjs_nickname',
+        (e.target as HTMLInputElement).value,
+      )
+    })
 
     spaceshipColors.forEach(({ name, color }, index) => {
       const colorButton = createElement<HTMLButtonElement>('button')
@@ -227,15 +225,13 @@ export class Menu
         removeClass('.color-button.active', 'active')
         addClass(colorButton, 'active')
 
-        if (!isMobile || this.userService.isMaster) {
-          window.localStorage.setItem(
-            'asteroidsjs_spaceship_color',
-            JSON.stringify({
-              rgb: colorButton.style.backgroundColor,
-              name,
-            }),
-          )
-        }
+        window.localStorage.setItem(
+          'asteroidsjs_spaceship_color',
+          JSON.stringify({
+            rgb: colorButton.style.backgroundColor,
+            name,
+          }),
+        )
 
         spaceshipSkin.src = `./assets/svg/spaceship-${name}.svg`
       })
