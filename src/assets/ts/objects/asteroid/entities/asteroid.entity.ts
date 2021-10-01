@@ -17,6 +17,7 @@ import { SocketService } from '../../../shared/services/socket.service'
 import { Bullet } from '../../bullet/entities/bullet.entity'
 
 import { GameService } from '../../../shared/services/game.service'
+import { MultiplayerService } from '../../../shared/services/multiplayer.service'
 import { UserService } from '../../../shared/services/user.service'
 
 import { CircleCollider2 } from '../../../shared/components/colliders/circle-collider2.component'
@@ -34,7 +35,7 @@ import { IOnTriggerEnter } from '../../../shared/interfaces/on-trigger-enter.int
  * Class that represents the asteroid entity and it's behavior.
  */
 @Entity({
-  services: [UserService, GameService, SocketService],
+  services: [UserService, GameService, SocketService, MultiplayerService],
   components: [
     Render,
     Drawer,
@@ -60,6 +61,8 @@ export class Asteroid
   private userService: UserService
 
   private socketService: SocketService
+
+  private multiplayerService: MultiplayerService
 
   private gameService: GameService
 
@@ -110,6 +113,7 @@ export class Asteroid
     this.userService = this.getService(UserService)
     this.socketService = this.getService(SocketService)
     this.gameService = this.getService(GameService)
+    this.multiplayerService = this.getService(MultiplayerService)
 
     this.transform = this.getComponent(Transform)
     this.health = this.getComponent(Health)
@@ -180,7 +184,18 @@ export class Asteroid
     }
 
     if (collision.entity2.tag?.includes(Bullet.name)) {
-      this.userService.increaseScore(this._asteroidSize + 1)
+      if (
+        this.gameService.isInLocalMPGame ||
+        this.gameService.isConnectedToRoom
+      ) {
+        const bullet = collision.entity2 as unknown as Bullet
+        this.multiplayerService.increasePlayerScore(
+          bullet.userId,
+          this._asteroidSize + 1,
+        )
+      } else {
+        this.userService.increaseScore(this._asteroidSize + 1)
+      }
     }
 
     if (this._asteroidSize > 0) {

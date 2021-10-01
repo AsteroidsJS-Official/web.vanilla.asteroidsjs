@@ -16,6 +16,7 @@ import { Asteroid } from '../../asteroid/entities/asteroid.entity'
 import { Bullet } from '../../bullet/entities/bullet.entity'
 
 import { GameService } from '../../../shared/services/game.service'
+import { MultiplayerService } from '../../../shared/services/multiplayer.service'
 import { UserService } from '../../../shared/services/user.service'
 
 import { CircleCollider2 } from '../../../shared/components/colliders/circle-collider2.component'
@@ -35,7 +36,7 @@ import { IOnTriggerEnter } from '../../../shared/interfaces/on-trigger-enter.int
  */
 @Entity({
   order: 1,
-  services: [UserService, GameService, SocketService],
+  services: [UserService, GameService, SocketService, MultiplayerService],
   components: [
     Drawer,
     RenderOverflow,
@@ -96,6 +97,8 @@ export class Spaceship
 
   private gameService: GameService
 
+  private multiplayerService: MultiplayerService
+
   private socketService: SocketService
 
   /**
@@ -143,6 +146,7 @@ export class Spaceship
     this.socketService = this.getService(SocketService)
     this.userService = this.getService(UserService)
     this.gameService = this.getService(GameService)
+    this.multiplayerService = this.getService(MultiplayerService)
 
     this.transform = this.getComponent(Transform)
     this.rigidbody = this.getComponent(Rigidbody)
@@ -176,6 +180,11 @@ export class Spaceship
     if (collision.entity2.tag?.includes(Bullet.name)) {
       this.destroy(collision.entity2)
       this.health.hurt(5)
+
+      if (this.health.health <= 0 && this.gameService.isInLocalMPGame) {
+        const bullet = collision.entity2 as unknown as Bullet
+        this.multiplayerService.increasePlayerScore(bullet.userId, 50)
+      }
     }
 
     if (collision.entity2.tag?.includes(Spaceship.name)) {
@@ -191,6 +200,8 @@ export class Spaceship
           joystickId: this.joystickId,
           score: this.userService.score,
         })
+
+        this.multiplayerService.decreasePlayerScore(this.userId, 20)
       }
 
       this.destroy(this)

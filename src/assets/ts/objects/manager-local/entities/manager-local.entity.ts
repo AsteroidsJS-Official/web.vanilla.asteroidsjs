@@ -12,6 +12,7 @@ import {
 import { LGSocketService } from '../../../shared/services/lg-socket.service'
 import { SocketService } from '../../../shared/services/socket.service'
 
+import { ScoreMultiplayer } from '../../../ui/score/entities/score-multiplayer.entity'
 import { AsteroidVirtual } from '../../asteroid/entities/asteroid-virtual.entity'
 import { Asteroid } from '../../asteroid/entities/asteroid.entity'
 import { BulletVirtual } from '../../bullet/entities/bullet-virtual.entity'
@@ -50,6 +51,8 @@ export class ManagerLocal
 
   private disconnectionSubscription: Subscription
 
+  private respawnSubscription: Subscription
+
   private spaceships: { [id: string]: Spaceship } = {}
 
   onAwake(): void {
@@ -75,10 +78,13 @@ export class ManagerLocal
     this.connectionSubscription?.unsubscribe()
     this.controllerStatusSub?.unsubscribe()
     this.disconnectionSubscription?.unsubscribe()
+    this.respawnSubscription?.unsubscribe()
   }
 
   private master(): void {
     this.multiplayerService.openLobby()
+
+    this.instantiate({ entity: ScoreMultiplayer })
 
     this.connectionSubscription = this.multiplayerService
       .listenConnections()
@@ -102,13 +108,15 @@ export class ManagerLocal
         }
       })
 
-    this.multiplayerService.listenPlayerRespawns().subscribe((rspPlayer) => {
-      const spaceship = this.spaceships[rspPlayer.id]
+    this.respawnSubscription = this.multiplayerService
+      .listenPlayerRespawns()
+      .subscribe((rspPlayer) => {
+        const spaceship = this.spaceships[rspPlayer.id]
 
-      if (spaceship) {
-        this.spaceships[rspPlayer.id] = this.instantiateSpaceship(rspPlayer)
-      }
-    })
+        if (spaceship) {
+          this.spaceships[rspPlayer.id] = this.instantiateSpaceship(rspPlayer)
+        }
+      })
 
     this.disconnectionSubscription = this.multiplayerService
       .listenDisconnections()
