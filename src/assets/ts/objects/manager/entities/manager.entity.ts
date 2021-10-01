@@ -86,6 +86,8 @@ export class Manager
       },
     )
 
+    this.gameService.maxAsteroidsAmount = 10
+
     const color = window.localStorage.getItem('asteroidsjs_spaceship_color')
     const nickname = window.localStorage.getItem('asteroidsjs_nickname')
 
