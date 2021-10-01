@@ -52,7 +52,11 @@ export class RectCollider2 extends AbstractCollider {
    * consider the collision
    */
   protected isColliding(entity: AbstractEntity): boolean {
-    if (entity === this.entity) {
+    if (
+      entity === this.entity ||
+      !this.enabled ||
+      entity.hasTag('intangible')
+    ) {
       return false
     }
 

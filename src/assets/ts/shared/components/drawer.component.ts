@@ -14,6 +14,10 @@ export class Drawer extends AbstractComponent implements IOnAwake, IDraw {
   }
 
   draw(): void {
+    if (!this.enabled) {
+      return
+    }
+
     const entities = [
       this.entity,
       ...this.transform.children.map((t) => t.entity),

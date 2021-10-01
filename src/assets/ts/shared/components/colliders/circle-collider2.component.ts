@@ -46,7 +46,11 @@ export class CircleCollider2 extends AbstractCollider {
    * @returns true if the two entities are colliding, otherwise false
    */
   protected isColliding(entity: AbstractEntity): boolean {
-    if (entity === this.entity) {
+    if (
+      entity === this.entity ||
+      !this.enabled ||
+      entity.hasTag('intangible')
+    ) {
       return false
     }
 
