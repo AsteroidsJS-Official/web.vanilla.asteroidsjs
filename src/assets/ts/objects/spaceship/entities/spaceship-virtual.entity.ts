@@ -3,6 +3,7 @@ import {
   Entity,
   IDraw,
   IOnAwake,
+  IOnLateLoop,
   IOnStart,
   ISocketData,
   Vector2,
@@ -31,9 +32,11 @@ import { Transform } from '../../../shared/components/transform.component'
 })
 export class SpaceshipVirtual
   extends AbstractEntity
-  implements IOnAwake, IOnStart, IDraw
+  implements IOnAwake, IOnStart, IDraw, IOnLateLoop
 {
   private socketService: SocketService
+
+  private drawer: Drawer
 
   /**
    * Property that contains the spaceship position, dimensions and rotation.
@@ -44,6 +47,15 @@ export class SpaceshipVirtual
    * Property responsible for the spaceship last bullet time.
    */
   public lastShot: Date
+
+  /**
+   * Property that defines the time that the spaceship was generated.
+   */
+  private generationTime: Date
+
+  private isVisible = false
+
+  private visibilityInterval: NodeJS.Timer
 
   private health: Health
 
@@ -67,14 +79,23 @@ export class SpaceshipVirtual
 
   onAwake(): void {
     this.socketService = this.getService(SocketService)
+
+    this.drawer = this.getComponent(Drawer)
     this.transform = this.getComponent(Transform)
     this.health = this.getComponent(Health)
   }
 
   onStart(): void {
+    this.generationTime = new Date()
+    this.addTags('intangible')
+
     if (this.getComponent(Render) || this.getComponent(RenderOverflow)) {
       this.image = new Image()
       this.image.src = this.imageSrc
+
+      this.visibilityInterval = setInterval(() => {
+        this.isVisible = !this.isVisible
+      }, 200)
     }
 
     this.health.color = this.spaceshipColor
@@ -99,11 +120,28 @@ export class SpaceshipVirtual
     })
   }
 
-  public draw(): void {
-    this.drawTriangle()
+  onLateLoop(): void {
+    const generationDiff = new Date().getTime() - this.generationTime.getTime()
+
+    if (generationDiff > 1600) {
+      clearInterval(this.visibilityInterval)
+      this.isVisible = true
+      this.drawer.enabled = true
+      this.removeTags('intangible')
+    }
+
+    if (this.drawer.enabled && !this.isVisible && this.hasTag('intangible')) {
+      this.drawer.enabled = false
+    } else if (
+      !this.drawer.enabled &&
+      this.isVisible &&
+      this.hasTag('intangible')
+    ) {
+      this.drawer.enabled = true
+    }
   }
 
-  private drawTriangle(): void {
+  public draw(): void {
     this.getContexts()[0].translate(
       this.transform.canvasPosition.x,
       this.transform.canvasPosition.y,
