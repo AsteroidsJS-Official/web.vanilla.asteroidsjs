@@ -415,11 +415,14 @@ export class Menu
       })
   }
 
+  /**
+   * Inserts the overlay element into the body.
+   */
   private insertSlaveMenuHtml(): void {
     destroyMultipleElements('.overlay')
 
     const div = createElement('div')
-    div.classList.add('overlay')
+    addClass(div, 'overlay')
 
     appendChildren(document.body, div)
   }
