@@ -76,16 +76,16 @@ export class Input
     this.gameService = this.getService(GameService)
     this.socketService = this.getService(SocketService)
     this.userService = this.getService(UserService)
+  }
 
+  onStart(): void {
     if (
       !this.gameService.isInLocalMPGame ||
       this.spaceship.joystickId === this.userService.userId
     ) {
       this.listenKeys()
     }
-  }
 
-  onStart(): void {
     this.socketService
       .on<{ isMaster: boolean; userId: string; actions: IJoystickActions }>(
         'update-actions',
