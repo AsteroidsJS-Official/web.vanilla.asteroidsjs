@@ -87,7 +87,6 @@ export class AudioSource
       src: clip,
     })
 
-    console.log(this.spatial)
     if (this.spatial) {
       howl.stereo(this.getStereoBias())
     }
@@ -99,14 +98,14 @@ export class AudioSource
    * Method that stops the current audio.
    */
   stop(): void {
-    this.howl.stop()
+    this.howl?.stop()
   }
 
   /**
    * Method that pauses the current audio.
    */
   pause(): void {
-    this.howl.pause()
+    this.howl?.pause()
   }
 
   /**
