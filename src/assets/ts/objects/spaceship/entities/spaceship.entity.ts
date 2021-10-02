@@ -17,7 +17,6 @@ import { Bullet } from '../../bullet/entities/bullet.entity'
 
 import { GameService } from '../../../shared/services/game.service'
 import { MultiplayerService } from '../../../shared/services/multiplayer.service'
-import { UserService } from '../../../shared/services/user.service'
 
 import { CircleCollider2 } from '../../../shared/components/colliders/circle-collider2.component'
 import { Drawer } from '../../../shared/components/drawer.component'
@@ -38,7 +37,7 @@ import { Subscription } from 'rxjs'
  */
 @Entity({
   order: 1,
-  services: [UserService, GameService, SocketService, MultiplayerService],
+  services: [GameService, SocketService, MultiplayerService],
   components: [
     Drawer,
     RenderOverflow,
@@ -95,8 +94,6 @@ export class Spaceship
   extends AbstractEntity
   implements IOnAwake, IDraw, IOnLateLoop, IOnTriggerEnter, IOnDestroy
 {
-  private userService: UserService
-
   private gameService: GameService
 
   private multiplayerService: MultiplayerService
@@ -161,7 +158,6 @@ export class Spaceship
 
   onAwake(): void {
     this.socketService = this.getService(SocketService)
-    this.userService = this.getService(UserService)
     this.gameService = this.getService(GameService)
     this.multiplayerService = this.getService(MultiplayerService)
 
