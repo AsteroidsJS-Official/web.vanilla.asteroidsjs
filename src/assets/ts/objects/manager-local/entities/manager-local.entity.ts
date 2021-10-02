@@ -61,6 +61,8 @@ export class ManagerLocal
 
   private disconnectionSubscription: Subscription
 
+  private lobbySubscription: Subscription
+
   private respawnSubscription: Subscription
 
   private spaceships: { [id: string]: Spaceship } = {}
@@ -89,6 +91,7 @@ export class ManagerLocal
     this.connectionSubscription?.unsubscribe()
     this.controllerStatusSub?.unsubscribe()
     this.disconnectionSubscription?.unsubscribe()
+    this.lobbySubscription?.unsubscribe()
     this.respawnSubscription?.unsubscribe()
   }
 
@@ -150,6 +153,13 @@ export class ManagerLocal
   }
 
   private virtual(): void {
+    this.lobbySubscription = this.socketService
+      .on('close-lobby')
+      .subscribe(() => {
+        this.scene.unload(this.scene)
+        this.scene.load(Menu)
+      })
+
     this.socketService
       .on<ISocketData>('instantiate')
       .subscribe(({ id, type, data }) => {
@@ -301,7 +311,7 @@ export class ManagerLocal
       data: {
         position: playerPosition,
         dimensions: new Rect(50, 50),
-        spaceshipColor: player.spaceship.colorName,
+        spaceshipColor: player.spaceship.color,
         nickname: player.nickname,
         imageSrc: `./assets/svg/spaceship-${player.spaceship.colorName}.svg`,
         maxHealth: spaceship.health.health,
