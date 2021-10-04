@@ -138,6 +138,9 @@ class AsteroidsApplication implements IAsteroidsApplication {
     const services = this.toProviders([
       ...(this.getServicesFromMetadata(options.entity) ?? []),
       ...(options.services ?? []),
+      ...components
+        .map((c) => this.getServicesFromMetadata(c.class) ?? [])
+        .flat(),
     ])
 
     if (services && services.length) {
@@ -417,11 +420,11 @@ class AsteroidsApplication implements IAsteroidsApplication {
   private getServicesFromMetadata<
     T extends AbstractEntity | AbstractService | AbstractComponent,
   >(target: Type<T>): Type<AbstractService>[] {
-    return (
-      Reflect.getMetadata(ENTITY_OPTIONS, target)?.services ??
-      Reflect.getMetadata(SERVICE_OPTIONS, target)?.services ??
-      Reflect.getMetadata(COMPONENT_OPTIONS, target)?.services
-    )
+    return !target
+      ? []
+      : Reflect.getMetadata(ENTITY_OPTIONS, target)?.services ??
+          Reflect.getMetadata(SERVICE_OPTIONS, target)?.services ??
+          Reflect.getMetadata(COMPONENT_OPTIONS, target)?.services
   }
 
   /**
