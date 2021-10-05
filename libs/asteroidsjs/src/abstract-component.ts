@@ -249,4 +249,12 @@ export abstract class AbstractComponent implements IEnabled {
   getTags(): string[] {
     return this.entity.getTags()
   }
+
+  addIntent(intent: () => void): void {
+    this.entity.addIntent(intent)
+  }
+
+  removeIntent(intent: () => void): void {
+    this.entity.removeIntent(intent)
+  }
 }

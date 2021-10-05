@@ -55,6 +55,8 @@ class AsteroidsApplication implements IAsteroidsApplication {
    */
   private services: AbstractService[] = []
 
+  private intents: (() => void)[] = []
+
   constructor(private readonly bootstrap: Type<AbstractScene>[]) {}
 
   /**
@@ -269,6 +271,14 @@ class AsteroidsApplication implements IAsteroidsApplication {
     return p as P
   }
 
+  addIntent(intent: () => void): void {
+    this.intents.push(intent)
+  }
+
+  removeIntent(intent: () => void): void {
+    this.intents = this.intents.filter((i) => i !== intent)
+  }
+
   /**
    * Method that finds all the components of some type
    *
@@ -353,6 +363,8 @@ class AsteroidsApplication implements IAsteroidsApplication {
           value.onLateLoop()
         }
       })
+
+      this.intents.forEach((intent) => intent())
     }, 100 / 16)
   }
 

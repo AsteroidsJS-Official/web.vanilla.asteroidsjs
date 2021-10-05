@@ -288,4 +288,12 @@ export abstract class AbstractEntity implements IEnabled {
   getTags(): string[] {
     return this.tag.split('|')
   }
+
+  addIntent(intent: () => void): void {
+    this.scene.addIntent(intent)
+  }
+
+  removeIntent(intent: () => void): void {
+    this.scene.removeIntent(intent)
+  }
 }

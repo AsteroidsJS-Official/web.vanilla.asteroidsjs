@@ -89,4 +89,8 @@ export interface IAsteroidsApplication {
     entity: E,
     component: Type<C>,
   ): C
+
+  addIntent(intent: () => void): void
+
+  removeIntent(intent: () => void): void
 }

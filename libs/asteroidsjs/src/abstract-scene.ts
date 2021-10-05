@@ -116,4 +116,12 @@ export abstract class AbstractScene implements IEnabled {
   getEntities(): AbstractEntity[] {
     return this.entities
   }
+
+  addIntent(intent: () => void): void {
+    this.game.addIntent(intent)
+  }
+
+  removeIntent(intent: () => void): void {
+    this.game.removeIntent(intent)
+  }
 }
