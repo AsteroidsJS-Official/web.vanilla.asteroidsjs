@@ -96,6 +96,9 @@ export class GameOver
     this.sceneSubscription?.unsubscribe()
   }
 
+  /**
+   * Inserts the game over HTML into the body.
+   */
   private async insertGameOverHtml(): Promise<void> {
     destroyMultipleElements('ast-score')
     getMultipleElements('canvas').forEach((canvas) => {

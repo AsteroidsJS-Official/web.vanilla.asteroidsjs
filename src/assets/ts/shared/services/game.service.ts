@@ -44,6 +44,10 @@ export class GameService extends AbstractService {
    */
   public isConnectedToRoom = false
 
+  /**
+   * An observable that is triggered every time the game over property
+   * is updated.
+   */
   public get gameOver$(): Observable<boolean> {
     return this._gameOver.asObservable()
   }
@@ -56,6 +60,10 @@ export class GameService extends AbstractService {
     this._gameOver.next(value)
   }
 
+  /**
+   * An observable that is triggered every time the asteroids amount
+   * is updated.
+   */
   public get asteroidsAmount$(): Observable<number> {
     return this._asteroidsAmount.asObservable()
   }

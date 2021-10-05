@@ -18,6 +18,9 @@ import { Transform } from '../../../shared/components/transform.component'
 
 import { IBullet } from '../interfaces/bullet.interface'
 
+/**
+ * Class that represents the bullet entity and its behavior.
+ */
 @Entity({
   services: [SocketService],
   components: [
@@ -45,12 +48,24 @@ export class Bullet
 {
   private socketService: SocketService
 
+  /**
+   * Property that contains the bullet position, dimensions and rotation.
+   */
   public transform: Transform
 
+  /**
+   * Property that contains the bullet physics.
+   */
   public rigidbody: Rigidbody
 
+  /**
+   * Property that links the bullet to its user by the user id.
+   */
   public userId: string
 
+  /**
+   * Property that represents the bullet direction.
+   */
   public get direction(): Vector2 {
     return new Vector2(
       Math.sin(this.transform.rotation),

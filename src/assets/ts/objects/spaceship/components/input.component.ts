@@ -33,16 +33,15 @@ export class Input
   extends AbstractComponent
   implements IOnAwake, IOnStart, IOnLoop
 {
-  public force: number
-
-  public angularForce: number
-
   private gameService: GameService
 
   private socketService: SocketService
 
   private userService: UserService
 
+  /**
+   * Property that represents the joystick controller actions.
+   */
   private actions: IJoystickActions
 
   /**
@@ -67,7 +66,20 @@ export class Input
    */
   private rigidbody: Rigidbody
 
+  /**
+   * Property that defines the controller spaceship.
+   */
   private spaceship: Spaceship
+
+  /**
+   * Property that defines the acceleration force.
+   */
+  public force: number
+
+  /**
+   * Property that defines the angular acceleration force.
+   */
+  public angularForce: number
 
   onAwake(): void {
     this.spaceship = this.getEntityAs<Spaceship>()

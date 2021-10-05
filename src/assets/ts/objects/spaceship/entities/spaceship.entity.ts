@@ -100,7 +100,7 @@ export class Spaceship
 
   private socketService: SocketService
 
-  private drawer: Drawer
+  private healthSubscription: Subscription
 
   /**
    * Property responsible for the spaceship bullet velocity.
@@ -111,6 +111,11 @@ export class Spaceship
    * Property responsible for the spaceship last bullet time.
    */
   private lastShot: Date
+
+  /**
+   * Property responsible for the spaceship canvas drawing.
+   */
+  private drawer: Drawer
 
   /**
    * Property that contains the spaceship position, dimensions and rotation.
@@ -127,28 +132,59 @@ export class Spaceship
    */
   private generationTime: Date
 
-  private healthSubscription: Subscription
-
+  /**
+   * Property that defines whether the spaceship is visible.
+   */
   private isVisible = false
 
+  /**
+   * Property that represents the blinking interval.
+   */
   private visibilityInterval: NodeJS.Timer
 
+  /**
+   * Property that represents whether the spaceship was destroyed.
+   */
   private wasDestroyed = false
 
+  /**
+   * Property that defines the spaceship image.
+   */
   private image: HTMLImageElement
 
-  public imageSrc: string
-
-  public isShooting = false
-
-  public tag = Spaceship.name
-
-  public userId = ''
-
-  public joystickId = ''
-
+  /**
+   * Property that contains the spaceship health status.
+   */
   public health: Health
 
+  /**
+   * Property that defines the spaceship image url.
+   */
+  public imageSrc: string
+
+  /**
+   * Property that represents whether the spaceship is shooting.
+   */
+  public isShooting = false
+
+  /**
+   * Property that defines the spaceship tag.
+   */
+  public tag = Spaceship.name
+
+  /**
+   * Property that links the spaceship to its user by the user id.
+   */
+  public userId = ''
+
+  /**
+   * Property that links the spaceship to its joystick controller.
+   */
+  public joystickId = ''
+
+  /**
+   * Property that represents the spaceship direction.
+   */
   public get direction(): Vector2 {
     return new Vector2(
       Math.sin(this.transform.rotation),
@@ -321,6 +357,9 @@ export class Spaceship
     )
   }
 
+  /**
+   * Shoots new bullets according to the spaceship last shot time.
+   */
   public shoot(): void {
     if (
       (this.lastShot && new Date().getTime() - this.lastShot.getTime() < 400) ||
@@ -338,6 +377,15 @@ export class Spaceship
     this.createBullet(-(2 * Math.PI) / 7, 7.5)
   }
 
+  /**
+   * Instantiates a new bullet from the spaceship.
+   *
+   * @param localPosition The bullet initial position.
+   * @param offset The bullet position offset.
+   *
+   * @example
+   * createBullet(Math.PI, 5.5)
+   */
   private createBullet(localPosition: number, offset: number): void {
     const rotation = this.transform.rotation
     const position = Vector2.sum(

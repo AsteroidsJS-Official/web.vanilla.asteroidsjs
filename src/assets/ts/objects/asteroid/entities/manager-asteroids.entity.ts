@@ -19,7 +19,8 @@ import { GameService } from '../../../shared/services/game.service'
 import { isMobile } from '../../../utils/platform'
 
 /**
- * Class that represents the first entity to be loaded into the game
+ * Class that represents the asteroids manager entity that
+ * generates new asteroids according to the current scene.
  */
 @Entity({
   services: [LGSocketService, GameService, SocketService],
@@ -36,6 +37,10 @@ export class ManagerAsteroids
 
   private socketService: SocketService
 
+  /**
+   * Property that defines whether the current screen is the
+   * menu.
+   */
   public isMenu = false
 
   onAwake(): void {
@@ -89,6 +94,9 @@ export class ManagerAsteroids
     clearInterval(this.interval)
   }
 
+  /**
+   * Generates a new asteroid in the scene.
+   */
   private generateAsteroid(): void {
     const sizes = [0, 1, 2, 3, 4]
     const asteroidSize = sizes[Math.floor(Math.random() * sizes.length)]
@@ -178,6 +186,9 @@ export class ManagerAsteroids
     } as ISocketData)
   }
 
+  /**
+   * Listens for asteroid instances in menu.
+   */
   private listenForAsteroids(): void {
     this.socketService
       .on<ISocketData>('instantiate')

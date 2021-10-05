@@ -250,10 +250,20 @@ export abstract class AbstractComponent implements IEnabled {
     return this.entity.getTags()
   }
 
+  /**
+   * Adds an intent to the intents array.
+   *
+   * @param intent a callback to be called in the end of the loop.
+   */
   addIntent(intent: () => void): void {
     this.entity.addIntent(intent)
   }
 
+  /**
+   * Removes an intent from the intents array.
+   *
+   * @param intent the intent to be removed.
+   */
   removeIntent(intent: () => void): void {
     this.entity.removeIntent(intent)
   }

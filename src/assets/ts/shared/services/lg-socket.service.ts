@@ -12,7 +12,7 @@ export type LoadScreensData = {
 }
 
 /**
- * Service responsible for socket liquid galaxy management.
+ * Service responsible for the socket liquid galaxy management.
  */
 @Service({
   services: [GameService, SocketService],

@@ -50,6 +50,9 @@ export class Health extends AbstractComponent implements IOnStart, IDraw {
    */
   private opacity = 0
 
+  /**
+   * An observable that is triggered every time the health is updated.
+   */
   public get health$(): Observable<number> {
     return this._health.asObservable()
   }

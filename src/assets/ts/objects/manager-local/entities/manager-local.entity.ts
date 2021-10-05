@@ -32,6 +32,9 @@ import { IPlayer } from '../../../shared/interfaces/player.interface'
 import { Menu } from '../../../scenes/menu.scene'
 import { Subscription } from 'rxjs'
 
+/**
+ * Class that represents the local multiplayer game manager.
+ */
 @Entity({
   services: [
     GameService,
@@ -65,6 +68,9 @@ export class ManagerLocal
 
   private respawnSubscription: Subscription
 
+  /**
+   * Property that keeps all local multiplayer instantiated spaceships.
+   */
   private spaceships: { [id: string]: Spaceship } = {}
 
   onAwake(): void {
@@ -95,6 +101,9 @@ export class ManagerLocal
     this.respawnSubscription?.unsubscribe()
   }
 
+  /**
+   * Manages the game in master screen.
+   */
   private master(): void {
     this.multiplayerService.openLobby()
 
@@ -152,6 +161,9 @@ export class ManagerLocal
       })
   }
 
+  /**
+   * Manages the game in slave screens.
+   */
   private virtual(): void {
     this.lobbySubscription = this.socketService
       .on('close-lobby')
@@ -260,6 +272,12 @@ export class ManagerLocal
       })
   }
 
+  /**
+   * Instantiates a new spaceship with the given player data.
+   *
+   * @param player The player data.
+   * @returns A spaceship entity with all player data.
+   */
   private instantiateSpaceship(player: IPlayer): Spaceship {
     const canvasHeight = this.getContexts()[0].canvas.height
     const canvasWidth = this.getContexts()[0].canvas.width

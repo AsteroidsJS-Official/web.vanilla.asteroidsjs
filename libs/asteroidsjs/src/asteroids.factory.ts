@@ -55,6 +55,10 @@ class AsteroidsApplication implements IAsteroidsApplication {
    */
   private services: AbstractService[] = []
 
+  /**
+   * Property that defines an array of intents (callbacks), that are called
+   * at the end of the loop.
+   */
   private intents: (() => void)[] = []
 
   constructor(private readonly bootstrap: Type<AbstractScene>[]) {}
@@ -271,10 +275,20 @@ class AsteroidsApplication implements IAsteroidsApplication {
     return p as P
   }
 
+  /**
+   * Adds an intent to the intents array.
+   *
+   * @param intent a callback to be called in the end of the loop.
+   */
   addIntent(intent: () => void): void {
     this.intents.push(intent)
   }
 
+  /**
+   * Removes an intent from the intents array.
+   *
+   * @param intent the intent to be removed.
+   */
   removeIntent(intent: () => void): void {
     this.intents = this.intents.filter((i) => i !== intent)
   }

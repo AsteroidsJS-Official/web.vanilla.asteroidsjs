@@ -16,6 +16,10 @@ import { LGSocketService } from '../../../shared/services/lg-socket.service'
 
 import { isMobile } from '../../../utils/platform'
 
+/**
+ * Class that represents the authentication modal, containing the
+ * nickname, e-mail and password fields.
+ */
 @Entity({
   services: [LGSocketService],
 })
@@ -25,6 +29,9 @@ export class Auth
 {
   private lgSocketService: LGSocketService
 
+  /**
+   * Property that defines whether the user is signing up.
+   */
   public isSigningUp = false
 
   onAwake(): void {
@@ -41,6 +48,9 @@ export class Auth
     destroyMultipleElements('ast-auth')
   }
 
+  /**
+   * Inserts the auth HTML into the body.
+   */
   private async insertAuthHtml(): Promise<void> {
     const html = await getHtml('auth', 'ast-auth')
     html.style.position = 'absolute'

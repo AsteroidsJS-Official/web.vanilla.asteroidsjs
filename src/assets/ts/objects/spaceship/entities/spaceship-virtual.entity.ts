@@ -53,18 +53,39 @@ export class SpaceshipVirtual
    */
   private generationTime: Date
 
+  /**
+   * Property that defines whether the spaceship is visible.
+   */
   private isVisible = false
 
+  /**
+   * Property that represents the blinking interval.
+   */
   private visibilityInterval: NodeJS.Timer
 
+  /**
+   * Property that contains the spaceship health status.
+   */
   private health: Health
 
+  /**
+   * Property that defines the spaceship image.
+   */
   private image: HTMLImageElement
 
+  /**
+   * Property that defines the spaceship image url.
+   */
   public imageSrc = ''
 
+  /**
+   * Property that represents the player nickname.
+   */
   public nickname = ''
 
+  /**
+   * Property that represents the spaceship and player color.
+   */
   public spaceshipColor = ''
 
   /**
@@ -146,16 +167,6 @@ export class SpaceshipVirtual
       this.transform.canvasPosition.x,
       this.transform.canvasPosition.y,
     )
-
-    // this.getContext().fillStyle = this.spaceshipColor
-    // this.getContext().textAlign = 'center'
-    // this.getContext().canvas.style.letterSpacing = '0.75px'
-    // this.getContext().font = '12px Neptunus'
-    // this.getContext().fillText(
-    //   this.nickname,
-    //   0,
-    //   0 - (this.transform.dimensions.height / 2 + 20),
-    // )
 
     this.getContexts()[0].rotate(this.transform.rotation)
 

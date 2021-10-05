@@ -32,7 +32,7 @@ import { ICollision2 } from '../../../shared/interfaces/collision2.interface'
 import { IOnTriggerEnter } from '../../../shared/interfaces/on-trigger-enter.interface'
 
 /**
- * Class that represents the asteroid entity and it's behavior.
+ * Class that represents the asteroid entity and its behavior.
  */
 @Entity({
   services: [UserService, GameService, SocketService, MultiplayerService],
@@ -66,10 +66,19 @@ export class Asteroid
 
   private gameService: GameService
 
+  /**
+   * Property that contains the asteroid position, dimensions and rotation.
+   */
   private transform: Transform
 
+  /**
+   * Property that contains the asteroid health status.
+   */
   private health: Health
 
+  /**
+   * Property that defines the asteroid tag.
+   */
   public tag = Asteroid.name
 
   /**
@@ -231,11 +240,31 @@ export class Asteroid
   }
 
   public draw(): void {
-    this.drawAsteroid()
+    this.getContexts()[0].translate(
+      this.transform.canvasPosition.x,
+      this.transform.canvasPosition.y,
+    )
+    this.getContexts()[0].rotate(this.transform.rotation)
+
+    this.getContexts()[0].beginPath()
+    this.getContexts()[0].drawImage(
+      this.image,
+      0 - this.transform.dimensions.width / 2,
+      0 - this.transform.dimensions.height / 2,
+      this.transform.dimensions.width,
+      this.transform.dimensions.height,
+    )
+    this.getContexts()[0].closePath()
+
+    this.getContexts()[0].rotate(-this.transform.rotation)
+    this.getContexts()[0].translate(
+      -this.transform.canvasPosition.x,
+      -this.transform.canvasPosition.y,
+    )
   }
 
   /**
-   * Generates new asteroid from the current asteroid according to
+   * Generates a new asteroid from the current asteroid according to
    * the given amount.
    *
    * @param amount The amount of fragments to be generated.
@@ -312,29 +341,5 @@ export class Asteroid
         },
       })
     }
-  }
-
-  private drawAsteroid(): void {
-    this.getContexts()[0].translate(
-      this.transform.canvasPosition.x,
-      this.transform.canvasPosition.y,
-    )
-    this.getContexts()[0].rotate(this.transform.rotation)
-
-    this.getContexts()[0].beginPath()
-    this.getContexts()[0].drawImage(
-      this.image,
-      0 - this.transform.dimensions.width / 2,
-      0 - this.transform.dimensions.height / 2,
-      this.transform.dimensions.width,
-      this.transform.dimensions.height,
-    )
-    this.getContexts()[0].closePath()
-
-    this.getContexts()[0].rotate(-this.transform.rotation)
-    this.getContexts()[0].translate(
-      -this.transform.canvasPosition.x,
-      -this.transform.canvasPosition.y,
-    )
   }
 }

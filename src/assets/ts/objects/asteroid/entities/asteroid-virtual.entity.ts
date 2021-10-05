@@ -19,6 +19,9 @@ import { Render } from '../../../shared/components/renderers/render.component'
 import { Rigidbody } from '../../../shared/components/rigidbody/rigidbody.component'
 import { Transform } from '../../../shared/components/transform.component'
 
+/**
+ * Class that represents the virtual asteroid entity and its behavior.
+ */
 @Entity({
   services: [SocketService],
   components: [
@@ -44,16 +47,35 @@ export class AsteroidVirtual
 {
   private socketService: SocketService
 
+  /**
+   * Property that contains the asteroid position, dimensions and rotation.
+   */
   private transform: Transform
 
+  /**
+   * Property that defines the asteroid size.
+   */
   private _asteroidSize: number
 
+  /**
+   * Property that defines the asteroid image.
+   */
   private image: HTMLImageElement
 
+  /**
+   * Property that contains the asteroid health status.
+   */
   public health: Health
 
-  public imageSrc = ''
+  /**
+   * Property that defines the asteroid image url.
+   */
+  public imageSrc: string
 
+  /**
+   * Property that defines whether the asteroid is a fragment
+   * from another.
+   */
   public isFragment = false
 
   public set asteroidSize(size: number) {
@@ -115,10 +137,6 @@ export class AsteroidVirtual
   }
 
   public draw(): void {
-    this.drawAsteroid()
-  }
-
-  private drawAsteroid(): void {
     this.getContexts()[0].translate(
       this.transform.canvasPosition.x,
       this.transform.canvasPosition.y,

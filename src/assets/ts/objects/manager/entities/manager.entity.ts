@@ -28,7 +28,7 @@ import { UserService } from '../../../shared/services/user.service'
 import { Subscription } from 'rxjs'
 
 /**
- * Class that represents the first entity to be loaded into the game
+ * Class that represents the first entity to be loaded into the game.
  */
 @Entity({
   services: [UserService, LGSocketService, SocketService, GameService],
@@ -45,9 +45,6 @@ export class Manager
 
   private gameService: GameService
 
-  /**
-   * Property responsible for keeping the game over subscription.
-   */
   private gameOverSubscription: Subscription
 
   onAwake(): void {
@@ -75,6 +72,9 @@ export class Manager
     this.gameOverSubscription?.unsubscribe()
   }
 
+  /**
+   * Manages the game in master screen.
+   */
   private master(): void {
     this.gameOverSubscription = this.gameService.gameOver$.subscribe(
       (isGameOver) => {
@@ -159,6 +159,9 @@ export class Manager
     } as ISocketData)
   }
 
+  /**
+   * Manages the game in slave screens.
+   */
   private virtual(): void {
     this.gameOverSubscription = this.socketService
       .on('game-over')

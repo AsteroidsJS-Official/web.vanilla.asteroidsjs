@@ -67,7 +67,6 @@ export function getMultipleElements(selector: string): HTMLElement[] {
  *
  * @param element The HTML element / selector that identifies the element.
  * @param classes The classes to be added.
- * @returns The HTML element with the given class.
  *
  * @example
  * addClass<HTMLButtonElement>('button.button-class', 'active')
@@ -96,7 +95,6 @@ export function addClass<T extends HTMLElement>(
  *
  * @param element The HTML element / selector that identifies the element.
  * @param classes The classes to be removed.
- * @returns The HTML element without the given class.
  *
  * @example
  * removeClass<HTMLButtonElement>('button.button-class', 'active')
@@ -125,7 +123,6 @@ export function removeClass<T extends HTMLElement>(
  *
  * @param element The HTML element / selector that identifies the parent element.
  * @param children The children HTML elements.
- * @returns The parent HTML element.
  *
  * @example
  * const child = createElement('div')
@@ -157,7 +154,6 @@ export function appendChildren<T extends HTMLElement>(
  *
  * @param element The HTML element / selector that identifies the parent element.
  * @param children The children HTML elements.
- * @returns The parent HTML element.
  *
  * @example
  * const child = getElement('.child-element')
