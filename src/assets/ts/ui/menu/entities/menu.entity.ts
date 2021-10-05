@@ -17,6 +17,8 @@ import {
 import { LGSocketService } from '../../../shared/services/lg-socket.service'
 import { SocketService } from '../../../shared/services/socket.service'
 
+import { GameService } from '../../../shared/services/game.service'
+import { MultiplayerService } from '../../../shared/services/multiplayer.service'
 import { UserService } from '../../../shared/services/user.service'
 
 import { IPlayerVisual } from '../../../shared/interfaces/player.interface'
@@ -24,40 +26,82 @@ import { IPlayerVisual } from '../../../shared/interfaces/player.interface'
 import { isMobile } from './../../../utils/platform'
 
 import { Joystick } from '../../../scenes/joystick.scene'
+import { LocalMP } from '../../../scenes/local-mp.scene'
 import { Single } from '../../../scenes/single.scene'
 import { Subscription } from 'rxjs'
 
 @Entity({
-  services: [LGSocketService, SocketService, UserService],
+  services: [
+    GameService,
+    LGSocketService,
+    MultiplayerService,
+    SocketService,
+    UserService,
+  ],
 })
 export class Menu
   extends AbstractEntity
   implements IOnAwake, IOnStart, IOnDestroy
 {
+  private gameService: GameService
+
   private lgSocketService: LGSocketService
 
   private socketService: SocketService
 
+  private multiplayerService: MultiplayerService
+
   private userService: UserService
+
+  private constrollerStatusSub: Subscription
 
   private sceneSubscription: Subscription
 
   onAwake(): void {
+    this.gameService = this.getService(GameService)
     this.lgSocketService = this.getService(LGSocketService)
+    this.multiplayerService = this.getService(MultiplayerService)
     this.socketService = this.getService(SocketService)
     this.userService = this.getService(UserService)
   }
 
   onStart(): void {
-    this.sceneSubscription = this.socketService
-      .on<string>('change-scene')
-      .subscribe((scene) => {
-        if (scene === 'single') {
-          this.loadSinglePlayer()
-        }
-      })
+    if (!isMobile) {
+      this.sceneSubscription = this.socketService
+        .on<string>('change-scene')
+        .subscribe((scene) => {
+          if (scene === 'single') {
+            this.loadSinglePlayer()
+          } else if (scene === 'local-mp') {
+            this.loadLocalMultiplayer()
+          }
+        })
+    }
 
-    if (this.lgSocketService.screen?.number === 1 || isMobile) {
+    if (isMobile) {
+      this.constrollerStatusSub = this.socketService
+        .emit<unknown, string | null>('master-controller-status')
+        .subscribe((masterController) => {
+          if (masterController === null) {
+            this.socketService.emit(
+              'connect-master-controller',
+              this.userService.userId,
+            )
+            this.userService.isMaster = true
+          }
+
+          if (
+            masterController &&
+            !masterController.includes(this.userService.userId)
+          ) {
+            this.userService.isMaster = false
+          }
+
+          if (masterController || masterController === null) {
+            this.insertMenuHtml()
+          }
+        })
+    } else if (this.lgSocketService.screen?.number === 1) {
       this.insertMenuHtml()
     } else {
       this.insertSlaveMenuHtml()
@@ -80,11 +124,8 @@ export class Menu
     destroyMultipleElements('ast-controller-menu')
     destroyMultipleElements('.overlay')
 
-    if (!this.sceneSubscription) {
-      return
-    }
-
-    this.sceneSubscription.unsubscribe()
+    this.sceneSubscription?.unsubscribe()
+    this.constrollerStatusSub?.unsubscribe()
   }
 
   /**
@@ -174,10 +215,12 @@ export class Menu
         this.userService.spaceshipColor = colorButton.style.backgroundColor
         this.userService.spaceshipImage = name
 
-        this.socketService.emit('update-player', {
-          nickname: this.userService.nickname,
-          color: name,
-        })
+        if (!isMobile || this.userService.isMaster) {
+          this.socketService.emit('update-player', {
+            nickname: this.userService.nickname,
+            color: name,
+          })
+        }
 
         removeClass('.color-button.active', 'active')
         addClass(colorButton, 'active')
@@ -227,7 +270,9 @@ export class Menu
     const playSPButton = getElement<HTMLButtonElement>(
       '.play-singleplayer-button',
     )
-    // const playLMP = getElement('.play-local-multiplayer-button')
+    const playLMPButton = getElement<HTMLButtonElement>(
+      '.play-local-multiplayer-button',
+    )
     // const playOMP = getElement('.play-online-multiplayer-button')
 
     const playButton = getElement<HTMLButtonElement>('.play-button')
@@ -244,6 +289,7 @@ export class Menu
     if (
       !(
         playSPButton &&
+        playLMPButton &&
         inputGuest &&
         spaceshipSkin &&
         (!isMobile || (playButton && backButton))
@@ -254,6 +300,19 @@ export class Menu
 
     if (isMobile) {
       playButton.addEventListener('click', () => {
+        if (!this.userService.isMaster) {
+          this.multiplayerService.lobbyStatus.subscribe((isLobbyOpen) => {
+            if (isLobbyOpen) {
+              this.multiplayerService.connectMe()
+
+              destroyMultipleElements('ast-controller-menu')
+              this.scene.unload(this.scene)
+              this.scene.load(Joystick)
+            }
+          })
+
+          return
+        }
         addClass('.controller-menu-container', 'hide')
         removeClass('.controller-play-menu-container', 'hide')
       })
@@ -274,6 +333,18 @@ export class Menu
       }
     })
 
+    playLMPButton.addEventListener('click', () => {
+      this.lgSocketService.changeScene('local-mp')
+
+      if (isMobile) {
+        this.gameService.isConnectedToRoom = true
+        this.multiplayerService.connectMe()
+        destroyMultipleElements('ast-controller-menu')
+        this.scene.unload(this.scene)
+        this.scene.load(Joystick)
+      }
+    })
+
     colorButtons.forEach((button) => {
       if (button.classList.contains('active')) {
         this.userService.spaceshipColor = button.style.backgroundColor
@@ -283,18 +354,27 @@ export class Menu
 
     this.userService.nickname = inputGuest.value
 
-    this.socketService.emit('update-player', {
-      nickname: this.userService.nickname,
-      color: this.userService.spaceshipImage,
-    })
-
-    inputGuest.addEventListener('input', (event: InputEvent) => {
-      this.userService.nickname = (event.target as HTMLInputElement).value
+    if (!isMobile || this.userService.isMaster) {
       this.socketService.emit('update-player', {
         nickname: this.userService.nickname,
         color: this.userService.spaceshipImage,
       })
+    }
+
+    inputGuest.addEventListener('input', (event: InputEvent) => {
+      this.userService.nickname = (event.target as HTMLInputElement).value
+
+      if (!isMobile || this.userService.isMaster) {
+        this.socketService.emit('update-player', {
+          nickname: this.userService.nickname,
+          color: this.userService.spaceshipImage,
+        })
+      }
     })
+
+    if (isMobile && !this.userService.isMaster) {
+      return
+    }
 
     this.socketService
       .on<IPlayerVisual>('update-player')
@@ -335,11 +415,14 @@ export class Menu
       })
   }
 
+  /**
+   * Inserts the overlay element into the body.
+   */
   private insertSlaveMenuHtml(): void {
     destroyMultipleElements('.overlay')
 
     const div = createElement('div')
-    div.classList.add('overlay')
+    addClass(div, 'overlay')
 
     appendChildren(document.body, div)
   }
@@ -350,5 +433,13 @@ export class Menu
   private loadSinglePlayer(): void {
     this.scene.unload(this.scene)
     this.scene.load(Single)
+  }
+
+  /**
+   * Unloads the current scene and loads the local mp player scene.
+   */
+  private loadLocalMultiplayer(): void {
+    this.scene.unload(this.scene)
+    this.scene.load(LocalMP)
   }
 }

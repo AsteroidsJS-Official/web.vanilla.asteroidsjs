@@ -206,4 +206,65 @@ export abstract class AbstractComponent implements IEnabled {
   destroy<T extends AbstractEntity | AbstractComponent>(instance: T): void {
     this.entity.destroy(instance)
   }
+
+  /**
+   * Adds tags to the current entity according to the given array.
+   *
+   * @param tags an array of tags to be added to the current entity.
+   *
+   * @example
+   * addTags('tag1', 'tag2')
+   */
+  addTags(...tags: string[]): void {
+    this.entity.addTags(...tags)
+  }
+
+  /**
+   * Removes tags from the current entity according to the given array.
+   *
+   * @param tags an array of tags to be removed from the current entity.
+   *
+   * @example
+   * removeTags('tag1', 'tag2')
+   */
+  removeTags(...tags: string[]): void {
+    this.entity.removeTags(...tags)
+  }
+
+  /**
+   * Verifies whether the given tag is present in the current entity.
+   *
+   * @param tag the tag to be checked.
+   * @returns whether the current entity has the given tag.
+   */
+  hasTag(tag: string): boolean {
+    return this.entity.hasTag(tag)
+  }
+
+  /**
+   * Gets an array of tags from the current entity.
+   *
+   * @returns an array of tags.
+   */
+  getTags(): string[] {
+    return this.entity.getTags()
+  }
+
+  /**
+   * Adds an intent to the intents array.
+   *
+   * @param intent a callback to be called in the end of the loop.
+   */
+  addIntent(intent: () => void): void {
+    this.entity.addIntent(intent)
+  }
+
+  /**
+   * Removes an intent from the intents array.
+   *
+   * @param intent the intent to be removed.
+   */
+  removeIntent(intent: () => void): void {
+    this.entity.removeIntent(intent)
+  }
 }

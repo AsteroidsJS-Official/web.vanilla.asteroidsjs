@@ -12,3 +12,53 @@
     letter-spacing: 2px;
   }
 }
+
+.score-multiplayer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  position: fixed;
+  top: 40px;
+  right: 30px;
+
+  min-width: 200px;
+
+  pointer-events: none;
+  z-index: 20;
+
+  font-family: 'Neptunus';
+
+  & > .title {
+    color: #fff;
+    font-size: 1.4rem;
+    letter-spacing: 2px;
+  }
+
+  & > .score-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    max-height: 120px;
+    width: 100%;
+
+    margin-top: 20px;
+
+    & > .score-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+
+      width: 100%;
+
+      color: #fff;
+      letter-spacing: 0.8px;
+
+      &.me {
+        color: #48bdff;
+      }
+    }
+  }
+}

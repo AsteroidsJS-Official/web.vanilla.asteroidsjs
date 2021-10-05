@@ -17,6 +17,7 @@ import { LGSocketService } from '../../../shared/services/lg-socket.service'
 import { SocketService } from '../../../shared/services/socket.service'
 
 import { GameService } from '../../../shared/services/game.service'
+import { MultiplayerService } from '../../../shared/services/multiplayer.service'
 import { UserService } from '../../../shared/services/user.service'
 
 import { isMobile } from '../../../utils/platform'
@@ -31,7 +32,13 @@ import { Subscription } from 'rxjs'
  * after the user death.
  */
 @Entity({
-  services: [GameService, LGSocketService, UserService, SocketService],
+  services: [
+    GameService,
+    LGSocketService,
+    UserService,
+    SocketService,
+    MultiplayerService,
+  ],
 })
 export class GameOver
   extends AbstractEntity
@@ -45,6 +52,8 @@ export class GameOver
 
   private gameService: GameService
 
+  private multiplayerService: MultiplayerService
+
   private sceneSubscription: Subscription
 
   onAwake(): void {
@@ -52,6 +61,7 @@ export class GameOver
     this.socketService = this.getService(SocketService)
     this.userService = this.getService(UserService)
     this.gameService = this.getService(GameService)
+    this.multiplayerService = this.getService(MultiplayerService)
   }
 
   onStart(): void {
@@ -86,6 +96,9 @@ export class GameOver
     this.sceneSubscription?.unsubscribe()
   }
 
+  /**
+   * Inserts the game over HTML into the body.
+   */
   private async insertGameOverHtml(): Promise<void> {
     destroyMultipleElements('ast-score')
     getMultipleElements('canvas').forEach((canvas) => {
@@ -118,11 +131,27 @@ export class GameOver
       getMultipleElements('canvas').forEach((canvas) => {
         canvas.style.pointerEvents = 'unset'
       })
-      this.lgSocketService.changeScene('single')
+
+      if (this.gameService.isConnectedToRoom) {
+        this.multiplayerService.respawn(this.userService.userId)
+        this.loadJoystick()
+      } else {
+        this.lgSocketService.changeScene('single')
+      }
     })
 
     backButton.addEventListener('click', () => {
-      this.lgSocketService.changeScene('menu')
+      if (this.gameService.isConnectedToRoom) {
+        this.multiplayerService.disconnectMe()
+
+        if (this.userService.isMaster) {
+          this.lgSocketService.changeScene('menu')
+        } else {
+          this.loadMenu()
+        }
+      } else {
+        this.lgSocketService.changeScene('menu')
+      }
     })
   }
 

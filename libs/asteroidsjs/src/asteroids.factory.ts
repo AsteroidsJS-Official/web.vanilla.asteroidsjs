@@ -55,6 +55,12 @@ class AsteroidsApplication implements IAsteroidsApplication {
    */
   private services: AbstractService[] = []
 
+  /**
+   * Property that defines an array of intents (callbacks), that are called
+   * at the end of the loop.
+   */
+  private intents: (() => void)[] = []
+
   constructor(private readonly bootstrap: Type<AbstractScene>[]) {}
 
   /**
@@ -270,6 +276,24 @@ class AsteroidsApplication implements IAsteroidsApplication {
   }
 
   /**
+   * Adds an intent to the intents array.
+   *
+   * @param intent a callback to be called in the end of the loop.
+   */
+  addIntent(intent: () => void): void {
+    this.intents.push(intent)
+  }
+
+  /**
+   * Removes an intent from the intents array.
+   *
+   * @param intent the intent to be removed.
+   */
+  removeIntent(intent: () => void): void {
+    this.intents = this.intents.filter((i) => i !== intent)
+  }
+
+  /**
    * Method that finds all the components of some type
    *
    * @param component defines the component type
@@ -324,7 +348,7 @@ class AsteroidsApplication implements IAsteroidsApplication {
       .filter((c) => c.mode === 'clear')
 
     cleanableContexts.forEach((c) =>
-      c.clearRect(0, 0, window.innerWidth, window.innerHeight),
+      c.clearRect(0, 0, c.canvas.width, c.canvas.height),
     )
     ;[...this.entities, ...this.components].forEach((value) => {
       if (hasOnRender(value) && value.enabled) {
@@ -353,6 +377,8 @@ class AsteroidsApplication implements IAsteroidsApplication {
           value.onLateLoop()
         }
       })
+
+      this.intents.forEach((intent) => intent())
     }, 100 / 16)
   }
 

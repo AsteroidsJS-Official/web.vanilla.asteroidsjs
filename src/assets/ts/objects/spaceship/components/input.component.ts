@@ -11,6 +11,9 @@ import { SocketService } from '../../../shared/services/socket.service'
 
 import { Spaceship } from '../entities/spaceship.entity'
 
+import { GameService } from '../../../shared/services/game.service'
+import { UserService } from '../../../shared/services/user.service'
+
 import { Rigidbody } from '../../../shared/components/rigidbody/rigidbody.component'
 
 import { IJoystickActions } from '../../../shared/interfaces/joystick.interface'
@@ -24,18 +27,21 @@ import { fromEvent } from 'rxjs'
  */
 @Component({
   required: [Rigidbody],
-  services: [SocketService],
+  services: [GameService, SocketService, UserService],
 })
 export class Input
   extends AbstractComponent
   implements IOnAwake, IOnStart, IOnLoop
 {
-  public force: number
-
-  public angularForce: number
+  private gameService: GameService
 
   private socketService: SocketService
 
+  private userService: UserService
+
+  /**
+   * Property that represents the joystick controller actions.
+   */
   private actions: IJoystickActions
 
   /**
@@ -60,27 +66,57 @@ export class Input
    */
   private rigidbody: Rigidbody
 
+  /**
+   * Property that defines the controller spaceship.
+   */
   private spaceship: Spaceship
+
+  /**
+   * Property that defines the acceleration force.
+   */
+  public force: number
+
+  /**
+   * Property that defines the angular acceleration force.
+   */
+  public angularForce: number
 
   onAwake(): void {
     this.spaceship = this.getEntityAs<Spaceship>()
     this.rigidbody = this.getComponent(Rigidbody)
 
+    this.gameService = this.getService(GameService)
     this.socketService = this.getService(SocketService)
-
-    this.listenKeys()
+    this.userService = this.getService(UserService)
   }
 
   onStart(): void {
-    this.socketService
-      .on<IJoystickActions>('update-actions')
-      .subscribe((actions) => {
-        this.actions = actions
+    if (
+      !this.gameService.isInLocalMPGame ||
+      this.spaceship.joystickId === this.userService.userId
+    ) {
+      this.listenKeys()
+    }
 
-        if (actions.rotating === 'right') {
+    this.socketService
+      .on<{ isMaster: boolean; userId: string; actions: IJoystickActions }>(
+        'update-actions',
+      )
+      .subscribe((data) => {
+        if (
+          !data.isMaster &&
+          this.spaceship.joystickId &&
+          data.userId !== this.spaceship.joystickId
+        ) {
+          return
+        }
+
+        this.actions = data.actions
+
+        if (data.actions.rotating === 'right') {
           this.setGameKeyPressed('ArrowRight', true)
           this.setGameKeyPressed('ArrowLeft', false)
-        } else if (actions.rotating === 'left') {
+        } else if (data.actions.rotating === 'left') {
           this.setGameKeyPressed('ArrowRight', false)
           this.setGameKeyPressed('ArrowLeft', true)
         } else {

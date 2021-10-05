@@ -18,7 +18,7 @@ dotenv.config()
  */
 
 /**
- * @typedef {Object} Vector2
+ * @typedef {Object} Transform
  * @property {object} position - The entity position;
  * @property {number} position.x - The entity x position;
  * @property {number} position.y - The entity y position;
@@ -26,6 +26,19 @@ dotenv.config()
  * @property {object} dimensions - The entity dimensions;
  * @property {number} dimensions.width - The entity width;
  * @property {number} dimensions.height - The entity height;
+ */
+
+/**
+ * @typedef {Object} Player
+ * @property {string} id - The player id.
+ * @property {boolean} isMaster - Whether the player controls master screen.
+ * @property {string} nickname - The player nickname.
+ * @property {number} score - The player score.
+ * @property {number} health - The player health.
+ * @property {number} maxHealth - The player maximum health.
+ * @property {Object} spaceship - The player spaceship info.
+ * @property {string} color - The player spaceship color.
+ * @property {string} colorName - The player spaceship color name.
  */
 
 /**
@@ -82,6 +95,25 @@ let isWaitingForSlaves = false
  * Whether the screen connection phase has finished.
  */
 let isInGame = false
+
+/**
+ * Whether the master joystick controller is connected.
+ *
+ * @type {string | null}
+ */
+let masterController = null
+
+/**
+ * Whether the local multiplayer lobby is opened or not.
+ */
+let isLobbyOpened = false
+
+/**
+ * Property that keeps all players from a multiplayer game.
+ *
+ * @type {{ [id: string]: Player }}
+ */
+let players = {}
 
 /**
  * Function that starts the application, serving the main "index.html" and
@@ -171,6 +203,16 @@ function setupSocketScreen() {
     }
     socket.on('check-connection-waiting', checkConnectionWaiting)
 
+    function masterControllerStatus(_, callback) {
+      callback(masterController)
+    }
+    socket.on('master-controller-status', masterControllerStatus)
+
+    function connectMasterController(userId) {
+      masterController = `${socket.id}|${userId}`
+    }
+    socket.on('connect-master-controller', connectMasterController)
+
     /**
      * Sets the total screen amount.
      *
@@ -200,6 +242,9 @@ function setupSocketScreen() {
     }
     socket.on('get-game-status', getGameStatus)
 
+    /**
+     * Cancels the slave connection awaiting.
+     */
     function cancelConnection() {
       screens = {
         1: screens['1'],
@@ -250,6 +295,66 @@ function setupSocketScreen() {
       ioScreen.to('slave').emit('destroy', id)
     }
     socket.on('destroy', onDestroy)
+
+    /**
+     * Connects a player to the game.
+     *
+     * @param {Player} player The player data.
+     */
+    function connectPlayer(player) {
+      players[socket.id] = player
+      socket.join('local-mp')
+      ioScreen.emit('player-connected', player)
+    }
+    socket.on('connect-player', connectPlayer)
+
+    function disconnectPlayer(player) {
+      if (player.isMaster) {
+        players = {}
+      } else {
+        delete players[socket.id]
+      }
+
+      socket.leave('local-mp')
+      ioScreen.emit('player-disconnected', player)
+    }
+    socket.on('disconnect-player', disconnectPlayer)
+
+    function playerKilled(playerInfo) {
+      ioScreen.emit('player-killed', playerInfo)
+    }
+    socket.on('player-killed', playerKilled)
+
+    function playerRespawn(playerId) {
+      const player = Object.values(players).find((p) => p.id === playerId)
+
+      if (player) {
+        ioScreen.emit('player-respawn', player)
+      }
+    }
+    socket.on('player-respawn', playerRespawn)
+
+    function updatePlayerData(player) {
+      players[player.id] = player
+    }
+    socket.on('update-player-data', updatePlayerData)
+
+    function openLobby() {
+      isLobbyOpened = true
+      ioScreen.emit('open-lobby')
+    }
+    socket.on('open-lobby', openLobby)
+
+    function lobbyStatus(_, callback) {
+      callback(isLobbyOpened)
+    }
+    socket.on('lobby-status', lobbyStatus)
+
+    function closeLobby() {
+      isLobbyOpened = false
+      ioScreen.emit('close-lobby')
+    }
+    socket.on('close-lobby', closeLobby)
 
     /**
      * Updates the entity data in the slaves screens.
@@ -318,6 +423,23 @@ function setupSocketScreen() {
      * @param {string} reason - The reason for the disconnection.
      */
     function disconnect(reason) {
+      const player = players[socket.id]
+
+      if (player) {
+        if (player.isMaster) {
+          players = {}
+        }
+
+        socket.leave('local-mp')
+        ioScreen.emit('player-disconnected', player)
+        delete players[socket.id]
+      }
+
+      if (masterController && masterController.includes(socket.id)) {
+        masterController = null
+        return
+      }
+
       const screen = Object.entries(screens).find(
         (entry) => entry[1].id === socket.id,
       )
@@ -357,7 +479,7 @@ function setupSocketClient() {
    * Function that informs the user if the connection was failed
    */
   function disconnect() {
-    console.log('Connected to server: ' + socket.id)
+    console.log('Disconnected to server: ' + socket.id)
   }
   socket.on('disconnect', disconnect)
 }

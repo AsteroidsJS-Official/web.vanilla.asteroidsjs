@@ -16,9 +16,8 @@ import { Asteroid } from '../../asteroid/entities/asteroid.entity'
 import { Bullet } from '../../bullet/entities/bullet.entity'
 
 import { GameService } from '../../../shared/services/game.service'
-import { UserService } from '../../../shared/services/user.service'
+import { MultiplayerService } from '../../../shared/services/multiplayer.service'
 
-import { AudioSource } from '../../../shared/components/audio-source.component'
 import { CircleCollider2 } from '../../../shared/components/colliders/circle-collider2.component'
 import { Drawer } from '../../../shared/components/drawer.component'
 import { Health } from '../../../shared/components/health.component'
@@ -31,21 +30,17 @@ import { Input } from '../components/input.component'
 import { ICollision2 } from '../../../shared/interfaces/collision2.interface'
 import { IOnTriggerEnter } from '../../../shared/interfaces/on-trigger-enter.interface'
 
+import { Subscription } from 'rxjs'
+
 /**
  * Class that represents the spaceship entity controlled by the user.
  */
 @Entity({
   order: 1,
-  services: [UserService, GameService, SocketService],
+  services: [GameService, SocketService, MultiplayerService],
   components: [
     Drawer,
     RenderOverflow,
-    {
-      class: AudioSource,
-      use: {
-        spatial: true,
-      },
-    },
     {
       class: CircleCollider2,
       use: {
@@ -99,11 +94,13 @@ export class Spaceship
   extends AbstractEntity
   implements IOnAwake, IDraw, IOnLateLoop, IOnTriggerEnter, IOnDestroy
 {
-  private userService: UserService
-
   private gameService: GameService
 
+  private multiplayerService: MultiplayerService
+
   private socketService: SocketService
+
+  private healthSubscription: Subscription
 
   /**
    * Property responsible for the spaceship bullet velocity.
@@ -116,6 +113,11 @@ export class Spaceship
   private lastShot: Date
 
   /**
+   * Property responsible for the spaceship canvas drawing.
+   */
+  private drawer: Drawer
+
+  /**
    * Property that contains the spaceship position, dimensions and rotation.
    */
   private transform: Transform
@@ -125,16 +127,64 @@ export class Spaceship
    */
   private rigidbody: Rigidbody
 
-  private audioSource: AudioSource
+  /**
+   * Property that defines the time that the spaceship was generated.
+   */
+  private generationTime: Date
 
+  /**
+   * Property that defines whether the spaceship is visible.
+   */
+  private isVisible = false
+
+  /**
+   * Property that represents the blinking interval.
+   */
+  private visibilityInterval: NodeJS.Timer
+
+  /**
+   * Property that represents whether the spaceship was destroyed.
+   */
+  private wasDestroyed = false
+
+  /**
+   * Property that defines the spaceship image.
+   */
   private image: HTMLImageElement
 
-  public isShooting = false
-
-  public tag = Spaceship.name
-
+  /**
+   * Property that contains the spaceship health status.
+   */
   public health: Health
 
+  /**
+   * Property that defines the spaceship image url.
+   */
+  public imageSrc: string
+
+  /**
+   * Property that represents whether the spaceship is shooting.
+   */
+  public isShooting = false
+
+  /**
+   * Property that defines the spaceship tag.
+   */
+  public tag = Spaceship.name
+
+  /**
+   * Property that links the spaceship to its user by the user id.
+   */
+  public userId = ''
+
+  /**
+   * Property that links the spaceship to its joystick controller.
+   */
+  public joystickId = ''
+
+  /**
+   * Property that represents the spaceship direction.
+   */
   public get direction(): Vector2 {
     return new Vector2(
       Math.sin(this.transform.rotation),
@@ -144,32 +194,75 @@ export class Spaceship
 
   onAwake(): void {
     this.socketService = this.getService(SocketService)
-    this.userService = this.getService(UserService)
     this.gameService = this.getService(GameService)
+    this.multiplayerService = this.getService(MultiplayerService)
 
     this.transform = this.getComponent(Transform)
     this.rigidbody = this.getComponent(Rigidbody)
-    this.audioSource = this.getComponent(AudioSource)
     this.health = this.getComponent(Health)
+    this.drawer = this.getComponent(Drawer)
   }
 
   onStart(): void {
+    this.generationTime = new Date()
+    this.getComponents(CircleCollider2).forEach((c) => (c.enabled = false))
+    this.addTags('intangible')
+
     if (this.getComponent(Render) || this.getComponent(RenderOverflow)) {
       this.image = new Image()
-      this.image.src = `./assets/svg/spaceship-${this.userService.spaceshipImage}.svg`
+      this.image.src = this.imageSrc
+
+      this.visibilityInterval = setInterval(() => {
+        this.isVisible = !this.isVisible
+      }, 200)
     }
-    this.health.color = this.userService.spaceshipColor
+
+    this.healthSubscription = this.health.health$.subscribe((amount) => {
+      if (amount <= 0 && !this.gameService.gameOver) {
+        if (!this.gameService.isInLocalMPGame) {
+          this.gameService.gameOver = true
+        } else {
+          const score =
+            this.multiplayerService.getPlayerById(this.userId)?.score || 0
+          this.socketService.emit('player-killed', {
+            playerId: this.userId,
+            joystickId: this.joystickId,
+            score,
+          })
+
+          this.multiplayerService.decreasePlayerScore(
+            this.userId,
+            score - Math.round(score * 0.3) <= 20
+              ? score
+              : Math.round(score * 0.3),
+          )
+        }
+
+        this.wasDestroyed = true
+        this.destroy(this)
+      }
+    })
   }
 
   onDestroy(): void {
     this.socketService.emit('destroy', this.id)
+    this.healthSubscription?.unsubscribe()
   }
 
   onTriggerEnter(collision: ICollision2): void {
+    if (this.wasDestroyed) {
+      return
+    }
+
+    if (collision.entity2.tag?.includes(Spaceship.name)) {
+      const enemySpaceship = collision.entity2 as unknown as Spaceship
+      enemySpaceship.health.hurt(enemySpaceship.health.maxHealth)
+      this.health.hurt(this.health.maxHealth)
+    }
+
     if (
       collision.entity2.tag?.includes(Bullet.name) &&
-      (collision.entity2 as unknown as Bullet).userId ===
-        this.userService.userId
+      (collision.entity2 as unknown as Bullet).userId === this.userId
     ) {
       return
     }
@@ -182,15 +275,37 @@ export class Spaceship
     if (collision.entity2.tag?.includes(Bullet.name)) {
       this.destroy(collision.entity2)
       this.health.hurt(5)
-    }
 
-    if (this.health.health <= 0 && !this.gameService.gameOver) {
-      this.destroy(this)
-      this.gameService.gameOver = true
+      if (this.health.health <= 0) {
+        const bullet = collision.entity2 as unknown as Bullet
+        this.multiplayerService.increasePlayerScore(bullet.userId, 50)
+
+        this.wasDestroyed = true
+      }
     }
   }
 
   onLateLoop(): void {
+    const generationDiff = new Date().getTime() - this.generationTime.getTime()
+
+    if (generationDiff > 1600) {
+      clearInterval(this.visibilityInterval)
+      this.isVisible = true
+      this.drawer.enabled = true
+      this.removeTags('intangible')
+      this.getComponents(CircleCollider2).forEach((c) => (c.enabled = true))
+    }
+
+    if (this.drawer.enabled && !this.isVisible && this.hasTag('intangible')) {
+      this.drawer.enabled = false
+    } else if (
+      !this.drawer.enabled &&
+      this.isVisible &&
+      this.hasTag('intangible')
+    ) {
+      this.drawer.enabled = true
+    }
+
     this.socketService.emit('update-slaves', {
       id: this.id,
       data: {
@@ -201,6 +316,10 @@ export class Spaceship
         maxHealth: this.health.maxHealth,
       },
     })
+
+    if (!this.gameService.isInLocalMPGame) {
+      return
+    }
   }
 
   public draw(): void {
@@ -238,14 +357,18 @@ export class Spaceship
     )
   }
 
+  /**
+   * Shoots new bullets according to the spaceship last shot time.
+   */
   public shoot(): void {
-    if (this.lastShot && new Date().getTime() - this.lastShot.getTime() < 400) {
+    if (
+      (this.lastShot && new Date().getTime() - this.lastShot.getTime() < 400) ||
+      this.hasTag('intangible')
+    ) {
       return
     }
 
     this.lastShot = new Date()
-
-    this.audioSource.playOneShot('./assets/audios/shot.mp3')
 
     this.createBullet((2 * Math.PI) / 5, 7.5)
     this.createBullet(-(2 * Math.PI) / 5, 5.5)
@@ -254,6 +377,15 @@ export class Spaceship
     this.createBullet(-(2 * Math.PI) / 7, 7.5)
   }
 
+  /**
+   * Instantiates a new bullet from the spaceship.
+   *
+   * @param localPosition The bullet initial position.
+   * @param offset The bullet position offset.
+   *
+   * @example
+   * createBullet(Math.PI, 5.5)
+   */
   private createBullet(localPosition: number, offset: number): void {
     const rotation = this.transform.rotation
     const position = Vector2.sum(
@@ -274,7 +406,7 @@ export class Spaceship
     const bullet = this.instantiate({
       use: {
         tag: `${Bullet.name}`,
-        userId: this.userService.userId,
+        userId: this.userId,
       },
       entity: Bullet,
       components: [

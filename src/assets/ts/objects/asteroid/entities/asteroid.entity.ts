@@ -17,6 +17,7 @@ import { SocketService } from '../../../shared/services/socket.service'
 import { Bullet } from '../../bullet/entities/bullet.entity'
 
 import { GameService } from '../../../shared/services/game.service'
+import { MultiplayerService } from '../../../shared/services/multiplayer.service'
 import { UserService } from '../../../shared/services/user.service'
 
 import { CircleCollider2 } from '../../../shared/components/colliders/circle-collider2.component'
@@ -31,10 +32,10 @@ import { ICollision2 } from '../../../shared/interfaces/collision2.interface'
 import { IOnTriggerEnter } from '../../../shared/interfaces/on-trigger-enter.interface'
 
 /**
- * Class that represents the asteroid entity and it's behavior.
+ * Class that represents the asteroid entity and its behavior.
  */
 @Entity({
-  services: [UserService, GameService, SocketService],
+  services: [UserService, GameService, SocketService, MultiplayerService],
   components: [
     Render,
     Drawer,
@@ -61,12 +62,23 @@ export class Asteroid
 
   private socketService: SocketService
 
+  private multiplayerService: MultiplayerService
+
   private gameService: GameService
 
+  /**
+   * Property that contains the asteroid position, dimensions and rotation.
+   */
   private transform: Transform
 
+  /**
+   * Property that contains the asteroid health status.
+   */
   private health: Health
 
+  /**
+   * Property that defines the asteroid tag.
+   */
   public tag = Asteroid.name
 
   /**
@@ -110,6 +122,7 @@ export class Asteroid
     this.userService = this.getService(UserService)
     this.socketService = this.getService(SocketService)
     this.gameService = this.getService(GameService)
+    this.multiplayerService = this.getService(MultiplayerService)
 
     this.transform = this.getComponent(Transform)
     this.health = this.getComponent(Health)
@@ -180,7 +193,18 @@ export class Asteroid
     }
 
     if (collision.entity2.tag?.includes(Bullet.name)) {
-      this.userService.increaseScore(this._asteroidSize + 1)
+      if (
+        this.gameService.isInLocalMPGame ||
+        this.gameService.isConnectedToRoom
+      ) {
+        const bullet = collision.entity2 as unknown as Bullet
+        this.multiplayerService.increasePlayerScore(
+          bullet.userId,
+          this._asteroidSize + 1,
+        )
+      } else {
+        this.userService.increaseScore(this._asteroidSize + 1)
+      }
     }
 
     if (this._asteroidSize > 0) {
@@ -216,11 +240,31 @@ export class Asteroid
   }
 
   public draw(): void {
-    this.drawAsteroid()
+    this.getContexts()[0].translate(
+      this.transform.canvasPosition.x,
+      this.transform.canvasPosition.y,
+    )
+    this.getContexts()[0].rotate(this.transform.rotation)
+
+    this.getContexts()[0].beginPath()
+    this.getContexts()[0].drawImage(
+      this.image,
+      0 - this.transform.dimensions.width / 2,
+      0 - this.transform.dimensions.height / 2,
+      this.transform.dimensions.width,
+      this.transform.dimensions.height,
+    )
+    this.getContexts()[0].closePath()
+
+    this.getContexts()[0].rotate(-this.transform.rotation)
+    this.getContexts()[0].translate(
+      -this.transform.canvasPosition.x,
+      -this.transform.canvasPosition.y,
+    )
   }
 
   /**
-   * Generates new asteroid from the current asteroid according to
+   * Generates a new asteroid from the current asteroid according to
    * the given amount.
    *
    * @param amount The amount of fragments to be generated.
@@ -297,29 +341,5 @@ export class Asteroid
         },
       })
     }
-  }
-
-  private drawAsteroid(): void {
-    this.getContexts()[0].translate(
-      this.transform.canvasPosition.x,
-      this.transform.canvasPosition.y,
-    )
-    this.getContexts()[0].rotate(this.transform.rotation)
-
-    this.getContexts()[0].beginPath()
-    this.getContexts()[0].drawImage(
-      this.image,
-      0 - this.transform.dimensions.width / 2,
-      0 - this.transform.dimensions.height / 2,
-      this.transform.dimensions.width,
-      this.transform.dimensions.height,
-    )
-    this.getContexts()[0].closePath()
-
-    this.getContexts()[0].rotate(-this.transform.rotation)
-    this.getContexts()[0].translate(
-      -this.transform.canvasPosition.x,
-      -this.transform.canvasPosition.y,
-    )
   }
 }

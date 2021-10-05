@@ -118,7 +118,11 @@ export abstract class AbstractCollider
       this.collisions = this.collisions.filter((_, index) => index !== i)
 
       if (this.hasOnTriggerExit(this.entity)) {
-        this.entity.onTriggerExit(collision)
+        const callback = () => {
+          ;(this.entity as any).onTriggerExit(collision)
+          this.removeIntent(callback)
+        }
+        this.addIntent(callback)
       }
     })
 
@@ -146,11 +150,19 @@ export abstract class AbstractCollider
         this.collisions.push(collision)
 
         if (this.hasOnTriggerEnter(this.entity)) {
-          this.entity.onTriggerEnter(collision)
+          const callback = () => {
+            ;(this.entity as any).onTriggerEnter(collision)
+            this.removeIntent(callback)
+          }
+          this.addIntent(callback)
         }
       } else {
         if (this.hasOnTriggerStay(this.entity)) {
-          this.entity.onTriggerStay(collision)
+          const callback = () => {
+            ;(this.entity as any).onTriggerStay(collision)
+            this.removeIntent(callback)
+          }
+          this.addIntent(callback)
         }
       }
     })

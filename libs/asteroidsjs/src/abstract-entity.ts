@@ -25,10 +25,10 @@ export abstract class AbstractEntity implements IEnabled {
   deltaTime = 0
 
   /**
-   * Property that defines some tag allowing to differ thngs in collider
+   * Property that defines some tag allowing to differ things in collider
    * behaviours
    */
-  tag: string
+  tag = ''
 
   /**
    * Property that enables the entity.
@@ -232,5 +232,78 @@ export abstract class AbstractEntity implements IEnabled {
    */
   find<C extends AbstractComponent>(component: Type<C>): C[] {
     return this.scene.game.find(component)
+  }
+
+  /**
+   * Adds tags to the current entity according to the given array.
+   *
+   * @param tags an array of tags to be added to the current entity.
+   *
+   * @example
+   * addTags('tag1', 'tag2')
+   */
+  addTags(...tags: string[]): void {
+    tags.forEach((tag) => {
+      this.tag = this.tag ? this.tag + `|${tag}` : tag
+    })
+  }
+
+  /**
+   * Removes tags from the current entity according to the given array.
+   *
+   * @param tags an array of tags to be removed from the current entity.
+   *
+   * @example
+   * removeTags('tag1', 'tag2')
+   */
+  removeTags(...tags: string[]): void {
+    tags.forEach((tag) => {
+      if (!this.hasTag(tag)) {
+        return
+      }
+
+      this.tag = this.tag
+        .replace(tag, '')
+        .split('|')
+        .filter((t) => !!t)
+        .join('|')
+    })
+  }
+
+  /**
+   * Verifies whether the given tag is present in the current entity.
+   *
+   * @param tag the tag to be checked.
+   * @returns whether the current entity has the given tag.
+   */
+  hasTag(tag: string): boolean {
+    return this.tag && this.tag.includes(tag)
+  }
+
+  /**
+   * Gets an array of tags from the current entity.
+   *
+   * @returns an array of tags.
+   */
+  getTags(): string[] {
+    return this.tag.split('|')
+  }
+
+  /**
+   * Adds an intent to the intents array.
+   *
+   * @param intent a callback to be called in the end of the loop.
+   */
+  addIntent(intent: () => void): void {
+    this.scene.addIntent(intent)
+  }
+
+  /**
+   * Removes an intent from the intents array.
+   *
+   * @param intent the intent to be removed.
+   */
+  removeIntent(intent: () => void): void {
+    this.scene.removeIntent(intent)
   }
 }

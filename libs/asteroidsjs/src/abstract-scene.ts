@@ -116,4 +116,22 @@ export abstract class AbstractScene implements IEnabled {
   getEntities(): AbstractEntity[] {
     return this.entities
   }
+
+  /**
+   * Adds an intent to the intents array.
+   *
+   * @param intent a callback to be called in the end of the loop.
+   */
+  addIntent(intent: () => void): void {
+    this.game.addIntent(intent)
+  }
+
+  /**
+   * Removes an intent from the intents array.
+   *
+   * @param intent the intent to be removed.
+   */
+  removeIntent(intent: () => void): void {
+    this.game.removeIntent(intent)
+  }
 }

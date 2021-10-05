@@ -1,4 +1,4 @@
-import { AbstractService, Service } from '@asteroidsjs'
+import { AbstractService, generateUUID, Service } from '@asteroidsjs'
 
 import { IPlayer } from '../interfaces/player.interface'
 
@@ -17,7 +17,13 @@ export class UserService extends AbstractService {
   /**
    * Property that defines the user id.
    */
-  public userId = 'fbA8293AA89'
+  public userId = generateUUID()
+
+  /**
+   * Property that defines whether the user controls the master
+   * screen.
+   */
+  public isMaster = true
 
   /**
    * Property that defines the user nickname.
@@ -33,6 +39,16 @@ export class UserService extends AbstractService {
    * Property that defines the user spaceship image.
    */
   public spaceshipImage = 'grey'
+
+  /**
+   * Property that defines the user health.
+   */
+  public health = 30
+
+  /**
+   * Property that defines the user maximum health.
+   */
+  public maxHealth = 30
 
   /**
    * Property responsible for the user score observer.
@@ -56,9 +72,15 @@ export class UserService extends AbstractService {
   public get player(): IPlayer {
     return {
       id: this.userId,
-      color: this.spaceshipImage,
+      isMaster: this.isMaster,
       nickname: this.nickname,
       score: this.score,
+      health: this.health,
+      maxHealth: this.maxHealth,
+      spaceship: {
+        color: this.spaceshipColor,
+        colorName: this.spaceshipImage,
+      },
     }
   }
 
