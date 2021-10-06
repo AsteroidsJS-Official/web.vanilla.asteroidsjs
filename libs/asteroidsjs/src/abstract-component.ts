@@ -18,12 +18,6 @@ export abstract class AbstractComponent implements IEnabled {
   order = 0
 
   /**
-   * Property that defines a number used to synchronize the application
-   * physics.
-   */
-  deltaTime = 0
-
-  /**
    * Property that enables the component.
    *
    * All "loop" methods such as "onLoop" or "onLateLoop" are only executed
@@ -31,6 +25,12 @@ export abstract class AbstractComponent implements IEnabled {
    * methods.
    */
   private _enabled = true
+
+  /**
+   * Property that defines a number used to synchronize the application
+   * physics.
+   */
+  private _deltaTime = 0
 
   /**
    * Property that defines a number that represents the last time saved for
@@ -58,6 +58,30 @@ export abstract class AbstractComponent implements IEnabled {
    */
   set enabled(value: boolean) {
     this._enabled = value
+  }
+
+  /**
+   * Property that defines a number used to synchronize the application
+   * physics.
+   */
+  get deltaTime(): number {
+    return this._deltaTime * this.timeScale
+  }
+
+  /**
+   * Property that defines a number used to synchronize the application
+   * physics.
+   */
+  private set deltaTime(value: number) {
+    this._deltaTime = value
+  }
+
+  get timeScale(): number {
+    return this.entity.timeScale
+  }
+
+  set timeScale(value: number) {
+    this.entity.timeScale = value
   }
 
   /**

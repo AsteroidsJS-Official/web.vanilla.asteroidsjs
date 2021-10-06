@@ -149,6 +149,7 @@ export class ManagerAsteroids
       ],
     })
 
+    // TODO: convert data properties in subproperties ex: { data: property1: 2, property2: { property3: 3 } }
     this.lgSocketService.emit('instantiate', {
       id: asteroid.id,
       type: Asteroid.name,

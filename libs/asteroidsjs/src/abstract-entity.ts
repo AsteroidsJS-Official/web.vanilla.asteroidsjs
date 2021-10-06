@@ -76,6 +76,14 @@ export abstract class AbstractEntity implements IEnabled {
     this._enabled = value
   }
 
+  get timeScale(): number {
+    return this.scene.timeScale
+  }
+
+  set timeScale(value: number) {
+    this.scene.timeScale = value
+  }
+
   constructor(
     readonly id: string | number,
     public scene: AbstractScene,

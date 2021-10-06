@@ -31,6 +31,8 @@ import { Entity, generateUUID } from '..'
  * Class that represents the main application behaviour
  */
 class AsteroidsApplication implements IAsteroidsApplication {
+  timeScale = 1
+
   /**
    * Property that defines an array of scenes, that represents all the
    * loaded entities in the game

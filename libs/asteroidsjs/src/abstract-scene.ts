@@ -1,4 +1,4 @@
-import { AbstractEntity, generateUUID, IContext, Type } from '..'
+import { AbstractEntity, clamp, generateUUID, IContext, Type } from '..'
 
 import { IAsteroidsApplication } from './interfaces/asteroids-application.interface'
 import { ICanvasOptions } from './interfaces/canvas-options.interface'
@@ -30,6 +30,14 @@ export abstract class AbstractScene implements IEnabled {
    * Property that defines an object that represents the canvas context
    */
   private _contexts: IContext[] = []
+
+  get timeScale(): number {
+    return this.game.timeScale
+  }
+
+  set timeScale(value: number) {
+    this.game.timeScale = clamp(value, 0, 1)
+  }
 
   constructor(
     readonly id: number | string,
