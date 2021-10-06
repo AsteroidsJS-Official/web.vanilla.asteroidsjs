@@ -163,11 +163,16 @@ export class ManagerAsteroids
       ],
     })
 
+<<<<<<< HEAD
     if (isMobile) {
       return
     }
 
     this.socketService.emit('instantiate', {
+=======
+    // TODO: convert data properties in subproperties ex: { data: property1: 2, property2: { property3: 3 } }
+    this.lgSocketService.emit('instantiate', {
+>>>>>>> 57cb3e7... feat: add the timeScale property in som of the game structures (entity, component and scene), in order to allow accelerating or desacelerating the object physics checking and calculating
       id: asteroid.id,
       type: Asteroid.name,
       data: {

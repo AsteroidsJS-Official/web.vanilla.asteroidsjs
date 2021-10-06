@@ -9,6 +9,7 @@ import {
 } from '@asteroidsjs'
 
 import { Transform } from '../transform.component'
+
 /**
  * Component that adds physical behaviors such as velocity and
  * acceleration to an entity
