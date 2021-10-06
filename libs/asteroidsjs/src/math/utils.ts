@@ -10,6 +10,16 @@ export function abs(value: number): number {
   return value < 0 ? -value : value
 }
 
+export function clamp(value: number, min: number, max: number): number {
+  if (value <= min) {
+    return min
+  } else if (value >= max) {
+    return max
+  } else {
+    return value
+  }
+}
+
 /**
  * Function that, passed an angle, returns a vector based on that angle
  *

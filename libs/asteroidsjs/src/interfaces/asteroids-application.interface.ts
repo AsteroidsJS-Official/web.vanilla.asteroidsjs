@@ -13,6 +13,8 @@ import { AbstractScene } from '../abstract-scene'
  * Interface that represents the game instance.
  */
 export interface IAsteroidsApplication {
+  timeScale: number
+
   /**
    * Method that starts the game lifecycle.
    */
