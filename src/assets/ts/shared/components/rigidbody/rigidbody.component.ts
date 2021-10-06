@@ -183,17 +183,8 @@ export class Rigidbody
    */
   private applyFriction(): void {
     let force = Vector2.multiply(this.velocity.normalized, -1)
-    let angularForce =
-      this.angularVelocity === 0
-        ? 0
-        : -this.angularVelocity / abs(this.angularVelocity)
-
     const normal = this.mass
-
     force = Vector2.multiply(force, this.friction * normal)
-    angularForce = angularForce * this.friction * normal
-
     this.resultant = Vector2.multiply(force, this.deltaTime)
-    this.angularResultant = angularForce * this.deltaTime
   }
 }
