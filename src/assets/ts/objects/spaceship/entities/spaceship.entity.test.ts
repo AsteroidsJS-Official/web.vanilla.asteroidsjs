@@ -3,21 +3,14 @@ import {
   AbstractScene,
   IAsteroidsApplication,
   AsteroidsFactory,
-  Entity,
-  AbstractEntity,
 } from '@asteroidsjs'
 
 import { Bullet } from '../../../objects/bullet/entities/bullet.entity'
 import { Spaceship } from '../../../objects/spaceship/entities/spaceship.entity'
 
-import { Health } from '../../../shared/components/health.component'
-
 describe('rigidbody', () => {
   @Scene()
   class TestScene extends AbstractScene {}
-
-  @Entity()
-  class TestEntity extends AbstractEntity {}
 
   let app: IAsteroidsApplication
   let scene: TestScene
