@@ -21,6 +21,9 @@ import { GameService } from '../../../shared/services/game.service'
 import { MultiplayerService } from '../../../shared/services/multiplayer.service'
 import { UserService } from '../../../shared/services/user.service'
 
+import { AudioSource } from '../../../shared/components/audio-source.component'
+import { Transform } from '../../../shared/components/transform.component'
+
 import { IPlayerVisual } from '../../../shared/interfaces/player.interface'
 
 import { isMobile } from './../../../utils/platform'
@@ -37,6 +40,17 @@ import { Subscription } from 'rxjs'
     MultiplayerService,
     SocketService,
     UserService,
+  ],
+  components: [
+    {
+      class: AudioSource,
+      use: {
+        spatial: true,
+        loop: true,
+        volume: 0.7,
+      },
+    },
+    Transform,
   ],
 })
 export class Menu
@@ -57,12 +71,19 @@ export class Menu
 
   private sceneSubscription: Subscription
 
+  /**
+   * Property that contains the menu sound effects.
+   */
+  private audioSource: AudioSource
+
   onAwake(): void {
     this.gameService = this.getService(GameService)
     this.lgSocketService = this.getService(LGSocketService)
     this.multiplayerService = this.getService(MultiplayerService)
     this.socketService = this.getService(SocketService)
     this.userService = this.getService(UserService)
+
+    this.audioSource = this.getComponent(AudioSource)
   }
 
   onStart(): void {
@@ -76,6 +97,8 @@ export class Menu
             this.loadLocalMultiplayer()
           }
         })
+
+      this.audioSource.play('./assets/audios/menu-music.mp3')
     }
 
     if (isMobile) {
@@ -135,6 +158,7 @@ export class Menu
     const inputGuest = getElement<HTMLInputElement>('#nickname-guest-input')
 
     const loginButton = getElement<HTMLButtonElement>('.login-button')
+    const skinButtons = getMultipleElements('.spaceship-skin-picker')
 
     const spaceshipSkin = getElement<HTMLImageElement>('.spaceship-skin')
     const colorPicker = getElement('.spaceship-color-picker')
@@ -190,6 +214,12 @@ export class Menu
         'asteroidsjs_nickname',
         (e.target as HTMLInputElement).value,
       )
+    })
+
+    skinButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.audioSource.playOneShot('./assets/audios/menu-mouse-click.mp3')
+      })
     })
 
     spaceshipColors.forEach(({ name, color }, index) => {
@@ -248,6 +278,18 @@ export class Menu
 
       spaceshipSkin.src = `./assets/svg/spaceship-${colorName}.svg`
     }
+
+    getMultipleElements('.play-buttons button').forEach((btn) => {
+      if (!isMobile) {
+        btn.addEventListener('mouseenter', () => {
+          this.audioSource.playOneShot('./assets/audios/menu-mouse-hover.mp3')
+        })
+      }
+
+      btn.addEventListener('click', () => {
+        this.audioSource.playOneShot('./assets/audios/menu-mouse-click.mp3')
+      })
+    })
   }
 
   /**
@@ -300,6 +342,8 @@ export class Menu
 
     if (isMobile) {
       playButton.addEventListener('click', () => {
+        this.audioSource.playOneShot('./assets/audios/menu-mouse-click.mp3')
+
         if (!this.userService.isMaster) {
           this.multiplayerService.lobbyStatus.subscribe((isLobbyOpen) => {
             if (isLobbyOpen) {
@@ -318,31 +362,37 @@ export class Menu
       })
 
       backButton.addEventListener('click', () => {
+        this.audioSource.playOneShot('./assets/audios/menu-mouse-click.mp3')
+
         addClass('.controller-play-menu-container', 'hide')
         removeClass('.controller-menu-container', 'hide')
       })
     }
 
     playSPButton.addEventListener('click', () => {
-      this.lgSocketService.changeScene('single')
+      setTimeout(() => {
+        this.lgSocketService.changeScene('single')
 
-      if (isMobile) {
-        destroyMultipleElements('ast-controller-menu')
-        this.scene.unload(this.scene)
-        this.scene.load(Joystick)
-      }
+        if (isMobile) {
+          destroyMultipleElements('ast-controller-menu')
+          this.scene.unload(this.scene)
+          this.scene.load(Joystick)
+        }
+      }, 400)
     })
 
     playLMPButton.addEventListener('click', () => {
-      this.lgSocketService.changeScene('local-mp')
+      setTimeout(() => {
+        this.lgSocketService.changeScene('local-mp')
 
-      if (isMobile) {
-        this.gameService.isConnectedToRoom = true
-        this.multiplayerService.connectMe()
-        destroyMultipleElements('ast-controller-menu')
-        this.scene.unload(this.scene)
-        this.scene.load(Joystick)
-      }
+        if (isMobile) {
+          this.gameService.isConnectedToRoom = true
+          this.multiplayerService.connectMe()
+          destroyMultipleElements('ast-controller-menu')
+          this.scene.unload(this.scene)
+          this.scene.load(Joystick)
+        }
+      }, 400)
     })
 
     colorButtons.forEach((button) => {
