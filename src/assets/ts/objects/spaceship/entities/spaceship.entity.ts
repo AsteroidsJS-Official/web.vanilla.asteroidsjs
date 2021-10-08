@@ -1,9 +1,11 @@
 import {
   AbstractEntity,
   Entity,
+  generateUUID,
   IDraw,
   IOnAwake,
   IOnDestroy,
+  IOnFixedLoop,
   IOnLateLoop,
   ISocketData,
   Rect,
@@ -18,6 +20,7 @@ import { Bullet } from '../../bullet/entities/bullet.entity'
 import { GameService } from '../../../shared/services/game.service'
 import { MultiplayerService } from '../../../shared/services/multiplayer.service'
 
+import { AudioSource } from '../../../shared/components/audio-source.component'
 import { CircleCollider2 } from '../../../shared/components/colliders/circle-collider2.component'
 import { Drawer } from '../../../shared/components/drawer.component'
 import { Health } from '../../../shared/components/health.component'
@@ -41,6 +44,20 @@ import { Subscription } from 'rxjs'
   components: [
     Drawer,
     RenderOverflow,
+    {
+      class: AudioSource,
+      use: {
+        spatial: true,
+        loop: true,
+      },
+    },
+    {
+      class: AudioSource,
+      use: {
+        spatial: true,
+        loop: true,
+      },
+    },
     {
       class: CircleCollider2,
       use: {
@@ -92,7 +109,13 @@ import { Subscription } from 'rxjs'
 })
 export class Spaceship
   extends AbstractEntity
-  implements IOnAwake, IDraw, IOnLateLoop, IOnTriggerEnter, IOnDestroy
+  implements
+    IOnAwake,
+    IDraw,
+    IOnLateLoop,
+    IOnFixedLoop,
+    IOnTriggerEnter,
+    IOnDestroy
 {
   private gameService: GameService
 
@@ -128,6 +151,11 @@ export class Spaceship
   private rigidbody: Rigidbody
 
   /**
+   * Property that contains the spaceship sound effects.
+   */
+  private audioSources: AudioSource[]
+
+  /**
    * Property that defines the time that the spaceship was generated.
    */
   private generationTime: Date
@@ -151,6 +179,16 @@ export class Spaceship
    * Property that defines the spaceship image.
    */
   private image: HTMLImageElement
+
+  /**
+   * Property that defines the group id that was hit.
+   */
+  private hitGroup: string
+
+  /**
+   * Property that defines whether the spaceship is accelerating.
+   */
+  public isBoosting: boolean
 
   /**
    * Property that contains the spaceship health status.
@@ -201,6 +239,7 @@ export class Spaceship
     this.rigidbody = this.getComponent(Rigidbody)
     this.health = this.getComponent(Health)
     this.drawer = this.getComponent(Drawer)
+    this.audioSources = this.getComponents(AudioSource)
   }
 
   onStart(): void {
@@ -214,8 +253,10 @@ export class Spaceship
 
       this.visibilityInterval = setInterval(() => {
         this.isVisible = !this.isVisible
-      }, 200)
+      }, 200 / this.timeScale)
     }
+
+    this.audioSources[0].play('./assets/audios/spaceship-thruster-v2.mp3', 0.5)
 
     this.healthSubscription = this.health.health$.subscribe((amount) => {
       if (amount <= 0 && !this.gameService.gameOver) {
@@ -269,11 +310,28 @@ export class Spaceship
 
     if (collision.entity2.tag?.includes(Asteroid.name)) {
       const asteroid = collision.entity2 as unknown as Asteroid
-      this.health.hurt(asteroid.asteroidSize + 1 * 8)
+      this.audioSources[0].playOneShot(
+        './assets/audios/spaceship-collision.mp3',
+        this.transform.position,
+        0.6,
+      )
+      this.health.hurt((asteroid.asteroidSize + 1) * 8)
     }
 
     if (collision.entity2.tag?.includes(Bullet.name)) {
-      this.destroy(collision.entity2)
+      const bullet = collision.entity2 as unknown as Bullet
+
+      this.destroy(bullet)
+
+      if (!this.hitGroup || this.hitGroup !== bullet.groupId) {
+        this.hitGroup = bullet.groupId
+        this.audioSources[0].playOneShot(
+          `./assets/audios/${bullet.hitSound}`,
+          this.transform.position,
+          0.3,
+        )
+      }
+
       this.health.hurt(5)
 
       if (this.health.health <= 0) {
@@ -286,9 +344,15 @@ export class Spaceship
   }
 
   onLateLoop(): void {
+    if (!this.audioSources[1].playing && this.isBoosting) {
+      this.audioSources[1].play('./assets/audios/spaceship-thruster.mp3', 1)
+    } else if (this.audioSources[1].playing && !this.isBoosting) {
+      this.audioSources[1].stop()
+    }
+
     const generationDiff = new Date().getTime() - this.generationTime.getTime()
 
-    if (generationDiff > 1600) {
+    if (generationDiff > 1600 / this.timeScale) {
       clearInterval(this.visibilityInterval)
       this.isVisible = true
       this.drawer.enabled = true
@@ -320,6 +384,10 @@ export class Spaceship
     if (!this.gameService.isInLocalMPGame) {
       return
     }
+  }
+
+  onFixedLoop(): void {
+    this.refreshDeltaTime()
   }
 
   public draw(): void {
@@ -362,7 +430,9 @@ export class Spaceship
    */
   public shoot(): void {
     if (
-      (this.lastShot && new Date().getTime() - this.lastShot.getTime() < 400) ||
+      (this.lastShot &&
+        new Date().getTime() - this.lastShot.getTime() <
+          400 / this.timeScale) ||
       this.hasTag('intangible')
     ) {
       return
@@ -370,11 +440,18 @@ export class Spaceship
 
     this.lastShot = new Date()
 
-    this.createBullet((2 * Math.PI) / 5, 7.5)
-    this.createBullet(-(2 * Math.PI) / 5, 5.5)
+    this.audioSources[0].playOneShot(
+      './assets/audios/blaster-shot.mp3',
+      this.transform.position,
+    )
 
-    this.createBullet((2 * Math.PI) / 7, 9.5)
-    this.createBullet(-(2 * Math.PI) / 7, 7.5)
+    const groupId = generateUUID()
+
+    this.createBullet((2 * Math.PI) / 5, 7.5, groupId)
+    this.createBullet(-(2 * Math.PI) / 5, 5.5, groupId)
+
+    this.createBullet((2 * Math.PI) / 7, 9.5, groupId)
+    this.createBullet(-(2 * Math.PI) / 7, 7.5, groupId)
   }
 
   /**
@@ -382,11 +459,16 @@ export class Spaceship
    *
    * @param localPosition The bullet initial position.
    * @param offset The bullet position offset.
+   * @param groupId The bullet group id.
    *
    * @example
-   * createBullet(Math.PI, 5.5)
+   * createBullet(Math.PI, 5.5, 'f783aDe20dDaf90')
    */
-  private createBullet(localPosition: number, offset: number): void {
+  private createBullet(
+    localPosition: number,
+    offset: number,
+    groupId: string,
+  ): void {
     const rotation = this.transform.rotation
     const position = Vector2.sum(
       this.transform.position,
@@ -407,6 +489,7 @@ export class Spaceship
       use: {
         tag: `${Bullet.name}`,
         userId: this.userId,
+        groupId,
       },
       entity: Bullet,
       components: [
