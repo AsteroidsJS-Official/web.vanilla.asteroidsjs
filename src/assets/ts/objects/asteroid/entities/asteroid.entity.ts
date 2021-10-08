@@ -20,6 +20,7 @@ import { GameService } from '../../../shared/services/game.service'
 import { MultiplayerService } from '../../../shared/services/multiplayer.service'
 import { UserService } from '../../../shared/services/user.service'
 
+import { AudioSource } from '../../../shared/components/audio-source.component'
 import { CircleCollider2 } from '../../../shared/components/colliders/circle-collider2.component'
 import { Drawer } from '../../../shared/components/drawer.component'
 import { Health } from '../../../shared/components/health.component'
@@ -40,6 +41,7 @@ import { IOnTriggerEnter } from '../../../shared/interfaces/on-trigger-enter.int
     Render,
     Drawer,
     CircleCollider2,
+    AudioSource,
     {
       id: '__asteroid_transform__',
       class: Transform,
@@ -77,6 +79,11 @@ export class Asteroid
   private health: Health
 
   /**
+   * Property that contains the asteroid sound effects.
+   */
+  private audioSource: AudioSource
+
+  /**
    * Property that defines the asteroid tag.
    */
   public tag = Asteroid.name
@@ -93,6 +100,11 @@ export class Asteroid
    * Property that defines whether the asteroid was destroyed.
    */
   private wasDestroyed = false
+
+  /**
+   * Property that defines the group id that was hit.
+   */
+  private hitGroup: string
 
   /**
    * Property that defines the asteroid image.
@@ -126,6 +138,7 @@ export class Asteroid
 
     this.transform = this.getComponent(Transform)
     this.health = this.getComponent(Health)
+    this.audioSource = this.getComponent(AudioSource)
   }
 
   public onStart(): void {
@@ -177,14 +190,25 @@ export class Asteroid
       new Date().getTime() - this.generationTime.getTime()
 
     if (collision.entity2.tag?.includes(Bullet.name)) {
-      this.destroy(collision.entity2)
+      const bullet = collision.entity2 as unknown as Bullet
 
-      if (generationDiff <= 100) {
+      this.destroy(bullet)
+
+      if (generationDiff <= 100 / this.timeScale) {
         return
       }
 
+      if (!this.hitGroup || this.hitGroup !== bullet.groupId) {
+        this.hitGroup = bullet.groupId
+        this.audioSource.playOneShot(
+          `./assets/audios/${bullet.hitSound}`,
+          this.transform.position,
+          0.3,
+        )
+      }
+
       this.health.hurt(20)
-    } else if (generationDiff > 100) {
+    } else if (generationDiff > 100 / this.timeScale) {
       this.health.hurt(this.health.maxHealth)
     }
 

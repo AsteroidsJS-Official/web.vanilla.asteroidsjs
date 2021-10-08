@@ -116,7 +116,7 @@ export class SpaceshipVirtual
 
       this.visibilityInterval = setInterval(() => {
         this.isVisible = !this.isVisible
-      }, 200)
+      }, 200 / this.timeScale)
     }
 
     this.health.color = this.spaceshipColor
@@ -144,7 +144,7 @@ export class SpaceshipVirtual
   onLateLoop(): void {
     const generationDiff = new Date().getTime() - this.generationTime.getTime()
 
-    if (generationDiff > 1600) {
+    if (generationDiff > 1600 / this.timeScale) {
       clearInterval(this.visibilityInterval)
       this.isVisible = true
       this.drawer.enabled = true
