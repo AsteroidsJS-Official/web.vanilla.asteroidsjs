@@ -76,12 +76,15 @@ import { Subscription } from 'rxjs'
     {
       id: '__spaceship_rigidbody__',
       class: Rigidbody,
+      use: {
+        maxAngularVelocity: 1,
+      },
     },
     {
       class: Input,
       use: {
         force: 0.01,
-        angularForce: 0.000003,
+        angularForce: 0.15,
       },
     },
     {
