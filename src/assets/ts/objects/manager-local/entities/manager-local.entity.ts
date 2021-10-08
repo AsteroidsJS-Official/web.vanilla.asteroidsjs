@@ -25,6 +25,8 @@ import { GameService } from '../../../shared/services/game.service'
 import { MultiplayerService } from '../../../shared/services/multiplayer.service'
 import { UserService } from '../../../shared/services/user.service'
 
+import { AudioSource } from '../../../shared/components/audio-source.component'
+import { Transform } from '../../../shared/components/transform.component'
 import { Input } from '../../spaceship/components/input.component'
 
 import { IPlayer } from '../../../shared/interfaces/player.interface'
@@ -42,6 +44,15 @@ import { Subscription } from 'rxjs'
     MultiplayerService,
     SocketService,
     UserService,
+  ],
+  components: [
+    Transform,
+    {
+      class: AudioSource,
+      use: {
+        loop: true,
+      },
+    },
   ],
 })
 export class ManagerLocal
@@ -69,6 +80,11 @@ export class ManagerLocal
   private respawnSubscription: Subscription
 
   /**
+   * Property that contains the manager sound effects.
+   */
+  private audioSource: AudioSource
+
+  /**
    * Property that keeps all local multiplayer instantiated spaceships.
    */
   private spaceships: { [id: string]: Spaceship } = {}
@@ -79,6 +95,8 @@ export class ManagerLocal
     this.multiplayerService = this.getService(MultiplayerService)
     this.socketService = this.getService(SocketService)
     this.userService = this.getService(UserService)
+
+    this.audioSource = this.getComponent(AudioSource)
   }
 
   onStart(): void {
@@ -106,6 +124,8 @@ export class ManagerLocal
    */
   private master(): void {
     this.multiplayerService.openLobby()
+
+    this.audioSource.play('./assets/audios/space-ambient.mp3')
 
     this.gameService.maxAsteroidsAmount = 5
 

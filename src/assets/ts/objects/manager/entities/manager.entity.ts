@@ -25,6 +25,9 @@ import { Spaceship } from '../../spaceship/entities/spaceship.entity'
 import { GameService } from '../../../shared/services/game.service'
 import { UserService } from '../../../shared/services/user.service'
 
+import { AudioSource } from '../../../shared/components/audio-source.component'
+import { Transform } from '../../../shared/components/transform.component'
+
 import { Subscription } from 'rxjs'
 
 /**
@@ -32,6 +35,15 @@ import { Subscription } from 'rxjs'
  */
 @Entity({
   services: [UserService, LGSocketService, SocketService, GameService],
+  components: [
+    Transform,
+    {
+      class: AudioSource,
+      use: {
+        loop: true,
+      },
+    },
+  ],
 })
 export class Manager
   extends AbstractEntity
@@ -47,11 +59,18 @@ export class Manager
 
   private gameOverSubscription: Subscription
 
+  /**
+   * Property that contains the manager sound effects.
+   */
+  private audioSource: AudioSource
+
   onAwake(): void {
     this.userService = this.getService(UserService)
     this.lgSocketService = this.getService(LGSocketService)
     this.socketService = this.getService(SocketService)
     this.gameService = this.getService(GameService)
+
+    this.audioSource = this.getComponent(AudioSource)
   }
 
   onStart(): void {
@@ -85,6 +104,8 @@ export class Manager
         }
       },
     )
+
+    this.audioSource.play('./assets/audios/space-ambient.mp3')
 
     this.gameService.maxAsteroidsAmount = 10
 
