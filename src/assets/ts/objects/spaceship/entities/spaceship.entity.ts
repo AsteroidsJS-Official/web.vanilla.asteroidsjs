@@ -16,6 +16,7 @@ import { SocketService } from '../../../shared/services/socket.service'
 
 import { Asteroid } from '../../asteroid/entities/asteroid.entity'
 import { Bullet } from '../../bullet/entities/bullet.entity'
+import { PowerUp } from '../../power-up/entities/power-up.entity'
 
 import { GameService } from '../../../shared/services/game.service'
 import { MultiplayerService } from '../../../shared/services/multiplayer.service'
@@ -57,6 +58,10 @@ import { Subscription } from 'rxjs'
         spatial: true,
         loop: true,
       },
+    },
+    {
+      id: '__spaceship_power_up_audio_source__',
+      class: AudioSource,
     },
     {
       class: CircleCollider2,
@@ -186,6 +191,12 @@ export class Spaceship
   private hitGroup: string
 
   /**
+   * Property that defines the time in miliseconds between each
+   * shot.
+   */
+  public fireRate = 400
+
+  /**
    * Property that defines whether the spaceship is accelerating.
    */
   public isBoosting: boolean
@@ -305,6 +316,12 @@ export class Spaceship
       collision.entity2.tag?.includes(Bullet.name) &&
       (collision.entity2 as unknown as Bullet).userId === this.userId
     ) {
+      return
+    }
+
+    if (collision.entity2.tag?.includes(PowerUp.name)) {
+      this.applyPowerUp(collision.entity2 as unknown as PowerUp)
+      this.destroy(collision.entity2)
       return
     }
 
@@ -432,7 +449,7 @@ export class Spaceship
     if (
       (this.lastShot &&
         new Date().getTime() - this.lastShot.getTime() <
-          400 / this.timeScale) ||
+          this.fireRate / this.timeScale) ||
       this.hasTag('intangible')
     ) {
       return
@@ -519,5 +536,35 @@ export class Spaceship
         velocity,
       },
     } as ISocketData)
+  }
+
+  /**
+   * Applies a power up effect to the current spaceship.
+   *
+   * @param powerUp The power up to be applied.
+   */
+  private applyPowerUp(powerUp: PowerUp): void {
+    if (powerUp.acquireSound) {
+      this.audioSources[2].playOneShot(powerUp.acquireSound)
+    }
+
+    if (powerUp.name === 'repair') {
+      this.health.heal(powerUp.affectValue)
+    }
+
+    if (powerUp.name === 'armor') {
+      this.health.maxHealth += powerUp.affectValue
+      this.health.heal(powerUp.affectValue)
+    }
+
+    if (powerUp.name === 'rapid-fire') {
+      this.fireRate = this.fireRate / powerUp.affectValue
+
+      if (powerUp.duration) {
+        setTimeout(() => {
+          this.fireRate = this.fireRate * powerUp.affectValue
+        }, powerUp.duration * 1000)
+      }
+    }
   }
 }
