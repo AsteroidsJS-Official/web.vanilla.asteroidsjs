@@ -6,6 +6,7 @@ import {
   ISocketData,
   IOnDestroy,
   IOnAwake,
+  getRandom,
 } from '@asteroidsjs'
 
 import { LGSocketService } from '../../../shared/services/lg-socket.service'
@@ -99,7 +100,13 @@ export class ManagerAsteroids
    */
   private generateAsteroid(): void {
     const sizes = [0, 1, 2, 3, 4]
-    const asteroidSize = sizes[Math.floor(Math.random() * sizes.length)]
+    const asteroidSize = getRandom(sizes)
+
+    const isPowered = !this.isMenu && asteroidSize > 2 && Math.random() * 5 <= 4
+    const poweredColors = [{ colorName: 'lime', hex: '#38EC75' }]
+    const color = isPowered
+      ? getRandom(poweredColors)
+      : { colorName: 'grey', hex: '#8d8d8d' }
 
     const offset = 150
 
@@ -133,6 +140,8 @@ export class ManagerAsteroids
     const asteroid = this.instantiate({
       use: {
         asteroidSize,
+        isPowered,
+        color: color.colorName,
       },
       entity: Asteroid,
       components: [
@@ -155,7 +164,7 @@ export class ManagerAsteroids
         {
           id: '__asteroid_health__',
           use: {
-            color: '#8d8d8d',
+            color: color.hex,
             maxHealth: (asteroidSize + 1) * 20,
             health: (asteroidSize + 1) * 20,
           },
@@ -179,7 +188,7 @@ export class ManagerAsteroids
         mass: 15 * (asteroidSize + 1),
         maxAngularVelocity: 0.005,
         angularVelocity: 0.005 / (asteroidSize + 1),
-        color: '#8d8d8d',
+        color: color.hex,
         maxHealth: (asteroidSize + 1) * 20,
         health: (asteroidSize + 1) * 20,
       },
