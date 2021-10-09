@@ -10,11 +10,13 @@ import {
   isOverflowingX,
   isOverflowingY,
   Vector2,
+  getRandom,
 } from '@asteroidsjs'
 
 import { SocketService } from '../../../shared/services/socket.service'
 
 import { Bullet } from '../../bullet/entities/bullet.entity'
+import { PowerUp } from '../../power-up/entities/power-up.entity'
 
 import { GameService } from '../../../shared/services/game.service'
 import { MultiplayerService } from '../../../shared/services/multiplayer.service'
@@ -118,6 +120,18 @@ export class Asteroid
   public isFragment = false
 
   /**
+   * Property that defines whether the asteroid is powered, meaning
+   * it will release a power up when destroyed.
+   */
+  public isPowered = false
+
+  /**
+   * Property that defines the asteroid cracks color when it's
+   * powered.
+   */
+  public color = ''
+
+  /**
    * Property that defines the time that the asteroid was generated.
    */
   public generationTime: Date
@@ -150,19 +164,22 @@ export class Asteroid
         this.image.src = './assets/svg/asteroid-xs.svg'
       } else if (this._asteroidSize === 1) {
         const smallAsteroids = [1, 2]
-        this.image.src = `./assets/svg/asteroid-sm-${
-          smallAsteroids[Math.floor(Math.random() * smallAsteroids.length)]
-        }.svg`
+
+        this.image.src = `./assets/svg/asteroid-sm-${getRandom(
+          smallAsteroids,
+        )}.svg`
       } else if (this._asteroidSize === 2) {
         const mediumAsteroids = [1, 2]
-        this.image.src = `./assets/svg/asteroid-md-${
-          mediumAsteroids[Math.floor(Math.random() * mediumAsteroids.length)]
-        }.svg`
+
+        this.image.src = `./assets/svg/asteroid-md-${getRandom(
+          mediumAsteroids,
+        )}.svg`
       } else {
         const largeAsteroids = [1, 2, 3]
-        this.image.src = `./assets/svg/asteroid-lg-${
-          largeAsteroids[Math.floor(Math.random() * largeAsteroids.length)]
-        }.svg`
+
+        this.image.src = `./assets/svg/asteroid-lg-${getRandom(
+          largeAsteroids,
+        )}${this.isPowered ? '-powered-' + this.color : ''}.svg`
       }
     }
 
@@ -177,11 +194,70 @@ export class Asteroid
   }
 
   public onDestroy(): void {
+    if (this.isPowered) {
+      const rotation = Math.random() * 2 * Math.PI
+      const direction = new Vector2(Math.sin(rotation), Math.cos(rotation))
+
+      const velocity = Vector2.multiply(direction.normalized, 0.05)
+
+      const powerUps = [
+        {
+          isPassive: true,
+          hasLifeTime: true,
+          lifeTime: 4,
+          name: 'repair',
+          type: 'health',
+          affectValue: 10,
+          acquireSound: './assets/audios/power-up-repair.mp3',
+        },
+        {
+          isPassive: true,
+          hasLifeTime: true,
+          lifeTime: 4,
+          name: 'armor',
+          type: 'health',
+          affectValue: 20,
+        },
+        {
+          isPassive: true,
+          hasLifeTime: true,
+          lifeTime: 4,
+          name: 'rapid-fire',
+          type: 'weapon',
+          affectValue: 2,
+          duration: 5,
+        },
+      ]
+
+      this.instantiate({
+        entity: PowerUp,
+        use: getRandom(powerUps) as PowerUp,
+        components: [
+          {
+            id: '__power_up_transform__',
+            use: {
+              position: this.transform.position,
+            },
+          },
+          {
+            id: '__power_up_rigidbody__',
+            use: {
+              velocity,
+            },
+          },
+        ],
+      })
+    }
+
     this.socketService.emit('destroy', this.id)
   }
 
   public onTriggerEnter(collision: ICollision2): void {
-    if (this.wasDestroyed || collision.entity2.tag?.includes(Asteroid.name)) {
+    if (
+      this.wasDestroyed ||
+      collision.entity2.tag?.includes(Asteroid.name) ||
+      collision.entity2.tag?.includes(PowerUp.name)
+    ) {
       return
     }
 
