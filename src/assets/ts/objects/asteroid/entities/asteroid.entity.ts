@@ -99,11 +99,6 @@ export class Asteroid
   private _asteroidSize: number
 
   /**
-   * Property that defines whether the asteroid was destroyed.
-   */
-  private wasDestroyed = false
-
-  /**
    * Property that defines the group id that was hit.
    */
   private hitGroup: string
@@ -254,7 +249,7 @@ export class Asteroid
 
   public onTriggerEnter(collision: ICollision2): void {
     if (
-      this.wasDestroyed ||
+      !this.enabled ||
       collision.entity2.tag?.includes(Asteroid.name) ||
       collision.entity2.tag?.includes(PowerUp.name)
     ) {
@@ -311,7 +306,6 @@ export class Asteroid
       this.generateAsteroidFragments(this._asteroidSize <= 2 ? 1 : 2)
     }
 
-    this.wasDestroyed = true
     this.gameService.asteroidsAmount -= 1
 
     this.destroy(this)

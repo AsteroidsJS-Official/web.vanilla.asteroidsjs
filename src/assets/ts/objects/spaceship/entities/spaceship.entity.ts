@@ -176,11 +176,6 @@ export class Spaceship
   private visibilityInterval: NodeJS.Timer
 
   /**
-   * Property that represents whether the spaceship was destroyed.
-   */
-  private wasDestroyed = false
-
-  /**
    * Property that defines the spaceship image.
    */
   private image: HTMLImageElement
@@ -290,7 +285,6 @@ export class Spaceship
           )
         }
 
-        this.wasDestroyed = true
         this.destroy(this)
       }
     })
@@ -302,7 +296,7 @@ export class Spaceship
   }
 
   onTriggerEnter(collision: ICollision2): void {
-    if (this.wasDestroyed) {
+    if (!this.enabled) {
       return
     }
 
@@ -320,8 +314,14 @@ export class Spaceship
     }
 
     if (collision.entity2.tag?.includes(PowerUp.name)) {
-      this.applyPowerUp(collision.entity2 as unknown as PowerUp)
-      this.destroy(collision.entity2)
+      const powerUp = collision.entity2 as unknown as PowerUp
+
+      if (!powerUp.enabled) {
+        return
+      }
+
+      this.applyPowerUp(powerUp)
+      this.destroy(powerUp)
       return
     }
 
@@ -354,8 +354,6 @@ export class Spaceship
       if (this.health.health <= 0) {
         const bullet = collision.entity2 as unknown as Bullet
         this.multiplayerService.increasePlayerScore(bullet.userId, 50)
-
-        this.wasDestroyed = true
       }
     }
   }
