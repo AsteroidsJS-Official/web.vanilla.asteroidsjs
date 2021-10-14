@@ -19,6 +19,7 @@ import { Asteroid } from '../../asteroid/entities/asteroid.entity'
 import { ManagerAsteroids } from '../../asteroid/entities/manager-asteroids.entity'
 import { BulletVirtual } from '../../bullet/entities/bullet-virtual.entity'
 import { Bullet } from '../../bullet/entities/bullet.entity'
+import { Missile } from '../../missile/entities/missile.entity'
 import { SpaceshipVirtual } from '../../spaceship/entities/spaceship-virtual.entity'
 import { Spaceship } from '../../spaceship/entities/spaceship.entity'
 
@@ -162,8 +163,31 @@ export class Manager
     })
 
     this.instantiate({
-      entity: ManagerAsteroids,
+      entity: Missile,
+      use: {
+        velocity: 0.4,
+      },
+      components: [
+        {
+          id: '__look_at_missile__',
+          use: {
+            target: spaceship.getComponent(Transform),
+          },
+        },
+        {
+          id: '__look_at_rigidbody__',
+          use: {
+            friction: 0.00003,
+            mass: 10,
+            maxVelocity: 0.6,
+          },
+        },
+      ],
     })
+
+    // this.instantiate({
+    //   entity: ManagerAsteroids,
+    // })
 
     this.socketService.emit('instantiate', {
       id: spaceship.id,
