@@ -8,21 +8,30 @@ import {
   Vector2,
 } from '@asteroidsjs'
 
+import { CircleCollider2 } from '../../../shared/components/colliders/circle-collider2.component'
 import { Drawer } from '../../../shared/components/drawer.component'
+import { Health } from '../../../shared/components/health.component'
 import { RenderOverflow } from '../../../shared/components/renderers/render-overflow.component'
 import { Render } from '../../../shared/components/renderers/render.component'
 import { Rigidbody } from '../../../shared/components/rigidbody/rigidbody.component'
 import { Transform } from '../../../shared/components/transform.component'
 import { LookAt } from '../components/look-at.component'
 
+import { ICollision2 } from '../../../shared/interfaces/collision2.interface'
+import { IOnTriggerEnter } from '../../../shared/interfaces/on-trigger-enter.interface'
+
 /**
  * Entity that represents the missile.
  */
 @Entity({
+  use: {
+    tag: 'missile',
+  },
   components: [
     Render,
     Drawer,
     {
+      id: '__transform_missile__',
       class: Transform,
       use: {
         dimensions: new Rect(25, 50),
@@ -36,11 +45,18 @@ import { LookAt } from '../components/look-at.component'
       id: '__look_at_rigidbody__',
       class: Rigidbody,
     },
+    {
+      class: CircleCollider2,
+      use: {
+        dimensions: new Rect(10, 10),
+        localPosition: new Vector2(0, 20),
+      },
+    },
   ],
 })
 export class Missile
   extends AbstractEntity
-  implements IOnAwake, IOnStart, IOnLoop
+  implements IOnAwake, IOnStart, IOnLoop, IOnTriggerEnter
 {
   /**
    * Property that represents the default missile chase velocity.
@@ -115,5 +131,10 @@ export class Missile
     ).normalized
 
     this._rigidbody.velocity = Vector2.multiply(direction, -this.velocity)
+  }
+
+  onTriggerEnter(coliision: ICollision2): void {
+    coliision.entity2.getComponent(Health).hurt(500)
+    this.destroy(this)
   }
 }
