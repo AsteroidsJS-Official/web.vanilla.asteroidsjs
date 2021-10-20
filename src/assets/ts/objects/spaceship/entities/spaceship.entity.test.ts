@@ -5,8 +5,13 @@ import {
   AsteroidsFactory,
 } from '@asteroidsjs'
 
+<<<<<<< HEAD
 import { Bullet } from '../../bullet/entities/bullet.entity'
 import { Spaceship } from './spaceship.entity'
+=======
+import { Bullet } from '../../../objects/bullet/entities/bullet.entity'
+import { Spaceship } from '../../../objects/spaceship/entities/spaceship.entity'
+>>>>>>> fe6f30d2d2a8c2edf4dc0f5421ba3bb24acc3089
 
 describe('rigidbody', () => {
   @Scene()
@@ -31,8 +36,11 @@ describe('rigidbody', () => {
       entity: Spaceship,
     })
 
+<<<<<<< HEAD
     entity.removeTags('intangible')
 
+=======
+>>>>>>> fe6f30d2d2a8c2edf4dc0f5421ba3bb24acc3089
     let bullets = scene.entities.filter(
       (e) => e.constructor.name === Bullet.name,
     )

@@ -171,6 +171,9 @@ export class Input
       case 'ShiftRight':
         this.gameKeys['shoot'] = isPressed
         break
+      case 'ShiftLeft':
+        this.gameKeys['slowmo'] = isPressed
+        break
     }
   }
 
@@ -203,11 +206,20 @@ export class Input
       this.spaceship.shoot()
     }
 
-    if (this.gameKeys['up'] || (this.actions && this.actions.isBoosting)) {
+    this.spaceship.isBoosting =
+      this.gameKeys['up'] || (this.actions && this.actions.isBoosting)
+
+    if (this.spaceship.isBoosting) {
       this.rigidbody.resultant = Vector2.sum(
         this.rigidbody.resultant,
         Vector2.multiply(this.spaceship.direction, this.force),
       )
+    }
+
+    if (this.gameKeys['slowmo']) {
+      this.timeScale = 0.5
+    } else {
+      this.timeScale = 1
     }
 
     // FIXME: Fix infinite angular resultant
