@@ -66,5 +66,10 @@ it('should create an entity and add a service', () => {
     })
     expect(entity.getService(TestService)).toBeDefined()
   })
-  
+
+    it('should add a service', () => {
+    const entity = scene.instantiate({ entity: TestEntity })
+    entity.addService(TestService)
+    expect(entity.getService(TestService)).toBeDefined()
+  })
 })
