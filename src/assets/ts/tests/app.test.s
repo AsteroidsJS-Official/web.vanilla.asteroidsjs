@@ -53,4 +53,10 @@ describe('app', () => {
     expect(entity.getComponent(TestComponent)).toBeDefined()
   })
 
+  it('should add a component', () => {
+    const entity = scene.instantiate({ entity: TestEntity })
+    entity.addComponent(TestComponent)
+    expect(entity.getComponent(TestComponent)).toBeDefined()
+  })
+
 })
