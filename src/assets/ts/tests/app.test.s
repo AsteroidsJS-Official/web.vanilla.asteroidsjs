@@ -36,4 +36,8 @@ describe('app', () => {
     scene.createCanvas({ name: 'test' })
   })
 
+  it('should be defined', () => {
+    expect(app.getScene(TestScene)).toBeDefined()
+  })
+
 })
