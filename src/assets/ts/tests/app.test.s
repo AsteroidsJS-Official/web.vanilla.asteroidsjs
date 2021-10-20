@@ -59,4 +59,12 @@ describe('app', () => {
     expect(entity.getComponent(TestComponent)).toBeDefined()
   })
 
+it('should create an entity and add a service', () => {
+    const entity = scene.instantiate({
+      entity: TestEntity,
+      services: [TestService],
+    })
+    expect(entity.getService(TestService)).toBeDefined()
+  })
+  
 })
