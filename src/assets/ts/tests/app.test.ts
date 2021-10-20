@@ -13,16 +13,16 @@ import {
 
 describe('app', () => {
   @Scene()
-  class TestScene extends AbstractScene {}
+  class TestScene extends AbstractScene { }
 
   @Entity()
-  class TestEntity extends AbstractEntity {}
+  class TestEntity extends AbstractEntity { }
 
   @Component()
-  class TestComponent extends AbstractComponent {}
+  class TestComponent extends AbstractComponent { }
 
   @Service()
-  class TestService extends AbstractService {}
+  class TestService extends AbstractService { }
 
   let app: IAsteroidsApplication
   let scene: TestScene
@@ -59,7 +59,7 @@ describe('app', () => {
     expect(entity.getComponent(TestComponent)).toBeDefined()
   })
 
-it('should create an entity and add a service', () => {
+  it('should create an entity and add a service', () => {
     const entity = scene.instantiate({
       entity: TestEntity,
       services: [TestService],
@@ -67,7 +67,7 @@ it('should create an entity and add a service', () => {
     expect(entity.getService(TestService)).toBeDefined()
   })
 
-    it('should add a service', () => {
+  it('should add a service', () => {
     const entity = scene.instantiate({ entity: TestEntity })
     entity.addService(TestService)
     expect(entity.getService(TestService)).toBeDefined()
