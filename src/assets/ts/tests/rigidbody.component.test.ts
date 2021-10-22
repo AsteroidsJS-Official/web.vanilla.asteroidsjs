@@ -7,8 +7,8 @@ import {
   AbstractEntity,
 } from '@asteroidsjs'
 
-import { Transform } from '../transform.component'
-import { Rigidbody } from './rigidbody.component'
+import { Transform } from '../shared/components/transform.component'
+import { Rigidbody } from '../shared/components/rigidbody/rigidbody.component'
 
 describe('rigidbody', () => {
   @Scene()
