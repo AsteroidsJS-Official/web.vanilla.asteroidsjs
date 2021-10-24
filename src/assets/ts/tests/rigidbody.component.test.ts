@@ -60,5 +60,22 @@ describe('rigidbody', () => {
 
     expect(transform.position.x).not.toBe(initialPosition.x)
   })
+
+  it('should be rotating', async () => {
+    const entity = scene.instantiate({
+      entity: TestEntity,
+      components: [Transform, Rigidbody],
+    })
+
+    const rigidbody = entity.getComponent(Rigidbody)
+    const transform = entity.getComponent(Transform)
+
+    const rotation = transform.rotation
+    rigidbody.angularVelocity = 1
+
+    await delay(1000)
+
+    expect(transform.position).not.toBe(rotation)
+  })
   
 })
