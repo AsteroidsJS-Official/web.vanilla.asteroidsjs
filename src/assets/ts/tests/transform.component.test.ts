@@ -38,5 +38,31 @@ describe('transform', () => {
         const component = entity.getComponent(Transform)
         expect(component).toBeDefined()
     })
+
+    it('should move with parent', () => {
+        const parent = scene.instantiate({
+          entity: TestEntity,
+          components: [Transform],
+        })
+        const child = scene.instantiate({
+          entity: TestEntity,
+          components: [Transform],
+        })
     
+        const parentTransform = parent.getComponent(Transform)
+        const childTransform = child.getComponent(Transform)
+        const initialPosition = childTransform.position.clone()
+    
+        childTransform.parent = parentTransform
+    
+        parentTransform.position = Vector2.sum(
+          parentTransform.position,
+          new Vector2(2, 2),
+        )
+    
+        expect(childTransform.position.x).toBe(initialPosition.x + 2)
+        expect(childTransform.position.y).toBe(initialPosition.y + 2)
+      })
+    
+
 })
