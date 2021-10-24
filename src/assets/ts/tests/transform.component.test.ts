@@ -20,6 +20,14 @@ import {
   
     let app: IAsteroidsApplication
     let scene: TestScene
+
+    beforeAll(() => {
+        app = AsteroidsFactory.create({
+          bootstrap: [TestScene],
+        })
+        app.start()
+        scene = app.getScene(TestScene)
+      })
   
   })
   
