@@ -41,50 +41,74 @@ describe('transform', () => {
 
     it('should move with parent', () => {
         const parent = scene.instantiate({
-          entity: TestEntity,
-          components: [Transform],
+            entity: TestEntity,
+            components: [Transform],
         })
         const child = scene.instantiate({
-          entity: TestEntity,
-          components: [Transform],
+            entity: TestEntity,
+            components: [Transform],
         })
-    
+
         const parentTransform = parent.getComponent(Transform)
         const childTransform = child.getComponent(Transform)
         const initialPosition = childTransform.position.clone()
-    
+
         childTransform.parent = parentTransform
-    
+
         parentTransform.position = Vector2.sum(
-          parentTransform.position,
-          new Vector2(2, 2),
+            parentTransform.position,
+            new Vector2(2, 2),
         )
-    
+
         expect(childTransform.position.x).toBe(initialPosition.x + 2)
         expect(childTransform.position.y).toBe(initialPosition.y + 2)
-      })
-    
+    })
 
-      it('should rotate with parent', () => {
+
+    it('should rotate with parent', () => {
         const parent = scene.instantiate({
-          entity: TestEntity,
-          components: [Transform],
+            entity: TestEntity,
+            components: [Transform],
         })
         const child = scene.instantiate({
-          entity: TestEntity,
-          components: [Transform],
+            entity: TestEntity,
+            components: [Transform],
         })
-    
+
         const parentTransform = parent.getComponent(Transform)
         const childTransform = child.getComponent(Transform)
         const initialRotation = childTransform.rotation
-    
+
         childTransform.parent = parentTransform
-    
+
         parentTransform.rotation += Math.PI
         expect(childTransform.rotation).not.toBe(initialRotation)
-      })
+    })
 
-      
+    it('should change the total dimensions', () => {
+        const parent = scene.instantiate({
+            entity: TestEntity,
+            components: [Transform],
+        })
+        const child = scene.instantiate({
+            entity: TestEntity,
+            components: [Transform],
+        })
+
+        const parentTransform = parent.getComponent(Transform)
+        const childTransform = child.getComponent(Transform)
+        const initialDimentions = new Rect(
+            parentTransform.totalDimensions.width,
+            parentTransform.totalDimensions.height,
+        )
+
+        childTransform.parent = parentTransform
+        childTransform.localPosition = new Vector2(5, 5)
+
+        expect(parentTransform.totalDimensions.area).not.toBe(
+            initialDimentions.area,
+        )
+    })
+
 
 })
