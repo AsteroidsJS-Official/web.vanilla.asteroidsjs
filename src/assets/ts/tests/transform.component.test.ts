@@ -65,4 +65,26 @@ describe('transform', () => {
       })
     
 
+      it('should rotate with parent', () => {
+        const parent = scene.instantiate({
+          entity: TestEntity,
+          components: [Transform],
+        })
+        const child = scene.instantiate({
+          entity: TestEntity,
+          components: [Transform],
+        })
+    
+        const parentTransform = parent.getComponent(Transform)
+        const childTransform = child.getComponent(Transform)
+        const initialRotation = childTransform.rotation
+    
+        childTransform.parent = parentTransform
+    
+        parentTransform.rotation += Math.PI
+        expect(childTransform.rotation).not.toBe(initialRotation)
+      })
+
+      
+
 })
