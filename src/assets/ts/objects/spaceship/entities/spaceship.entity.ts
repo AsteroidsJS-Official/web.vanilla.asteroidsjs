@@ -17,6 +17,7 @@ import { SocketService } from '../../../shared/services/socket.service'
 import { Asteroid } from '../../asteroid/entities/asteroid.entity'
 import { Bullet } from '../../bullet/entities/bullet.entity'
 import { PowerUp } from '../../power-up/entities/power-up.entity'
+import { Shield as ShieldEntity } from './../../power-up/entities/shield.entity'
 
 import { GameService } from '../../../shared/services/game.service'
 import { MultiplayerService } from '../../../shared/services/multiplayer.service'
@@ -29,6 +30,10 @@ import { RenderOverflow } from '../../../shared/components/renderers/render-over
 import { Render } from '../../../shared/components/renderers/render.component'
 import { Rigidbody } from '../../../shared/components/rigidbody/rigidbody.component'
 import { Transform } from '../../../shared/components/transform.component'
+import { Armor } from '../../power-up/components/armor.component'
+import { RapidFire } from '../../power-up/components/rapid-fire.component'
+import { Repair } from '../../power-up/components/repair.component'
+import { Shield } from '../../power-up/components/shield.component'
 import { Input } from '../components/input.component'
 
 import { ICollision2 } from '../../../shared/interfaces/collision2.interface'
@@ -306,13 +311,6 @@ export class Spaceship
       this.health.hurt(this.health.maxHealth)
     }
 
-    if (
-      collision.entity2.tag?.includes(Bullet.name) &&
-      (collision.entity2 as unknown as Bullet).userId === this.userId
-    ) {
-      return
-    }
-
     if (collision.entity2.tag?.includes(PowerUp.name)) {
       const powerUp = collision.entity2 as unknown as PowerUp
 
@@ -322,6 +320,14 @@ export class Spaceship
 
       this.applyPowerUp(powerUp)
       this.destroy(powerUp)
+      return
+    }
+
+    if (
+      (collision.entity2.tag?.includes(Bullet.name) &&
+        (collision.entity2 as unknown as Bullet).userId === this.userId) ||
+      collision.entity2.tag?.includes(ShieldEntity.name)
+    ) {
       return
     }
 
@@ -547,22 +553,59 @@ export class Spaceship
     }
 
     if (powerUp.name === 'repair') {
-      this.health.heal(powerUp.affectValue)
+      this.addComponent({
+        class: Repair,
+        use: {
+          repairAmount: 10,
+        },
+      })
+
+      return
     }
 
     if (powerUp.name === 'armor') {
-      this.health.maxHealth += powerUp.affectValue
-      this.health.heal(powerUp.affectValue)
+      this.addComponent({
+        class: Armor,
+        use: {
+          increasingAmount: powerUp.affectValue,
+          duration: powerUp.duration,
+        },
+      })
+
+      return
     }
 
     if (powerUp.name === 'rapid-fire') {
-      this.fireRate = this.fireRate / powerUp.affectValue
+      this.addComponent({
+        class: RapidFire,
+        use: {
+          shootingSpeed: powerUp.affectValue,
+          duration: powerUp.duration,
+        },
+      })
 
-      if (powerUp.duration) {
-        setTimeout(() => {
-          this.fireRate = this.fireRate * powerUp.affectValue
-        }, powerUp.duration * 1000)
+      return
+    }
+
+    if (powerUp.name === 'shield') {
+      const shield = this.getComponent(Shield)
+
+      if (shield) {
+        shield.increaseDuration(powerUp.duration)
+        return
       }
+
+      this.addComponent({
+        id: '__shield_component__',
+        class: Shield,
+        use: {
+          radius: (powerUp.affectValue as number[])[0],
+          shieldHealth: (powerUp.affectValue as number[])[1],
+          duration: powerUp.duration,
+        },
+      })
+
+      return
     }
   }
 }
