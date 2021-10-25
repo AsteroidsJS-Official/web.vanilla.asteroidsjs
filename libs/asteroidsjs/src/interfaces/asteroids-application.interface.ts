@@ -5,6 +5,7 @@ import { AbstractService } from '../abstract-service'
 import { AbstractComponent } from '../abstract-component'
 
 import { IInstantiateOptions } from './instantiate-options.interface'
+import { IProvider } from './provider.interface'
 import { Type } from './type.interface'
 
 import { AbstractScene } from '../abstract-scene'
@@ -89,7 +90,7 @@ export interface IAsteroidsApplication {
    */
   addComponent<E extends AbstractEntity, C extends AbstractComponent>(
     entity: E,
-    component: Type<C>,
+    component: Type<C> | IProvider<C>,
   ): C
 
   /**
