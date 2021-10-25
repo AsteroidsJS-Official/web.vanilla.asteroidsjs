@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+@import './assets/scss/screen.scss';
+@import './assets/scss/menu.scss';
+@import './assets/scss/buttons.scss';
+@import './assets/scss/inputs.scss';
+@import './assets/scss/score.scss';
+@import './assets/scss/game-over.scss';
+@import './assets/scss/canvas.scss';
+@import './assets/scss/modals.scss';
+@import './assets/scss/joystick.scss';
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+
+  overflow: hidden;
+}
+
+input,
+textarea,
+button,
+select,
+a {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+@font-face {
+  font-family: 'Neptunus';
+  src: url('./assets/fonts/Neptunus/Neptunus.ttf');
+  font-weight: normal;
+}
