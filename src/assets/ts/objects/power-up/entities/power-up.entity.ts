@@ -74,9 +74,13 @@ export class PowerUp
 
   duration: number
 
-  affectValue: number
+  affectValue: number | number[]
 
   acquireSound: string
+
+  activateSound: string
+
+  dropChance: number
 
   /**
    * Property that defines the time that the power up was

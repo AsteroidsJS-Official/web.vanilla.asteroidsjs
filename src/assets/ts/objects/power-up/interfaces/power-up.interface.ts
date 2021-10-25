@@ -16,13 +16,13 @@ export interface IPowerUp {
    * In case it's true, the power up will activate as soon
    * as the player gets it.
    */
-  isPassive: boolean
+  isPassive?: boolean
 
   /**
    * Property that defines whether the power up will be
    * destroyed after some time in case no player gets it.
    */
-  hasLifeTime: boolean
+  hasLifeTime?: boolean
 
   /**
    * Property that defines the amount of time in seconds
@@ -32,7 +32,7 @@ export interface IPowerUp {
    * @example
    * lifeTime = 3 // the power up will be destroyed after 3 seconds
    */
-  lifeTime: number
+  lifeTime?: number
 
   /**
    * Property that defines the power up name.
@@ -69,11 +69,11 @@ export interface IPowerUp {
    * in seconds, meaning that its effect will be stopped
    * some time.
    */
-  duration: number
+  duration?: number
 
   /**
-   * Property that defines a generic value that may be
-   * used to set the value of some specific effect.
+   * Property that defines a generic value / values that
+   * may be used to set the value of some specific effect.
    *
    * In example:
    * ```txt
@@ -83,11 +83,23 @@ export interface IPowerUp {
    * • increased the player fire rate
    * ```
    */
-  affectValue: number
+  affectValue: number | number[]
 
   /**
    * Property that defines the path to the audio file
    * that is played when a player acquires the power up.
    */
-  acquireSound: string
+  acquireSound?: string
+
+  /**
+   * Property that defines the path to the audio file
+   * that is played when a player activates the power up.
+   */
+  activateSound?: string
+
+  /**
+   * Property that defines the rarity/spawn chance of a
+   * power up to spawn.
+   */
+  dropChance: number
 }
