@@ -102,7 +102,7 @@ export class ManagerAsteroids
     const sizes = [0, 1, 2, 3, 4]
     const asteroidSize = getRandom(sizes)
 
-    const isPowered = !this.isMenu && asteroidSize > 2 && Math.random() * 5 <= 4
+    const isPowered = !this.isMenu && asteroidSize > 2 && Math.random() * 5 <= 1
     const poweredColors = [{ colorName: 'lime', hex: '#38EC75' }]
     const color = isPowered
       ? getRandom(poweredColors)
