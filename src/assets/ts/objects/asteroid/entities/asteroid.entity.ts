@@ -11,6 +11,7 @@ import {
   isOverflowingY,
   Vector2,
   getRandom,
+  getRandomWithWeight,
 } from '@asteroidsjs'
 
 import { SocketService } from '../../../shared/services/socket.service'
@@ -33,6 +34,7 @@ import { Transform } from '../../../shared/components/transform.component'
 
 import { ICollision2 } from '../../../shared/interfaces/collision2.interface'
 import { IOnTriggerEnter } from '../../../shared/interfaces/on-trigger-enter.interface'
+import { IPowerUp } from '../../power-up/interfaces/power-up.interface'
 
 /**
  * Class that represents the asteroid entity and its behavior.
@@ -195,38 +197,54 @@ export class Asteroid
 
       const velocity = Vector2.multiply(direction.normalized, 0.05)
 
-      const powerUps = [
+      const powerUps: IPowerUp[] = [
         {
           isPassive: true,
           hasLifeTime: true,
-          lifeTime: 4,
+          lifeTime: 6,
           name: 'repair',
           type: 'health',
           affectValue: 10,
           acquireSound: './assets/audios/power-up-repair.mp3',
+          dropChance: 0.5,
         },
         {
           isPassive: true,
           hasLifeTime: true,
-          lifeTime: 4,
+          lifeTime: 6,
           name: 'armor',
           type: 'health',
-          affectValue: 20,
+          affectValue: 150,
+          acquireSound: './assets/audios/power-up-armor.mp3',
+          duration: 4,
+          dropChance: 0.3,
         },
         {
           isPassive: true,
           hasLifeTime: true,
-          lifeTime: 4,
+          lifeTime: 6,
           name: 'rapid-fire',
           type: 'weapon',
           affectValue: 2,
+          acquireSound: './assets/audios/power-up-rapid-fire.mp3',
           duration: 5,
+          dropChance: 0.3,
         },
+        // {
+        //   hasLifeTime: true,
+        //   lifeTime: 6,
+        //   name: 'shield',
+        //   type: 'defense',
+        //   affectValue: [3, 100],
+        //   // acquireSound: './assets/audios/power-up-shield.mp3',
+        //   duration: 5,
+        //   dropChance: 0.8,
+        // },
       ]
 
       this.instantiate({
         entity: PowerUp,
-        use: getRandom(powerUps) as PowerUp,
+        use: getRandomWithWeight(powerUps, 'dropChance') as PowerUp,
         components: [
           {
             id: '__power_up_transform__',
