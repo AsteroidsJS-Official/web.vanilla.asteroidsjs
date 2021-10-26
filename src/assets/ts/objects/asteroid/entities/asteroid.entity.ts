@@ -12,6 +12,7 @@ import {
   Vector2,
   getRandom,
   getRandomWithWeight,
+  ISocketData,
 } from '@asteroidsjs'
 
 import { SocketService } from '../../../shared/services/socket.service'
@@ -191,77 +192,6 @@ export class Asteroid
   }
 
   public onDestroy(): void {
-    if (this.isPowered) {
-      const rotation = Math.random() * 2 * Math.PI
-      const direction = new Vector2(Math.sin(rotation), Math.cos(rotation))
-
-      const velocity = Vector2.multiply(direction.normalized, 0.05)
-
-      const powerUps: IPowerUp[] = [
-        {
-          isPassive: true,
-          hasLifeTime: true,
-          lifeTime: 6,
-          name: 'repair',
-          type: 'health',
-          affectValue: 10,
-          acquireSound: './assets/audios/power-up-repair.mp3',
-          dropChance: 0.5,
-        },
-        {
-          isPassive: true,
-          hasLifeTime: true,
-          lifeTime: 6,
-          name: 'armor',
-          type: 'health',
-          affectValue: 150,
-          acquireSound: './assets/audios/power-up-armor.mp3',
-          duration: 4,
-          dropChance: 0.3,
-        },
-        {
-          isPassive: true,
-          hasLifeTime: true,
-          lifeTime: 6,
-          name: 'rapid-fire',
-          type: 'weapon',
-          affectValue: 2,
-          acquireSound: './assets/audios/power-up-rapid-fire.mp3',
-          duration: 5,
-          dropChance: 0.3,
-        },
-        // {
-        //   hasLifeTime: true,
-        //   lifeTime: 6,
-        //   name: 'shield',
-        //   type: 'defense',
-        //   affectValue: [3, 100],
-        //   // acquireSound: './assets/audios/power-up-shield.mp3',
-        //   duration: 5,
-        //   dropChance: 0.8,
-        // },
-      ]
-
-      this.instantiate({
-        entity: PowerUp,
-        use: getRandomWithWeight(powerUps, 'dropChance') as PowerUp,
-        components: [
-          {
-            id: '__power_up_transform__',
-            use: {
-              position: this.transform.position,
-            },
-          },
-          {
-            id: '__power_up_rigidbody__',
-            use: {
-              velocity,
-            },
-          },
-        ],
-      })
-    }
-
     this.socketService.emit('destroy', this.id)
   }
 
@@ -325,6 +255,10 @@ export class Asteroid
     }
 
     this.gameService.asteroidsAmount -= 1
+
+    if (this.isPowered) {
+      this.generatePowerUp()
+    }
 
     this.destroy(this)
   }
@@ -453,5 +387,91 @@ export class Asteroid
         },
       })
     }
+  }
+
+  /**
+   * Generates a random power up.
+   */
+  private generatePowerUp(): void {
+    const rotation = Math.random() * 2 * Math.PI
+    const direction = new Vector2(Math.sin(rotation), Math.cos(rotation))
+
+    const velocity = Vector2.multiply(direction.normalized, 0.05)
+
+    const powerUps: IPowerUp[] = [
+      {
+        isPassive: true,
+        hasLifeTime: true,
+        lifeTime: 6,
+        name: 'repair',
+        type: 'health',
+        affectValue: 10,
+        acquireSound: './assets/audios/power-up-repair.mp3',
+        dropChance: 0.5,
+      },
+      {
+        isPassive: true,
+        hasLifeTime: true,
+        lifeTime: 6,
+        name: 'armor',
+        type: 'health',
+        affectValue: 150,
+        acquireSound: './assets/audios/power-up-armor.mp3',
+        duration: 4,
+        dropChance: 0.3,
+      },
+      {
+        isPassive: true,
+        hasLifeTime: true,
+        lifeTime: 6,
+        name: 'rapid-fire',
+        type: 'weapon',
+        affectValue: 2,
+        acquireSound: './assets/audios/power-up-rapid-fire.mp3',
+        duration: 5,
+        dropChance: 0.3,
+      },
+      // {
+      //   hasLifeTime: true,
+      //   lifeTime: 6,
+      //   name: 'shield',
+      //   type: 'defense',
+      //   affectValue: [3, 100],
+      //   // acquireSound: './assets/audios/power-up-shield.mp3',
+      //   duration: 5,
+      //   dropChance: 0.8,
+      // },
+    ]
+
+    const picked = getRandomWithWeight(powerUps, 'dropChance') as PowerUp
+
+    const powerUp = this.instantiate({
+      entity: PowerUp,
+      use: picked,
+      components: [
+        {
+          id: '__power_up_transform__',
+          use: {
+            position: this.transform.position,
+          },
+        },
+        {
+          id: '__power_up_rigidbody__',
+          use: {
+            velocity,
+          },
+        },
+      ],
+    })
+
+    this.socketService.emit('instantiate', {
+      id: powerUp.id,
+      type: PowerUp.name,
+      data: {
+        position: this.transform.position,
+        velocity,
+        powerUp: picked,
+      },
+    } as ISocketData)
   }
 }
