@@ -2,6 +2,7 @@ import {
   AbstractEntity,
   Entity,
   IOnAwake,
+  IOnDestroy,
   IOnLoop,
   IOnStart,
   Rect,
@@ -46,7 +47,7 @@ import {
 })
 export class PowerUp
   extends AbstractEntity
-  implements IOnAwake, IOnStart, IOnLoop, IPowerUp
+  implements IOnAwake, IOnStart, IOnDestroy, IOnLoop, IPowerUp
 {
   private socketService: SocketService
 
