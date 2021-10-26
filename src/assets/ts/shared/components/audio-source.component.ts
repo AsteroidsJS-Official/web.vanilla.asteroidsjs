@@ -11,6 +11,8 @@ import {
   Vector2,
 } from '@asteroidsjs'
 
+import { LGSocketService } from '../services/lg-socket.service'
+
 import { Transform } from './transform.component'
 
 import { Howl } from 'howler'
@@ -21,6 +23,7 @@ import { BehaviorSubject, Observable } from 'rxjs'
  */
 @Component({
   required: [Transform],
+  services: [LGSocketService],
 })
 export class AudioSource
   extends AbstractComponent
@@ -53,17 +56,19 @@ export class AudioSource
    */
   playing: boolean
 
+  private _lgSocketService: LGSocketService
+
   /**
    * Property that defines an object that represents the audio controller
    * object.
    */
-  private howl: Howl
+  private _howl: Howl
 
   /**
    * Property that defines an object that represents the entity transform
    * component.
    */
-  private transform: Transform
+  private _transform: Transform
 
   /**
    * Property that defines whether the audio has already ended.
@@ -79,29 +84,38 @@ export class AudioSource
   }
 
   onAwake(): void {
-    this.transform = this.getComponent(Transform)
+    this._lgSocketService = this.getService(LGSocketService)
+
+    this._transform = this.getComponent(Transform)
   }
 
   onDestroy(): void {
-    this.howl?.stop()
+    this._howl?.stop()
   }
 
   onLoop(): void {
-    if (this.howl && this.howl.rate() !== this.timeScale) {
-      this.howl.rate(this.timeScale)
+    if (
+      this._lgSocketService.screen &&
+      this._lgSocketService.screen.number !== 1
+    ) {
+      return
     }
 
-    if (this.howl && this.spatial) {
+    if (this._howl && this._howl.rate() !== this.timeScale) {
+      this._howl.rate(this.timeScale)
+    }
+
+    if (this._howl && this.spatial) {
       if (
         isOverflowingX(
           this.getContexts()[0].canvas.width,
-          this.transform.position.x,
-          this.transform.dimensions.width,
+          this._transform.position.x,
+          this._transform.dimensions.width,
         )
       ) {
-        this.howl.stereo(0)
+        this._howl.stereo(0)
       } else {
-        this.howl.stereo(this.getStereoBias())
+        this._howl.stereo(this.getStereoBias())
       }
     }
   }
@@ -116,9 +130,16 @@ export class AudioSource
    * @param volume defines a number that represents the audio volume.
    */
   play(clip?: string, volume?: number): void {
+    if (
+      this._lgSocketService.screen &&
+      this._lgSocketService.screen.number !== 1
+    ) {
+      return
+    }
+
     this.clip ??= clip
 
-    this.howl = new Howl({
+    this._howl = new Howl({
       src: this.clip,
       loop: this.loop,
       rate: this.timeScale,
@@ -130,7 +151,7 @@ export class AudioSource
     })
 
     this.playing = true
-    this.howl.play()
+    this._howl.play()
   }
 
   /**
@@ -142,6 +163,13 @@ export class AudioSource
    * @param volume The audio volume.
    */
   playOneShot(clip: string, position?: Vector2, volume = 1): void {
+    if (
+      this._lgSocketService.screen &&
+      this._lgSocketService.screen.number !== 1
+    ) {
+      return
+    }
+
     // FIXME: remove class
     @Entity()
     class DefaultEntity extends AbstractEntity {}
@@ -180,7 +208,7 @@ export class AudioSource
    */
   stop(): void {
     this.playing = false
-    this.howl?.stop()
+    this._howl?.stop()
   }
 
   /**
@@ -188,7 +216,7 @@ export class AudioSource
    */
   pause(): void {
     this.playing = false
-    this.howl?.pause()
+    this._howl?.pause()
   }
 
   /**
@@ -200,7 +228,7 @@ export class AudioSource
     const width = this.getContexts()[0].canvas.width
     const bias =
       -(
-        (Math.round(width / 2) - (width / 2 + this.transform.position.x)) /
+        (Math.round(width / 2) - (width / 2 + this._transform.position.x)) /
         width
       ) * 2
     return clamp(bias, -1, 1)
