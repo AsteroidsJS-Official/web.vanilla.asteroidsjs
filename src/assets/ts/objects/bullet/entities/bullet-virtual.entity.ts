@@ -87,11 +87,11 @@ export class BulletVirtual
     )
     this.getContexts()[0].rotate(this.transform.rotation)
 
-    this.getContexts()[0].shadowColor = 'yellow'
+    this.getContexts()[0].shadowColor = '#00ffff'
     this.getContexts()[0].shadowBlur = 25
 
     this.getContexts()[0].beginPath()
-    this.getContexts()[0].fillStyle = '#ffc887'
+    this.getContexts()[0].fillStyle = '#00ffff'
     this.getContexts()[0].rect(
       0,
       0,
