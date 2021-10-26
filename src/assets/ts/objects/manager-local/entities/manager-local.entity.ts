@@ -18,6 +18,8 @@ import { Asteroid } from '../../asteroid/entities/asteroid.entity'
 import { ManagerAsteroids } from '../../asteroid/entities/manager-asteroids.entity'
 import { BulletVirtual } from '../../bullet/entities/bullet-virtual.entity'
 import { Bullet } from '../../bullet/entities/bullet.entity'
+import { PowerUpVirtual } from '../../power-up/entities/power-up-virtual.entity'
+import { PowerUp } from '../../power-up/entities/power-up.entity'
 import { SpaceshipVirtual } from '../../spaceship/entities/spaceship-virtual.entity'
 import { Spaceship } from '../../spaceship/entities/spaceship.entity'
 
@@ -75,6 +77,8 @@ export class ManagerLocal
 
   private disconnectionSubscription: Subscription
 
+  private instantiateSubscription: Subscription
+
   private lobbySubscription: Subscription
 
   private respawnSubscription: Subscription
@@ -115,6 +119,7 @@ export class ManagerLocal
     this.connectionSubscription?.unsubscribe()
     this.controllerStatusSub?.unsubscribe()
     this.disconnectionSubscription?.unsubscribe()
+    this.instantiateSubscription?.unsubscribe()
     this.lobbySubscription?.unsubscribe()
     this.respawnSubscription?.unsubscribe()
   }
@@ -192,7 +197,7 @@ export class ManagerLocal
         this.scene.load(Menu)
       })
 
-    this.socketService
+    this.instantiateSubscription = this.socketService
       .on<ISocketData>('instantiate')
       .subscribe(({ id, type, data }) => {
         switch (type) {
@@ -283,6 +288,30 @@ export class ManagerLocal
                     color: data.color,
                     maxHealth: data.maxHealth,
                     health: data.health,
+                  },
+                },
+              ],
+            })
+            break
+          case PowerUp.name:
+            this.instantiate({
+              entity: PowerUpVirtual,
+              use: {
+                id,
+                name: data.powerUp.name,
+                type: data.powerUp.type,
+              },
+              components: [
+                {
+                  id: '__power_up_transform__',
+                  use: {
+                    position: data.position,
+                  },
+                },
+                {
+                  id: '__power_up_rigidbody__',
+                  use: {
+                    velocity: data.velocity,
                   },
                 },
               ],
