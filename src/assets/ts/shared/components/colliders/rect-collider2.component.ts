@@ -55,6 +55,7 @@ export class RectCollider2 extends AbstractCollider {
     if (
       entity === this.entity ||
       !this.enabled ||
+      !entity.enabled ||
       entity.hasTag('intangible')
     ) {
       return false

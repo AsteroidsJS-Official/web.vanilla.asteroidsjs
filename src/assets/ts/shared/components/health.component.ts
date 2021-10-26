@@ -3,7 +3,7 @@ import {
   AbstractComponent,
   Component,
   IDraw,
-  IOnStart,
+  IOnAwake,
 } from '@asteroidsjs'
 
 import { Drawer } from './drawer.component'
@@ -18,7 +18,7 @@ import { BehaviorSubject, Observable } from 'rxjs'
 @Component({
   required: [Transform, Drawer],
 })
-export class Health extends AbstractComponent implements IOnStart, IDraw {
+export class Health extends AbstractComponent implements IOnAwake, IDraw {
   /**
    * Property that defines the current health of an entity.
    *
@@ -65,7 +65,7 @@ export class Health extends AbstractComponent implements IOnStart, IDraw {
     this._health.next(value)
   }
 
-  public onStart(): void {
+  public onAwake(): void {
     this.transform = this.getComponent(Transform)
   }
 

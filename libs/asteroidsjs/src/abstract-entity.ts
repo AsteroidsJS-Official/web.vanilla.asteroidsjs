@@ -5,6 +5,7 @@ import { AbstractComponent } from './abstract-component'
 import { IContext } from './interfaces/context.interface'
 import { IEnabled } from './interfaces/enabled.interface'
 import { IInstantiateOptions } from './interfaces/instantiate-options.interface'
+import { IProvider } from './interfaces/provider.interface'
 import { Type } from './interfaces/type.interface'
 
 import { AbstractScene } from './abstract-scene'
@@ -209,7 +210,9 @@ export abstract class AbstractEntity implements IEnabled {
    * @param component defines the component type.
    * @returns an object that represents the component instance.
    */
-  addComponent<C extends AbstractComponent>(component: Type<C>): C {
+  addComponent<C extends AbstractComponent>(
+    component: Type<C> | IProvider<C>,
+  ): C {
     return this.scene.game.addComponent(this, component)
   }
 

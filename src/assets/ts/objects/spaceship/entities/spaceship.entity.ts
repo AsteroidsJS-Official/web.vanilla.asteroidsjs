@@ -16,6 +16,8 @@ import { SocketService } from '../../../shared/services/socket.service'
 
 import { Asteroid } from '../../asteroid/entities/asteroid.entity'
 import { Bullet } from '../../bullet/entities/bullet.entity'
+import { PowerUp } from '../../power-up/entities/power-up.entity'
+import { Shield as ShieldEntity } from './../../power-up/entities/shield.entity'
 
 import { GameService } from '../../../shared/services/game.service'
 import { MultiplayerService } from '../../../shared/services/multiplayer.service'
@@ -28,6 +30,10 @@ import { RenderOverflow } from '../../../shared/components/renderers/render-over
 import { Render } from '../../../shared/components/renderers/render.component'
 import { Rigidbody } from '../../../shared/components/rigidbody/rigidbody.component'
 import { Transform } from '../../../shared/components/transform.component'
+import { Armor } from '../../power-up/components/armor.component'
+import { RapidFire } from '../../power-up/components/rapid-fire.component'
+import { Repair } from '../../power-up/components/repair.component'
+import { Shield } from '../../power-up/components/shield.component'
 import { Input } from '../components/input.component'
 
 import { ICollision2 } from '../../../shared/interfaces/collision2.interface'
@@ -57,6 +63,10 @@ import { Subscription } from 'rxjs'
         spatial: true,
         loop: true,
       },
+    },
+    {
+      id: '__spaceship_power_up_audio_source__',
+      class: AudioSource,
     },
     {
       class: CircleCollider2,
@@ -171,11 +181,6 @@ export class Spaceship
   private visibilityInterval: NodeJS.Timer
 
   /**
-   * Property that represents whether the spaceship was destroyed.
-   */
-  private wasDestroyed = false
-
-  /**
    * Property that defines the spaceship image.
    */
   private image: HTMLImageElement
@@ -184,6 +189,12 @@ export class Spaceship
    * Property that defines the group id that was hit.
    */
   private hitGroup: string
+
+  /**
+   * Property that defines the time in miliseconds between each
+   * shot.
+   */
+  public fireRate = 400
 
   /**
    * Property that defines whether the spaceship is accelerating.
@@ -279,7 +290,6 @@ export class Spaceship
           )
         }
 
-        this.wasDestroyed = true
         this.destroy(this)
       }
     })
@@ -291,7 +301,7 @@ export class Spaceship
   }
 
   onTriggerEnter(collision: ICollision2): void {
-    if (this.wasDestroyed) {
+    if (!this.enabled) {
       return
     }
 
@@ -301,9 +311,22 @@ export class Spaceship
       this.health.hurt(this.health.maxHealth)
     }
 
+    if (collision.entity2.tag?.includes(PowerUp.name)) {
+      const powerUp = collision.entity2 as unknown as PowerUp
+
+      if (!powerUp.enabled) {
+        return
+      }
+
+      this.applyPowerUp(powerUp)
+      this.destroy(powerUp)
+      return
+    }
+
     if (
-      collision.entity2.tag?.includes(Bullet.name) &&
-      (collision.entity2 as unknown as Bullet).userId === this.userId
+      (collision.entity2.tag?.includes(Bullet.name) &&
+        (collision.entity2 as unknown as Bullet).userId === this.userId) ||
+      collision.entity2.tag?.includes(ShieldEntity.name)
     ) {
       return
     }
@@ -337,8 +360,6 @@ export class Spaceship
       if (this.health.health <= 0) {
         const bullet = collision.entity2 as unknown as Bullet
         this.multiplayerService.increasePlayerScore(bullet.userId, 50)
-
-        this.wasDestroyed = true
       }
     }
   }
@@ -432,7 +453,7 @@ export class Spaceship
     if (
       (this.lastShot &&
         new Date().getTime() - this.lastShot.getTime() <
-          400 / this.timeScale) ||
+          this.fireRate / this.timeScale) ||
       this.hasTag('intangible')
     ) {
       return
@@ -519,5 +540,72 @@ export class Spaceship
         velocity,
       },
     } as ISocketData)
+  }
+
+  /**
+   * Applies a power up effect to the current spaceship.
+   *
+   * @param powerUp The power up to be applied.
+   */
+  private applyPowerUp(powerUp: PowerUp): void {
+    if (powerUp.acquireSound) {
+      this.audioSources[2].playOneShot(powerUp.acquireSound)
+    }
+
+    if (powerUp.name === 'repair') {
+      this.addComponent({
+        class: Repair,
+        use: {
+          repairAmount: 10,
+        },
+      })
+
+      return
+    }
+
+    if (powerUp.name === 'armor') {
+      this.addComponent({
+        class: Armor,
+        use: {
+          increasingAmount: powerUp.affectValue,
+          duration: powerUp.duration,
+        },
+      })
+
+      return
+    }
+
+    if (powerUp.name === 'rapid-fire') {
+      this.addComponent({
+        class: RapidFire,
+        use: {
+          shootingSpeed: powerUp.affectValue,
+          duration: powerUp.duration,
+        },
+      })
+
+      return
+    }
+
+    if (powerUp.name === 'shield') {
+      const shield = this.getComponent(Shield)
+
+      if (shield) {
+        shield.increaseDuration(powerUp.duration)
+        return
+      }
+
+      this.addComponent({
+        id: '__shield_component__',
+        class: Shield,
+        use: {
+          radius: (powerUp.affectValue as number[])[0],
+          shieldHealth: (powerUp.affectValue as number[])[1],
+          duration: powerUp.duration,
+        },
+      })
+
+      return
+    }
   }
 }

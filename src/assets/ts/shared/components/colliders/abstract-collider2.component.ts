@@ -120,6 +120,13 @@ export abstract class AbstractCollider
       if (this.hasOnTriggerExit(this.entity)) {
         const callback = () => {
           ;(this.entity as any).onTriggerExit(collision)
+
+          this.entity.components.forEach((component) => {
+            if (this.hasOnTriggerExit(component)) {
+              component.onTriggerExit(collision)
+            }
+          })
+
           this.removeIntent(callback)
         }
         this.addIntent(callback)
@@ -152,6 +159,13 @@ export abstract class AbstractCollider
         if (this.hasOnTriggerEnter(this.entity)) {
           const callback = () => {
             ;(this.entity as any).onTriggerEnter(collision)
+
+            this.entity.components.forEach((component) => {
+              if (this.hasOnTriggerEnter(component)) {
+                component.onTriggerEnter(collision)
+              }
+            })
+
             this.removeIntent(callback)
           }
           this.addIntent(callback)
@@ -160,6 +174,13 @@ export abstract class AbstractCollider
         if (this.hasOnTriggerStay(this.entity)) {
           const callback = () => {
             ;(this.entity as any).onTriggerStay(collision)
+
+            this.entity.components.forEach((component) => {
+              if (this.hasOnTriggerStay(component)) {
+                component.onTriggerStay(collision)
+              }
+            })
+
             this.removeIntent(callback)
           }
           this.addIntent(callback)

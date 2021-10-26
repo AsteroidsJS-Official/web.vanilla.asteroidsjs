@@ -239,10 +239,18 @@ class AsteroidsApplication implements IAsteroidsApplication {
    */
   addComponent<E extends AbstractEntity, C extends AbstractComponent>(
     entity: E,
-    component: Type<C>,
+    component: Type<C> | IProvider<C>,
   ): C {
-    const c = new component(generateUUID(), entity)
+    const provider = this.toProviders([component])[0]
+
+    const c = new provider.class(generateUUID(), entity)
     entity.components.push(c)
+
+    if (provider.use) {
+      for (const key in provider.use) {
+        ;(c as any)[key] = provider.use[key]
+      }
+    }
 
     if (hasOnAwake(c)) {
       c.onAwake()
@@ -326,12 +334,20 @@ class AsteroidsApplication implements IAsteroidsApplication {
       instance.entities.forEach((entity) => {
         this.destroy(entity)
       })
+      return
     }
 
     if (isEntity(instance)) {
+      instance.scene.entities.filter((entity) => entity !== instance)
+
       this.entities = this.entities.filter((entity) => entity !== instance)
       instance.components.forEach((component) => this.destroy(component))
+      return
     }
+
+    instance.entity.components = instance.entity.components.filter(
+      (component) => component !== instance,
+    )
 
     this.components = this.components.filter(
       (component) => component !== instance,

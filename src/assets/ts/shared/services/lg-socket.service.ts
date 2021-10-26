@@ -67,10 +67,17 @@ export class LGSocketService extends AbstractService implements IOnAwake {
    */
   public displacement = 0
 
+  /**
+   * Property that defines an observable that triggers every time the current
+   * number screen changes (is loaded).
+   */
   public get screen$(): Observable<IScreen> {
     return this._screen.asObservable()
   }
 
+  /**
+   * Property that defines the current screen data.
+   */
   public get screen(): IScreen {
     return this._screen.value
   }
@@ -79,10 +86,19 @@ export class LGSocketService extends AbstractService implements IOnAwake {
     this._screen.next(value)
   }
 
+  /**
+   * Property that defines an observable that triggers every time the screen
+   * amount is updated.
+   */
   public get screenAmount$(): Observable<number> {
     return this._screenAmount.asObservable()
   }
 
+  /**
+   * Property that defines the amount of screens to be connected.
+   *
+   * @default 3
+   */
   public get screenAmount(): number {
     return this._screenAmount.value
   }
@@ -91,10 +107,17 @@ export class LGSocketService extends AbstractService implements IOnAwake {
     this._screenAmount.next(value)
   }
 
+  /**
+   * Property that defines an observable that triggers every time the master
+   * connection is updated.
+   */
   public get isMasterConnected$(): Observable<boolean> {
     return this._isMasterConnected.asObservable()
   }
 
+  /**
+   * Property that defines whether master screen is connected.
+   */
   public get isMasterConnected(): boolean {
     return this._isMasterConnected.value
   }
