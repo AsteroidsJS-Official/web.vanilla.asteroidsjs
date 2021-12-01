@@ -65,9 +65,7 @@ export class SocketService extends AbstractService {
   /**
    * Property that defines the liquid galaxy socket.
    */
-  public readonly socket = io(
-    `${window.location.protocol}//${window.location.host}`,
-  )
+  public readonly socket = io(`https://api-socketio-asteroidsjs.herokuapp.com`)
 
   /**
    * Emits some data to the given event.
